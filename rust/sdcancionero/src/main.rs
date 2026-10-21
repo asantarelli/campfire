@@ -13,6 +13,7 @@
 
 mod app;
 mod audio;
+mod diagnostics;
 mod diagram;
 mod editor;
 mod layout;

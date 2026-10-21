@@ -387,6 +387,7 @@ impl Editor {
             });
             if let Some(text) = pasted {
                 let converted = chordpro::convert::prepare_pasted_fragment(&text);
+                crate::diagnostics::record_paste(&text, &converted);
                 let (start, end) = self.selection(&ctx);
                 let edited = edit::insert_at_caret(&self.text, start, end, &converted);
                 self.put(&ctx, edited);

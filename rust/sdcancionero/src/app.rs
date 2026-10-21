@@ -430,6 +430,7 @@ impl App {
             return;
         };
         let song = chordpro::convert::prepare_pasted_song(&text);
+        crate::diagnostics::record_paste(&text, &song);
         let was_chordpro = chordpro::convert::looks_like_chordpro(&text);
         self.editor = Some(Editor::new(None, song));
         self.screen = Screen::Editor;

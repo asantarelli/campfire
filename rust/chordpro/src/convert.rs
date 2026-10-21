@@ -370,7 +370,7 @@ fn leading_fields(lines: &[String]) -> (Vec<String>, usize) {
 /// quotation marks a page puts around a whole block of text (one opening a line, one closing the last), whose place is kept as a
 /// space so that the columns the chords were measured in stay where they were.
 pub fn clean_pasted(text: &str) -> String {
-    let cleaned = text.replace('\u{a0}', " ").replace('\u{feff}', "");
+    let cleaned = without_invisible_characters(text);
     let mut lines = directives::split_lines(&cleaned);
     let is_quote = |c: char| matches!(c, '"' | '\u{201c}' | '\u{201d}');
     let closes = lines.iter().rposition(|line| !line.trim().is_empty()).filter(|&index| lines[index].trim_end().ends_with(is_quote));
@@ -385,7 +385,52 @@ pub fn clean_pasted(text: &str) -> String {
             lines[closing] = last;
         }
     }
-    lines.join("\n")
+    single_spaced(lines).join("\n")
+}
+
+/// `text` as the Kotlin converter reads it: the characters a page copies in without showing them (the zero-width spaces, soft
+/// hyphens, direction marks and control characters) are gone, every kind of space is a plain space, and a ligature is its letters. One
+/// of those invisible characters stuck to a chord is enough for a row of chords not to be one.
+fn without_invisible_characters(text: &str) -> String {
+    let mut cleaned = String::with_capacity(text.len());
+    for character in text.chars() {
+        match character {
+            '\u{ad}' | '\u{200b}' | '\u{200c}' | '\u{200d}' | '\u{feff}' | '\u{7f}' | '\u{202a}'..='\u{202e}' | '\u{2066}'..='\u{2069}' | '\u{2060}' | '\u{200e}' | '\u{200f}' => {}
+            '\u{fb00}' => cleaned.push_str("ff"),
+            '\u{fb01}' => cleaned.push_str("fi"),
+            '\u{fb02}' => cleaned.push_str("fl"),
+            '\u{fb03}' => cleaned.push_str("ffi"),
+            '\u{fb04}' => cleaned.push_str("ffl"),
+            '\u{fb05}' | '\u{fb06}' => cleaned.push_str("st"),
+            '\n' | '\r' => cleaned.push(character),
+            // A tab is one column to the converter, as every other space.
+            other if other.is_whitespace() => cleaned.push(' '),
+            other if (other as u32) < 0x20 => {}
+            other => cleaned.push(other),
+        }
+    }
+    cleaned
+}
+
+/// A page copied with every line as a paragraph of its own has a blank line after each, which would keep every row of chords from the
+/// lyrics under it. Where no two lines of the song are next to each other, the single blank lines go and a run of them is the one
+/// break between stanzas it stands for.
+fn single_spaced(lines: Vec<String>) -> Vec<String> {
+    let filled: Vec<usize> = (0..lines.len()).filter(|&index| !lines[index].trim().is_empty()).collect();
+    if filled.len() < 4 || filled.windows(2).any(|pair| pair[1] == pair[0] + 1) {
+        return lines;
+    }
+    if !lines.iter().any(|line| chord_row(line).is_some_and(|row| row.len() >= 2)) {
+        return lines;
+    }
+    lines
+        .iter()
+        .enumerate()
+        .filter(|(index, line)| {
+            !line.trim().is_empty() || (*index > 0 && lines[index - 1].trim().is_empty() && lines.get(index.wrapping_sub(2)).is_none_or(|before| !before.trim().is_empty()) && *index >= 2)
+        })
+        .map(|(_, line)| line.clone())
+        .collect()
 }
 
 /// What to write into the editor for a text pasted at the caret: a chord sheet converted to ChordPro (its chords set into the words,
@@ -586,6 +631,26 @@ mod tests {
         assert_eq!(fragment, "Hola [Am]mundo cru[G]el");
         assert_eq!(prepare_pasted_fragment("solo palabras\ncon \"comillas\" dentro"), "solo palabras\ncon \"comillas\" dentro");
         assert_eq!(clean_pasted("a\u{a0}b\r\nc"), "a b\nc");
+    }
+
+    #[test]
+    fn what_a_page_copies_in_without_showing_it_does_not_stop_a_row_of_chords() {
+        // A zero-width space in front of a chord, a soft hyphen in the words, a no-break space and a thin space between chords.
+        let pasted = "Sola\n\nTono: G\n\n\u{200b}G\u{a0}\u{a0}\u{a0}C\u{2009}D\nHola\u{ad} mundo cruel\n\u{feff}Em\nOtra linea\n";
+        let song = prepare_pasted_song(pasted);
+        assert!(song.contains("[G]Hola") && song.contains("[Em]Otra linea"), "{song}");
+        assert!(!song.contains('\u{200b}') && !song.contains('\u{ad}'), "{song}");
+        assert_eq!(clean_pasted("ﬁn\u{200b}de\tsemana"), "finde semana");
+    }
+
+    #[test]
+    fn a_page_with_a_blank_line_after_every_line_is_read_as_the_song_it_is() {
+        let pasted = "Am        G\n\nHello darkness my old friend\n\nC       F\n\nI have come to talk with you again\n";
+        let cleaned = clean_pasted(pasted);
+        assert_eq!(cleaned, "Am        G\nHello darkness my old friend\nC       F\nI have come to talk with you again");
+        // A song with stanzas keeps them.
+        let stanzas = "Am   G\nHello\nC    F\nAgain\n\nAm   G\nSecond\n";
+        assert_eq!(clean_pasted(stanzas), "Am   G\nHello\nC    F\nAgain\n\nAm   G\nSecond");
     }
 
     #[test]
