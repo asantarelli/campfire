@@ -96,7 +96,9 @@ fn bracket_heading(line: &str) -> Option<(&'static str, String, String)> {
         return None;
     }
     let lower = label.to_lowercase();
-    let environment = if lower.contains("intro") {
+    let environment = if lower.contains("pre-estribillo") || lower.contains("pre estribillo") || lower.contains("pre-chorus") || lower.contains("prechorus") || lower.contains("pre-coro") {
+        "pre-chorus"
+    } else if lower.contains("intro") {
         "intro"
     } else if lower.contains("estribillo") || lower.contains("coro") || lower.contains("chorus") || lower.contains("refrain") {
         "chorus"
@@ -147,18 +149,45 @@ fn heading(line: &str) -> Option<(&'static str, String)> {
     (is_plain && (is_bracketed || trimmed.ends_with(':') || !rest.is_empty() || word.len() > 4)).then(|| (environment, label.to_string()))
 }
 
-/// `lyrics` with the chords of `row` set into it at the columns they stood at.
+/// `lyrics` with the chords of `row` set into it at the columns they stood at, as a chord sheet in characters means them: a chord a
+/// letter away from the start of a word is set at that start (a row typed by hand is rarely exact), the others where they are, and
+/// the ones past the end of the words after them, apart.
 fn set_chords(lyrics: &str, row: &[(usize, String)]) -> String {
-    let mut chars: Vec<char> = lyrics.chars().collect();
-    for (column, name) in row.iter().rev() {
-        if *column > chars.len() {
-            chars.resize(*column, ' ');
+    let chars: Vec<char> = lyrics.trim_end().chars().collect();
+    let length = chars.len();
+    let starts: Vec<usize> = (0..length).filter(|&index| !chars[index].is_whitespace() && (index == 0 || chars[index - 1].is_whitespace())).collect();
+    let mut insertions: std::collections::BTreeMap<usize, Vec<String>> = std::collections::BTreeMap::new();
+    let mut previous = 0;
+    for (column, name) in row {
+        let mut at = (*column).min(length);
+        if *column < length {
+            let nearest = starts.iter().copied().min_by_key(|start| (start.abs_diff(*column), *start));
+            if let Some(start) = nearest.filter(|start| start.abs_diff(*column) <= 1) {
+                at = start;
+            }
         }
-        let bracketed: Vec<char> = format!("[{name}]").chars().collect();
-        let at = (*column).min(chars.len());
-        chars.splice(at..at, bracketed);
+        // The chords go in the order they stand in, never back over one that was set already.
+        at = at.max(previous);
+        previous = at;
+        insertions.entry(at).or_default().push(format!("[{name}]"));
     }
-    chars.into_iter().collect::<String>().trim_end().to_string()
+    let mut result = String::new();
+    for index in 0..=length {
+        if let Some(due) = insertions.get(&index) {
+            if index == length {
+                if !result.is_empty() && !result.ends_with(' ') {
+                    result.push(' ');
+                }
+                result.push_str(&due.join(" "));
+            } else {
+                result.push_str(&due.concat());
+            }
+        }
+        if let Some(character) = chars.get(index) {
+            result.push(*character);
+        }
+    }
+    result
 }
 
 /// Whether `text` is a chord sheet at all: at least one row of two chords or more, which a sung line never is.
@@ -233,7 +262,10 @@ pub fn convert_fragment(text: &str) -> Option<String> {
                             open_part(&mut output, &mut open_environment, "verse", &label);
                             (lyrics.chars().skip(prefix).collect::<String>(), prefix)
                         }
-                        None => (lyrics.clone(), 0),
+                        None => {
+                            let indent = lyrics.chars().take_while(|c| c.is_whitespace()).count();
+                            (lyrics.chars().skip(indent).collect::<String>(), indent)
+                        }
                     };
                     let shifted: Vec<(usize, String)> = row.iter().map(|(column, name)| (column.saturating_sub(shift), name.clone())).collect();
                     output.push(set_chords(&words, &shifted));
@@ -435,7 +467,7 @@ mod tests {
     #[test]
     fn a_chord_past_the_end_of_the_words_is_set_at_their_end() {
         let sheet = "C   G   D\nHi\n";
-        assert_eq!(convert_fragment(sheet).as_deref(), Some("[C]Hi  [G]    [D]"));
+        assert_eq!(convert_fragment(sheet).as_deref(), Some("[C]Hi [G] [D]"));
     }
 
     #[test]
@@ -443,7 +475,7 @@ mod tests {
         let sheet = "C  G  Am  F\n\nC    G\nla la\n";
         let converted = convert_fragment(sheet).unwrap();
         assert!(converted.contains("[C] [G] [Am] [F]"), "{converted}");
-        assert!(converted.contains("[C]la la[G]"), "{converted}");
+        assert!(converted.contains("[C]la la [G]"), "{converted}");
     }
 
     #[test]
@@ -452,7 +484,7 @@ mod tests {
         let converted = convert_fragment(sheet).unwrap();
         assert_eq!(
             converted,
-            "{start_of_verse: Verse 1}\n[C]Hola [G]amigos\n{end_of_verse}\n\n{start_of_chorus: Chorus}\n[Am]La la[F] la la\n{end_of_chorus}\n\n{start_of_bridge: Bridge}\n[C] [G] [Am] [F]\n{end_of_bridge}"
+            "{start_of_verse: Verse 1}\n[C]Hola [G]amigos\n{end_of_verse}\n\n{start_of_chorus: Chorus}\n[Am]La la [F]la la\n{end_of_chorus}\n\n{start_of_bridge: Bridge}\n[C] [G] [Am] [F]\n{end_of_bridge}"
         );
     }
 
@@ -469,7 +501,7 @@ mod tests {
         let sheet = "Sound of Silence\n\nAm   G\nHello darkness\n";
         let song = convert_song(sheet).unwrap();
         assert!(song.starts_with("{title: Sound of Silence}\n\n"), "{song}");
-        assert!(song.ends_with("[Am]Hello[G] darkness"), "{song}");
+        assert!(song.ends_with("[Am]Hello [G]darkness"), "{song}");
         let untitled = convert_song("Am   G\nHello darkness\n").unwrap();
         assert!(untitled.starts_with("{title: }\n"));
     }
@@ -490,7 +522,7 @@ mod tests {
         let pasted = "Tono: Am\nCapo: 2\nArtista: Alguien\n\nAm        G\nHola mundo cruel\n";
         let song = prepare_pasted_song(pasted);
         assert!(song.starts_with("{title: }\n{key: Am}\n{capo: 2}\n{artist: Alguien}\n"), "{song}");
-        assert!(song.ends_with("{artist: Alguien}\n\n[Am]Hola mundo[G] cruel"), "{song}");
+        assert!(song.ends_with("{artist: Alguien}\n\n[Am]Hola mundo [G]cruel"), "{song}");
         let titled = prepare_pasted_song("Alguien - Sola\nTono: G\n\nG   C\nla la la\n");
         assert!(titled.starts_with("{key: G}") || titled.starts_with("{title: Sola}"), "{titled}");
     }
@@ -503,11 +535,11 @@ mod tests {
         assert!(song.starts_with("{title: Sasha, Sissi y el Círculo de Baba}\n{artist: Fito Páez}\n{key: Am}\n\n"), "{song}");
         assert!(!song.contains('"'), "{song}");
         // The parts marked A. and B. are sections, and the chords moved left with the words.
-        assert!(song.contains("{start_of_verse: A}\nP[Am]ensar que no dijo nada"), "{song}");
+        assert!(song.contains("{start_of_verse: A}\n[Am]Pensar que no dijo nada, [Dm]la ma~ana"), "{song}");
         assert!(song.contains("[E7]Pensar que el amaba tanto a su divina Sissi") || song.contains("[E7]Pensar que el amaba"), "{song}");
         assert!(song.contains("{end_of_verse}\n\n{start_of_verse: B}\n"), "{song}");
         assert!(song.contains("[Am]Asi el meo tres veces [Dm]mis zapatos"), "{song}");
-        assert!(song.contains("P[Dm]ito ese cigarrillo hasta explot[Am]ar"), "{song}");
+        assert!(song.contains("[Dm]Pito ese cigarrillo hasta explot[Am]ar"), "{song}");
         let parsed = crate::parser::parse(&song, crate::notation::ChordNotation::Standard);
         assert_eq!(parsed.metadata.title.as_deref(), Some("Sasha, Sissi y el Círculo de Baba"));
         assert_eq!(parsed.metadata.artist.as_deref(), Some("Fito Páez"));
@@ -539,7 +571,7 @@ mod tests {
     #[test]
     fn what_is_pasted_into_the_editor_is_cleaned_and_converted_too() {
         let fragment = prepare_pasted_fragment("\"   Am        G\nHola mundo cruel\"");
-        assert_eq!(fragment, "Hola[Am] mundo cru[G]el");
+        assert_eq!(fragment, "Hola [Am]mundo cru[G]el");
         assert_eq!(prepare_pasted_fragment("solo palabras\ncon \"comillas\" dentro"), "solo palabras\ncon \"comillas\" dentro");
         assert_eq!(clean_pasted("a\u{a0}b\r\nc"), "a b\nc");
     }
