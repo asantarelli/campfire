@@ -386,8 +386,7 @@ impl Editor {
                 }
             });
             if let Some(text) = pasted {
-                let text = text.replace("\r\n", "\n");
-                let converted = chordpro::convert::convert_fragment(&text).unwrap_or(text);
+                let converted = chordpro::convert::prepare_pasted_fragment(&text);
                 let (start, end) = self.selection(&ctx);
                 let edited = edit::insert_at_caret(&self.text, start, end, &converted);
                 self.put(&ctx, edited);

@@ -14,6 +14,7 @@
 
 use crate::chord_names;
 use crate::directives;
+use crate::tokens;
 
 /// The words that head a part of a song, with the environment each opens.
 const HEADINGS: [(&str, &str); 16] = [
@@ -37,7 +38,7 @@ const HEADINGS: [(&str, &str); 16] = [
 
 /// A word that stands in a row of chords without being one.
 fn is_row_filler(word: &str) -> bool {
-    matches!(word, "N.C." | "NC" | "|" | "/" | "-" | "%") || (word.starts_with('x') && word[1..].chars().all(|c| c.is_ascii_digit()) && word.len() > 1)
+    matches!(word, "N.C." | "NC" | "|" | "/" | "-" | "%" | "\"" | "\u{201c}" | "\u{201d}" | "(" | ")") || (word.starts_with('x') && word[1..].chars().all(|c| c.is_ascii_digit()) && word.len() > 1)
 }
 
 /// The chords of `line` and the character column each starts at, `None` where the line is not a row of chords.
@@ -56,7 +57,11 @@ fn chord_row(line: &str) -> Option<Vec<(usize, String)>> {
             index += 1;
         }
         let word: String = chars[start..index].iter().collect();
-        let name = word.trim_matches(|c| c == '(' || c == ')').to_string();
+        let mut name = word.trim_matches(|c| c == '(' || c == ')').to_string();
+        // A full stop after a chord (`Am.`) is typing, not part of its name.
+        if !chord_names::is_chord_name(&name) && name.ends_with('.') && chord_names::is_chord_name(name.trim_end_matches('.')) {
+            name = name.trim_end_matches('.').to_string();
+        }
         if chord_names::is_chord_name(&name) {
             real += 1;
             found.push((start, name));
@@ -65,6 +70,64 @@ fn chord_row(line: &str) -> Option<Vec<(usize, String)>> {
         }
     }
     (real > 0).then_some(found)
+}
+
+/// The mark a line of lyrics opens its part with (`A.      Pensar que…`, `1.  Hola`): one letter or digit, a full stop and at least
+/// two spaces. Its label and how many characters the mark takes, spaces included.
+fn section_mark(line: &str) -> Option<(String, usize)> {
+    let chars: Vec<char> = line.chars().collect();
+    let first = *chars.first().filter(|c| c.is_alphanumeric())?;
+    if chars.get(1) != Some(&'.') {
+        return None;
+    }
+    let spaces = chars[2..].iter().take_while(|c| c.is_whitespace()).count();
+    let prefix = 2 + spaces;
+    (spaces >= 2 && prefix < chars.len() && chars[prefix..].iter().any(|c| !c.is_whitespace())).then(|| (first.to_uppercase().to_string(), prefix))
+}
+
+/// A heading written in brackets (`[Primera Parte]`, `[Riff 1]`, `[Intro] G C D`): the environment it opens, its label, and what
+/// follows it on the line. A bracket holding a chord is no heading, it is a chord already written in ChordPro.
+fn bracket_heading(line: &str) -> Option<(&'static str, String, String)> {
+    let trimmed = line.trim_start();
+    let inner_end = trimmed.strip_prefix('[')?.find(']')?;
+    let inner = &trimmed[1..1 + inner_end];
+    let label = inner.trim().trim_end_matches(':').trim();
+    if label.is_empty() || label.chars().count() > 40 || inner.contains('[') || !label.chars().any(char::is_alphabetic) || chord_names::is_chord_name(label) {
+        return None;
+    }
+    let lower = label.to_lowercase();
+    let environment = if lower.contains("intro") {
+        "intro"
+    } else if lower.contains("estribillo") || lower.contains("coro") || lower.contains("chorus") || lower.contains("refrain") {
+        "chorus"
+    } else if lower.contains("puente") || lower.contains("bridge") {
+        "bridge"
+    } else if lower.contains("solo") {
+        "solo"
+    } else if lower.contains("final") || lower.contains("outro") {
+        "outro"
+    } else if lower.contains("riff") {
+        "riff"
+    } else {
+        "verse"
+    };
+    // What stands after the bracket keeps the columns it had, so that the chords after a heading stay over their words.
+    let before: usize = line.chars().count() - trimmed.chars().count();
+    let rest_start = before + trimmed[..inner_end + 2].chars().count();
+    let rest: String = " ".repeat(rest_start) + line.chars().skip(rest_start).collect::<String>().as_str();
+    Some((environment, label.to_string(), rest))
+}
+
+/// A line of tablature (`e|--3h5--|`), which a chord sheet writes under its parts.
+fn is_tab_line(line: &str) -> bool {
+    line.contains('|') && tokens::is_staff_line(line)
+}
+
+/// A note in parentheses on a line of its own (`(Riff 2 y 3)`), which is a comment on the song and not part of it.
+fn parenthesized_note(line: &str) -> Option<String> {
+    let trimmed = line.trim();
+    let inner = trimmed.strip_prefix('(')?.strip_suffix(')')?.trim();
+    (!inner.is_empty() && chord_row(trimmed).is_none() && !inner.contains(['(', ')', '[', '{'])).then(|| inner.to_string())
 }
 
 /// The environment and the label a heading line opens, `None` for a line that is not one: a heading word, in brackets or
@@ -109,11 +172,11 @@ pub fn convert_fragment(text: &str) -> Option<String> {
     if !is_chord_sheet(text) {
         return None;
     }
-    let lines = directives::split_lines(text);
+    let mut lines = directives::split_lines(text);
     let mut output: Vec<String> = Vec::new();
     let mut open_environment: Option<&'static str> = None;
     let mut index = 0;
-    let close = |output: &mut Vec<String>, open_environment: &mut Option<&'static str>| {
+    fn close(output: &mut Vec<String>, open_environment: &mut Option<&'static str>) {
         if let Some(environment) = open_environment.take() {
             while output.last().is_some_and(|line| line.trim().is_empty()) {
                 output.pop();
@@ -121,13 +184,41 @@ pub fn convert_fragment(text: &str) -> Option<String> {
             output.push(format!("{{end_of_{environment}}}"));
             output.push(String::new());
         }
-    };
+    }
+    fn open_part(output: &mut Vec<String>, open_environment: &mut Option<&'static str>, environment: &'static str, label: &str) {
+        close(output, open_environment);
+        output.push(format!("{{start_of_{environment}: {label}}}"));
+        *open_environment = Some(environment);
+    }
     while index < lines.len() {
-        let line = &lines[index];
+        let line = lines[index].clone();
+        let line = &line;
+        if let Some((environment, label, rest)) = bracket_heading(line) {
+            open_part(&mut output, &mut open_environment, environment, &label);
+            if chord_row(&rest).is_some() {
+                // The chords after the heading are a row of their own, read again as the row they are.
+                lines[index] = rest;
+            } else {
+                index += 1;
+            }
+            continue;
+        }
+        if is_tab_line(line) {
+            output.push("{start_of_tab}".to_string());
+            while index < lines.len() && is_tab_line(&lines[index]) {
+                output.push(lines[index].trim_end().to_string());
+                index += 1;
+            }
+            output.push("{end_of_tab}".to_string());
+            continue;
+        }
+        if let Some(note) = parenthesized_note(line) {
+            output.push(format!("{{comment: {note}}}"));
+            index += 1;
+            continue;
+        }
         if let Some((environment, label)) = heading(line) {
-            close(&mut output, &mut open_environment);
-            output.push(format!("{{start_of_{environment}: {label}}}"));
-            open_environment = Some(environment);
+            open_part(&mut output, &mut open_environment, environment, &label);
             index += 1;
             continue;
         }
@@ -136,7 +227,16 @@ pub fn convert_fragment(text: &str) -> Option<String> {
             let lyrics = next.filter(|next| !next.trim().is_empty() && chord_row(next).is_none() && heading(next).is_none());
             match lyrics {
                 Some(lyrics) => {
-                    output.push(set_chords(lyrics, &row));
+                    // The mark of a part stands in the columns the chords were measured in, so they move left with the words.
+                    let (words, shift) = match section_mark(lyrics) {
+                        Some((label, prefix)) => {
+                            open_part(&mut output, &mut open_environment, "verse", &label);
+                            (lyrics.chars().skip(prefix).collect::<String>(), prefix)
+                        }
+                        None => (lyrics.clone(), 0),
+                    };
+                    let shifted: Vec<(usize, String)> = row.iter().map(|(column, name)| (column.saturating_sub(shift), name.clone())).collect();
+                    output.push(set_chords(&words, &shifted));
                     index += 2;
                 }
                 None => {
@@ -145,6 +245,12 @@ pub fn convert_fragment(text: &str) -> Option<String> {
                     index += 1;
                 }
             }
+            continue;
+        }
+        if let Some((label, prefix)) = section_mark(line) {
+            open_part(&mut output, &mut open_environment, "verse", &label);
+            output.push(line.chars().skip(prefix).collect::<String>().trim_end().to_string());
+            index += 1;
             continue;
         }
         output.push(line.trim_end().to_string());
@@ -216,13 +322,41 @@ fn leading_fields(lines: &[String]) -> (Vec<String>, usize) {
     (found, consumed)
 }
 
+/// What was pasted with the debris of a web page taken off: no-break spaces and byte order marks, one kind of line break, and the
+/// quotation marks a page puts around a whole block of text (one opening a line, one closing the last), whose place is kept as a
+/// space so that the columns the chords were measured in stay where they were.
+pub fn clean_pasted(text: &str) -> String {
+    let cleaned = text.replace('\u{a0}', " ").replace('\u{feff}', "");
+    let mut lines = directives::split_lines(&cleaned);
+    let is_quote = |c: char| matches!(c, '"' | '\u{201c}' | '\u{201d}');
+    let closes = lines.iter().rposition(|line| !line.trim().is_empty()).filter(|&index| lines[index].trim_end().ends_with(is_quote));
+    let opens = lines.iter().position(|line| line.starts_with(is_quote));
+    if let (Some(closing), Some(opening)) = (closes, opens) {
+        if opening < closing || (opening == closing && lines[opening].chars().filter(|c| is_quote(*c)).count() >= 2) {
+            let mut first: Vec<char> = lines[opening].chars().collect();
+            first[0] = ' ';
+            lines[opening] = first.into_iter().collect();
+            let mut last: String = lines[closing].trim_end().to_string();
+            last.pop();
+            lines[closing] = last;
+        }
+    }
+    lines.join("\n")
+}
+
+/// What to write into the editor for a text pasted at the caret: a chord sheet converted to ChordPro (its chords set into the words,
+/// its parts as sections), anything else as it is, both cleaned of what a web page leaves in a copy.
+pub fn prepare_pasted_fragment(text: &str) -> String {
+    let cleaned = clean_pasted(text);
+    convert_fragment(&cleaned).unwrap_or(cleaned)
+}
+
 /// The text of a song to open in the editor from what was pasted over the list of songs, whatever it is: ChordPro is kept as it is
 /// (its directives and its chords are the song), a chord sheet is converted, and anything else is the words of a new song. A
 /// song with no `{title}` gets an empty one to be filled in, which saving asks for.
 pub fn prepare_pasted_song(text: &str) -> String {
     // A page copied from the web is full of no-break spaces, and a file of every kind of line break.
-    let cleaned = text.replace('\u{a0}', " ").replace('\u{feff}', "");
-    let normalized = directives::split_lines(&cleaned).join("\n");
+    let normalized = clean_pasted(text);
     let has_title = directives::split_lines(&normalized).iter().any(|line| directives::match_directive(line.trim()).is_some_and(|directive| matches!(directive.name.as_str(), "title" | "t")));
     let with_header = |body: String, has_title: bool| if has_title { body } else { format!("{{title: }}\n{body}") };
     if looks_like_chordpro(&normalized) {
@@ -242,7 +376,14 @@ pub fn convert_song(text: &str) -> Option<String> {
     // The first line names the song where it is a short line of words, alone or over the fields: `Sola`, `Alguien - Sola`.
     if let Some(first) = lines.first() {
         let candidate = first.trim();
-        let next_is_field_or_blank = lines.get(1).map_or(true, |next| next.trim().is_empty() || field_directive(next).is_some());
+        let is_field_or_blank = |line: Option<&String>| line.map_or(true, |line| line.trim().is_empty() || field_directive(line).is_some());
+        let looks_like_words = |line: &str| {
+            let line = line.trim();
+            !line.is_empty() && chord_row(line).is_none() && heading(line).is_none() && !line.contains([':', '[', '{']) && line.chars().count() <= 60
+        };
+        // `Title`, then `Artist`, then a blank line or the fields, as a page of CifraClub copies.
+        let artist_line = lines.get(1).filter(|line| looks_like_words(line) && is_field_or_blank(lines.get(2))).map(|line| line.trim().to_string());
+        let next_is_field_or_blank = artist_line.is_some() || is_field_or_blank(lines.get(1));
         let is_title = chord_row(candidate).is_none()
             && heading(candidate).is_none()
             && !candidate.contains([':', '[', '{'])
@@ -254,7 +395,13 @@ pub fn convert_song(text: &str) -> Option<String> {
                     header.push(format!("{{title: {}}}", title.trim()));
                     header.push(format!("{{artist: {}}}", artist.trim()));
                 }
-                None => header.push(format!("{{title: {candidate}}}")),
+                None => {
+                    header.push(format!("{{title: {candidate}}}"));
+                    if let Some(artist) = &artist_line {
+                        header.push(format!("{{artist: {artist}}}"));
+                        lines.remove(1);
+                    }
+                }
             }
             lines.remove(0);
         }
@@ -346,6 +493,63 @@ mod tests {
         assert!(song.ends_with("{artist: Alguien}\n\n[Am]Hola mundo[G] cruel"), "{song}");
         let titled = prepare_pasted_song("Alguien - Sola\nTono: G\n\nG   C\nla la la\n");
         assert!(titled.starts_with("{key: G}") || titled.starts_with("{title: Sola}"), "{titled}");
+    }
+
+    const CIFRACLUB: &str = "Sasha, Sissi y el Círculo de Baba\nFito Páez\n\nTono: Am\n\n\"        Am                       Dm\nA.      Pensar que no dijo nada, la ma~ana que lo vi\nE7                            Am\nPensar que el amaba tanto a su divina Sissi\n\n        F               G            Am\nB.      Reptar, reptar en horas de la siesta\nF                G         Am\nCambiar, cambiar las leyes del amar\n\nAm.                   Dm\nAsi el meo tres veces mis zapatos\nAm\nY llego hasta el bar\n Dm                             Am\nPito ese cigarrillo hasta explotar\"";
+
+    #[test]
+    fn a_page_of_cifraclub_becomes_a_song() {
+        let song = prepare_pasted_song(CIFRACLUB);
+        assert!(song.starts_with("{title: Sasha, Sissi y el Círculo de Baba}\n{artist: Fito Páez}\n{key: Am}\n\n"), "{song}");
+        assert!(!song.contains('"'), "{song}");
+        // The parts marked A. and B. are sections, and the chords moved left with the words.
+        assert!(song.contains("{start_of_verse: A}\nP[Am]ensar que no dijo nada"), "{song}");
+        assert!(song.contains("[E7]Pensar que el amaba tanto a su divina Sissi") || song.contains("[E7]Pensar que el amaba"), "{song}");
+        assert!(song.contains("{end_of_verse}\n\n{start_of_verse: B}\n"), "{song}");
+        assert!(song.contains("[Am]Asi el meo tres veces [Dm]mis zapatos"), "{song}");
+        assert!(song.contains("P[Dm]ito ese cigarrillo hasta explot[Am]ar"), "{song}");
+        let parsed = crate::parser::parse(&song, crate::notation::ChordNotation::Standard);
+        assert_eq!(parsed.metadata.title.as_deref(), Some("Sasha, Sissi y el Círculo de Baba"));
+        assert_eq!(parsed.metadata.artist.as_deref(), Some("Fito Páez"));
+        assert_eq!(parsed.metadata.key.as_deref(), Some("Am"));
+        assert!(parsed.has_chords());
+    }
+
+    const CHARLY: &str = "De Mi\nCharly García\n\nTono: G\n\n[Intro] G  C/G  G  D\n        G  C/G  G  D\n\nE|-----------------|      \nB|--3h5p3-3s12-----|      \nG|-------------0-12| (4x) \n\n[Primera Parte]\n\nG                              C/G  G\nCuando estes mal cuando estes so---lo\n        Em7       D        F         C           G   D\nNo te olvides de mi porque se que te puedo estimular\n(Riff 2 y 3)\n\n[Estribillo]\n\nC                    Bb2\nNo pienses que estoy loco\n[Riff 4]\n   G7(4)\nEs solo una manera de actuar\n  A7                   D5+\nEstoy comunicado con todo lo demas\n\n( C  Bb2     G )\n( C  Bb2  A7  D7 )\n";
+
+    #[test]
+    fn a_page_with_headings_in_brackets_tablature_and_notes_becomes_a_song() {
+        let song = prepare_pasted_song(CHARLY);
+        assert!(song.starts_with("{title: De Mi}\n{artist: Charly García}\n{key: G}\n\n"), "{song}");
+        // The heading takes the chords that follow it on its line, and the rows under it are lines of chords.
+        assert!(song.contains("{start_of_intro: Intro}\n[G] [C/G] [G] [D]\n[G] [C/G] [G] [D]\n"), "{song}");
+        assert!(song.contains("{start_of_tab}\nE|-----------------|\nB|--3h5p3-3s12-----|\nG|-------------0-12| (4x)\n{end_of_tab}"), "{song}");
+        assert!(song.contains("{start_of_verse: Primera Parte}"), "{song}");
+        assert!(song.contains("[G]Cuando estes mal cuando estes so---lo") || song.contains("[G]Cuando estes mal"), "{song}");
+        assert!(song.contains("{comment: Riff 2 y 3}"), "{song}");
+        assert!(song.contains("{start_of_chorus: Estribillo}"), "{song}");
+        assert!(song.contains("{start_of_riff: Riff 4}"), "{song}");
+        assert!(song.contains("[C] [Bb2] [G]\n[C] [Bb2] [A7] [D7]"), "{song}");
+        let parsed = crate::parser::parse(&song, crate::notation::ChordNotation::Standard);
+        assert_eq!(parsed.metadata.title.as_deref(), Some("De Mi"));
+        assert_eq!(parsed.metadata.key.as_deref(), Some("G"));
+        assert!(parsed.has_chords());
+    }
+
+    #[test]
+    fn what_is_pasted_into_the_editor_is_cleaned_and_converted_too() {
+        let fragment = prepare_pasted_fragment("\"   Am        G\nHola mundo cruel\"");
+        assert_eq!(fragment, "Hola[Am] mundo cru[G]el");
+        assert_eq!(prepare_pasted_fragment("solo palabras\ncon \"comillas\" dentro"), "solo palabras\ncon \"comillas\" dentro");
+        assert_eq!(clean_pasted("a\u{a0}b\r\nc"), "a b\nc");
+    }
+
+    #[test]
+    fn a_full_stop_after_a_chord_and_a_mark_of_a_part_are_read() {
+        assert_eq!(chord_row("Am.        Dm").map(|row| row.len()), Some(2));
+        assert_eq!(section_mark("A.      Pensar").map(|(label, prefix)| (label, prefix)), Some(("A".to_string(), 8)));
+        assert_eq!(section_mark("A. una sola separación"), None);
+        assert_eq!(section_mark("Etc. y más"), None);
     }
 
     #[test]
