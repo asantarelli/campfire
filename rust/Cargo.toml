@@ -1,0 +1,28 @@
+# This file is part of Campfire.
+# Copyright (c) Pandula Péter 2017-2026.
+# https://github.com/pandulapeter/campfire
+#
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+# If a copy of the MPL was not distributed with this file, You can obtain one at
+# https://mozilla.org/MPL/2.0/.
+
+# The Rust variant of SDCancionero: the same songbook as the Kotlin one, for the Windows computers that one cannot run on
+# (32 bits). It shares nothing with Gradle and reads the same library (`.cho` songs, setlist documents, the zip an export
+# writes), so the two can be used over one folder.
+
+[workspace]
+resolver = "2"
+members = ["chordpro", "instruments", "library", "sdcancionero"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MPL-2.0"
+authors = ["SDigitales"]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"

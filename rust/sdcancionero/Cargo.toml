@@ -1,0 +1,28 @@
+# This file is part of Campfire.
+# Copyright (c) Pandula Péter 2017-2026.
+# https://github.com/pandulapeter/campfire
+#
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+# If a copy of the MPL was not distributed with this file, You can obtain one at
+# https://mozilla.org/MPL/2.0/.
+
+[package]
+name = "sdcancionero"
+description = "SDCancionero for Windows computers of 32 bits."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[build-dependencies]
+winresource = "0.1"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png"] }
+chordpro = { path = "../chordpro" }
+library = { path = "../library" }
+serde_json = { version = "1", features = ["preserve_order"] }
+rfd = "0.15"
+eframe = { version = "0.37.0", default-features = false, features = ["glow", "default_fonts", "clipboard", "links"] }
+cpal = "0.18.2"
+instruments = { version = "0.1.0", path = "../instruments" }
