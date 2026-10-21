@@ -20,4 +20,4 @@ internal val USER_AGENT = userAgent(CAMPFIRE_VERSION)
 
 internal fun userAgent(version: String) = "Campfire/$version ( $CONTACT_URL )"
 
-private const val CONTACT_URL = "https://github.com/pandulapeter/campfire"
+private const val CONTACT_URL = "https://github.com/asantarelli/campfire"

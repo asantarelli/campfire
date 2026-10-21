@@ -156,7 +156,7 @@
     <meta name="theme-color" content="#E9E7F0" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#15121C" media="(prefers-color-scheme: dark)">
     <meta name="description" content="Song lyrics and chords, in a library of plain ChordPro files that stays yours.">
-    <title>Campfire</title>
+    <title>SDCancionero</title>
     <link rel="icon" type="image/png" sizes="192x192">
     <!-- Every file of a distribution is asked for with its own version in the query string, this page aside, which
          is the one address that has to stay put. The host lets a browser keep any file for ten minutes by its address
@@ -382,8 +382,8 @@
 <div id="app"></div>
 <div id="splash">
     <div id="splash-icon"></div>
-    <div id="splash-name">Campfire</div>
-    <div id="splash-track" role="progressbar" aria-label="Campfire" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="splash-name">SDCancionero</div>
+    <div id="splash-track" role="progressbar" aria-label="SDCancionero" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="splash-bar"></div>
     </div>
     <!-- Only shown when the app could not be started. In the browser's language where that is one the app speaks:
@@ -412,10 +412,10 @@
         var retry = document.getElementById('splash-retry');
         var TEXTS = {
             en: {
-                loadFailed: 'Campfire could not be loaded. Check the connection and try again.',
-                loadFailedFirstVisit: 'Campfire could not be loaded. It needs a connection the first time it is opened in this browser, so check the connection and try again.',
-                unsupported: 'This browser cannot run Campfire. It needs Chrome or Edge 119, Firefox 120, Safari 18.2 (iOS 18.2), or a later version.',
-                alreadyOpen: 'Campfire is already open in another tab. Close that tab first, or carry on there.',
+                loadFailed: 'SDCancionero could not be loaded. Check the connection and try again.',
+                loadFailedFirstVisit: 'SDCancionero could not be loaded. It needs a connection the first time it is opened in this browser, so check the connection and try again.',
+                unsupported: 'This browser cannot run SDCancionero. It needs Chrome or Edge 119, Firefox 120, Safari 18.2 (iOS 18.2), or a later version.',
+                alreadyOpen: 'SDCancionero is already open in another tab. Close that tab first, or carry on there.',
                 retry: 'Try again'
             },
             hu: {
@@ -424,6 +424,13 @@
                 unsupported: 'Ez a böngésző nem tudja futtatni a Campfire-t. Chrome vagy Edge 119, Firefox 120, Safari 18.2 (iOS 18.2) vagy ezeknél újabb verzió kell hozzá.',
                 alreadyOpen: 'A Campfire már meg van nyitva egy másik lapon. Előbb zárd be azt a lapot, vagy folytasd ott.',
                 retry: 'Újra'
+            },
+            es: {
+                loadFailed: 'No se pudo cargar SDCancionero. Revisa la conexión y vuelve a intentarlo.',
+                loadFailedFirstVisit: 'No se pudo cargar SDCancionero. Necesita conexión la primera vez que se abre en este navegador, así que revisa la conexión y vuelve a intentarlo.',
+                unsupported: 'Este navegador no puede ejecutar SDCancionero. Necesita Chrome o Edge 119, Firefox 120, Safari 18.2 (iOS 18.2) o una versión posterior.',
+                alreadyOpen: 'SDCancionero ya está abierto en otra pestaña. Cierra esa pestaña primero o continúa ahí.',
+                retry: 'Reintentar'
             }
         };
         var text = /^hu\b/i.test(navigator.language || '') ? TEXTS.hu : TEXTS.en;

@@ -83,7 +83,7 @@ gradle.beforeProject {
     localProperties.forEach { name, value -> extensions.extraProperties.set(name.toString(), value) }
 }
 
-rootProject.name = "Campfire"
+rootProject.name = "SDCancionero"
 include(
     ":app:android",
     ":app:baselineprofile",

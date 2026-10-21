@@ -42,9 +42,9 @@
     </Resources>
 
     <Applications>
-        <Application Id="Campfire" Executable="Campfire.exe" EntryPoint="Windows.FullTrustApplication">
+        <Application Id="SDCancionero" Executable="SDCancionero.exe" EntryPoint="Windows.FullTrustApplication">
             <uap:VisualElements
-                DisplayName="Campfire"
+                DisplayName="SDCancionero"
                 Description="Your songbook, on every screen you own"
                 BackgroundColor="transparent"
                 Square150x150Logo="assets\Square150x150Logo.png"

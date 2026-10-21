@@ -40,3 +40,6 @@ build/
 
 # Python bytecode, written next to the workflow scripts whenever they are run locally
 __pycache__/
+
+# Session cache written by the Claude Code harness.
+/graft/

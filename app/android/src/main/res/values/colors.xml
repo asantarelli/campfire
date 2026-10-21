@@ -10,17 +10,17 @@
 -->
 <resources>
 
-    <!-- General: the purple of the app's own palette (see CampfireColorScheme.kt), whose launcher icon is a
-         gradient drawn as it is (mipmap-*/ic_launcher_background) rather than a color. -->
+    <!-- General: the purple of the app's own palette (see CampfireColorScheme.kt), and the white behind the guitar pick
+         of every launcher icon (app/generate_sd_icons.py draws the pick over it). -->
     <color name="campfire">#5A49CA</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 
     <!-- The window's background before the first frame (values-night has the dark one). -->
     <color name="campfire_window_background">#FEF7FF</color>
 
-    <!-- The launcher icons of the other theme colors, the seeds of their palettes (see MaterialColorSchemes.kt), with
-         those more saturated than the orange brought down to its saturation the way generate_theme_icons.py brings
-         down every other platform's icon: the red, the purple and the pink, whose seeds are #D32F2F, #7B1FA2 and
-         #E91EAF. -->
+    <!-- The seeds of the palettes of the other theme colors (see MaterialColorSchemes.kt), with those more saturated than
+         the orange brought down to its saturation: the red, the purple and the pink, whose seeds are #D32F2F, #7B1FA2
+         and #E91EAF. Their launcher icons are the same pick as the app's own. -->
     <color name="campfire_gray">#707070</color>
     <color name="campfire_red">#CB3D39</color>
     <color name="campfire_orange">#F57C00</color>

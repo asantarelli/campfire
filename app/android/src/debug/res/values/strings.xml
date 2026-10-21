@@ -11,6 +11,6 @@
 <resources>
 
     <!-- General -->
-    <string name="campfire" translatable="false">Campfire (debug)</string>
+    <string name="campfire" translatable="false">SDCancionero (debug)</string>
 
 </resources>

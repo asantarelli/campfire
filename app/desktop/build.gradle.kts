@@ -136,7 +136,7 @@ compose.desktop {
         javaHome = toolchainLauncher.get().metadata.installationPath.asFile.absolutePath
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Pkg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Campfire"
+            packageName = "SDCancionero"
             packageVersion = versionName
             description = "Your songbook, on every screen you own"
             vendor = "Pandula Péter"
@@ -152,7 +152,7 @@ compose.desktop {
             modules("java.instrument", "java.management", "jdk.accessibility", "jdk.localedata", "jdk.unsupported")
             macOS {
                 iconFile.set(project.file("src/main/resources/appIcon.icns"))
-                bundleID = "com.pandulapeter.campfire"
+                bundleID = "com.sdigitales.sdcancionero"
                 appCategory = "public.app-category.music"
                 // The App Store takes a Mac app built for Apple silicon alone only from macOS 12 on. The bundled JDK and
                 // skiko would run on 11, and the plugin's own default is older than either.
@@ -197,7 +197,7 @@ compose.desktop {
                 // jpackage creates no shortcut it is not asked for, and an installer asked for none installs an application
                 // that is nowhere to be found: these are the Start menu entry and the one on the desktop.
                 menu = true
-                menuGroup = "Campfire"
+                menuGroup = "SDCancionero"
                 shortcut = true
                 // Installs into the user's own profile, so the installer never asks for an administrator.
                 perUserInstall = true
@@ -263,7 +263,7 @@ tasks.withType<AbstractJLinkTask>().configureEach {
  */
 tasks.matching { isWindowsHost && it.name == "createReleaseDistributable" }.configureEach {
     val libraries = files(angleRuntime)
-    val appDirectory = layout.buildDirectory.dir("compose/binaries/main-release/app/Campfire/app")
+    val appDirectory = layout.buildDirectory.dir("compose/binaries/main-release/app/SDCancionero/app")
     inputs.files(libraries)
     doLast {
         val names = setOf("libEGL.dll", "libGLESv2.dll")
@@ -304,7 +304,7 @@ val recordClassDataArchive = tasks.register<RecordClassDataArchive>("recordClass
     onlyIf { trainsOnThisHost }
     dependsOn("createReleaseDistributable")
     doNotTrackState("Edits the release app image in place")
-    appImage = layout.buildDirectory.dir("compose/binaries/main-release/app/Campfire")
+    appImage = layout.buildDirectory.dir("compose/binaries/main-release/app/SDCancionero")
     targetsWindows = isWindowsHost
 }
 tasks.matching { it.name == "packageReleaseDeb" || it.name == "packageReleaseMsi" || it.name == "packageReleaseMsix" }.configureEach {
@@ -324,7 +324,7 @@ val addStartupWmClassToDeb = tasks.register<AddStartupWmClassToDeb>("addStartupW
     onlyIf { linux }
     val packages = fileTree(layout.buildDirectory.dir("compose/binaries")) { include("main/deb/*.deb", "main-release/deb/*.deb") }
     this.packages.from(packages)
-    windowClassName = "Campfire"
+    windowClassName = "SDCancionero"
     workingDirectory = layout.buildDirectory.dir("tmp/addStartupWmClassToDeb")
     // The package is rewritten in place, so it is both what the task reads and what it leaves behind: an unchanged
     // package is not unpacked and built again on every run.
@@ -348,8 +348,8 @@ val addLaunchAfterInstallToMsi = tasks.register<AddLaunchAfterInstallToMsi>("add
     val packages = fileTree(layout.buildDirectory.dir("compose/binaries")) { include("main/msi/*.msi", "main-release/msi/*.msi") }
     this.packages.from(packages)
     script = project.file("add-launch-after-install.ps1")
-    launcherName = "Campfire.exe"
-    checkboxText = "Launch Campfire"
+    launcherName = "SDCancionero.exe"
+    checkboxText = "Launch SDCancionero"
     // As with the .deb, the package is rewritten in place, so it is both what the task reads and what it leaves behind.
     inputs.files(packages)
     outputs.files(packages)
@@ -366,7 +366,7 @@ tasks.matching { it.name == "packageMsi" || it.name == "packageReleaseMsi" }.con
  */
 tasks.register<PackageMsix>("packageReleaseMsix") {
     dependsOn("createReleaseDistributable")
-    appImage = layout.buildDirectory.dir("compose/binaries/main-release/app/Campfire")
+    appImage = layout.buildDirectory.dir("compose/binaries/main-release/app/SDCancionero")
     manifest = project.file("AppxManifest.xml")
     icon = project.file("src/main/composeResources/drawable/app_icon.png")
     displayName = project.property("campfire.windows.displayName").toString()
@@ -376,7 +376,7 @@ tasks.register<PackageMsix>("packageReleaseMsix") {
     // A package version has four parts, and the Store keeps the last one for itself.
     packageVersion = msixPackageVersion(versionName)
     sdkBinDirectory = project.property("campfire.windows.sdkBinDirectory").toString()
-    outputFile = layout.buildDirectory.file("compose/binaries/main-release/msix/Campfire-$versionName.msix")
+    outputFile = layout.buildDirectory.file("compose/binaries/main-release/msix/SDCancionero-$versionName.msix")
 }
 
 /**

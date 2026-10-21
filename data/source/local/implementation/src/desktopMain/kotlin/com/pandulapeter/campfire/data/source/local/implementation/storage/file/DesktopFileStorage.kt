@@ -43,5 +43,5 @@ private fun desktopDataDirectory(): File {
     }
 }
 
-private const val APPLICATION_NAME = "Campfire"
+private const val APPLICATION_NAME = "SDCancionero"
 private const val PACKAGE_FAMILY_NAME_PROPERTY = "campfire.packageFamilyName"

@@ -34,7 +34,7 @@ android {
     val targetSdkVersion = libs.versions.android.compileSdk.get().toInt()
     compileSdk = targetSdkVersion
     defaultConfig {
-        applicationId = "com.pandulapeter.campfire"
+        applicationId = "com.sdigitales.sdcancionero"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = targetSdkVersion
         versionCode = project.property("campfire.buildNumber").toString().toInt()

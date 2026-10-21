@@ -121,7 +121,7 @@ fun main(args: Array<String>) {
         SwingWindow(
             state = windowState,
             visible = !isLeaving,
-            title = "Campfire",
+            title = "SDCancionero",
             onCloseRequest = requestExit,
             icon = appIcon(viewModel.value),
             onPreviewKeyEvent = ::handlePreviewKeyEvent,
@@ -165,9 +165,9 @@ fun main(args: Array<String>) {
  */
 @OptIn(ExperimentalComposeUiApi::class)
 private fun configureBeforeToolkit() {
-    // A Gradle or IDE run has no Campfire.app bundle, so macOS would use the Java launcher or this main class as
+    // A Gradle or IDE run has no SDCancionero.app bundle, so macOS would use the Java launcher or this main class as
     // the application name. AWT reads this once when it first starts, for both the menu bar and app switcher.
-    System.setProperty("apple.awt.application.name", "Campfire")
+    System.setProperty("apple.awt.application.name", "SDCancionero")
     // The JDK gives the application the light Aqua appearance whatever the system's is. The window follows the app's
     // own theme (TitleBarAppearance), but only once the preferences are read; until then the system's is the better
     // guess, and it is read once, like the name.
@@ -321,7 +321,7 @@ private fun setLinuxWindowClassName() {
         val toolkit = Toolkit.getDefaultToolkit()
         toolkit.javaClass.getDeclaredField("awtAppClassName").apply {
             isAccessible = true
-            set(toolkit, "Campfire")
+            set(toolkit, "SDCancionero")
         }
     }
 }
