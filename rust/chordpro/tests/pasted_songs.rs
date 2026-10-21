@@ -31,6 +31,25 @@ fn mil_horas_becomes_a_song() {
         .filter(|line| matches!(line, Line::Lyrics(lyrics) if !lyrics.chords.is_empty()))
         .count();
     assert!(lines_with_chords >= 20, "{lines_with_chords}\n{song}");
+    // The chord over "frío" is set at that word.
+    assert!(song.contains("Hace [Cm7]frío"), "{song}");
     // No row of chords is left among the words.
     assert!(!song.contains("Gm7  Cm7"), "{song}");
+}
+
+/// The same song as it came, repeats and all, and as a table cell of a page copies it: the whole text in quotation marks, and the
+/// ones inside it doubled.
+#[test]
+fn the_whole_of_mil_horas_is_recognized_as_it_is_and_as_a_quoted_cell() {
+    let full = include_str!("mil_horas_full.txt");
+    for pasted in [full.to_string(), format!("\"{}\"", full.trim_end().replace('"', "\"\""))] {
+        let song = prepare_pasted_song(&pasted);
+        assert!(song.starts_with("{title: Mil Horas}
+{artist: Los Abuelos de La Nada}
+{key: Gm}
+"), "{song}");
+        assert!(song.contains("{start_of_chorus: Estribillo}"), "{song}");
+        assert!(!song.contains("Gm7  Cm7"), "{song}");
+        assert!(song.matches("[Gm7]").count() >= 10, "{song}");
+    }
 }

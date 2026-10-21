@@ -149,6 +149,9 @@ fn heading(line: &str) -> Option<(&'static str, String)> {
     (is_plain && (is_bracketed || trimmed.ends_with(':') || !rest.is_empty() || word.len() > 4)).then(|| (environment, label.to_string()))
 }
 
+/// How far into a word a chord may stand and still be set at the start of that word.
+const MAX_OFFSET_IN_WORD: usize = 2;
+
 /// `lyrics` with the chords of `row` set into it at the columns they stood at, as a chord sheet in characters means them: a chord a
 /// letter away from the start of a word is set at that start (a row typed by hand is rarely exact), the others where they are, and
 /// the ones past the end of the words after them, apart.
@@ -161,8 +164,17 @@ fn set_chords(lyrics: &str, row: &[(usize, String)]) -> String {
     for (column, name) in row {
         let mut at = (*column).min(length);
         if *column < length {
-            let nearest = starts.iter().copied().min_by_key(|start| (start.abs_diff(*column), *start));
-            if let Some(start) = nearest.filter(|start| start.abs_diff(*column) <= 1) {
+            // A chord over the first letters of a word belongs to the word, and over a space to the word after it; deeper in, it
+            // is over a syllable and stays there.
+            let own_start = starts.iter().copied().filter(|start| *start <= *column).max();
+            let next_start = starts.iter().copied().find(|start| *start > *column);
+            if let Some(start) = own_start.filter(|start| column - start <= MAX_OFFSET_IN_WORD && !chars[*column].is_whitespace()) {
+                at = start;
+            } else if chars[*column].is_whitespace() || own_start.is_none() {
+                if let Some(start) = next_start.filter(|start| start - column <= MAX_OFFSET_IN_WORD) {
+                    at = start;
+                }
+            } else if let Some(start) = next_start.filter(|start| start - column <= 1) {
                 at = start;
             }
         }
