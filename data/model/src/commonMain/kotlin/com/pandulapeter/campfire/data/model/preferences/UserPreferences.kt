@@ -224,6 +224,14 @@ data class UserPreferences(
      * exported or synced.
      */
     val demoLibraryContentHashes: Map<String, String> = emptyMap(),
+    /** The service the song's listen button looks the song up on. */
+    val musicSearchService: MusicSearchService = MusicSearchService.YOUTUBE,
+    /** How many columns a song is set in, [AUTOMATIC_SONG_COLUMNS] leaving that to the width of the window. */
+    val songColumns: Int = AUTOMATIC_SONG_COLUMNS,
+    /** Where the diagrams of the chords of a song stand while it is read. */
+    val pinnedChordsPosition: PinnedChordsPosition = PinnedChordsPosition.RIGHT,
+    /** How fast a song scrolls itself, from [MIN_AUTO_SCROLL_SPEED] to [MAX_AUTO_SCROLL_SPEED]. */
+    val autoScrollSpeed: Int = DEFAULT_AUTO_SCROLL_SPEED,
 ) {
 
     /**
@@ -255,6 +263,13 @@ data class UserPreferences(
     }
 
     companion object {
+        /** The number of columns that says the width of the window decides, which is what a song has always done. */
+        const val AUTOMATIC_SONG_COLUMNS = 0
+        const val MAX_SONG_COLUMNS = 4
+        const val MIN_AUTO_SCROLL_SPEED = 1
+        const val MAX_AUTO_SCROLL_SPEED = 10
+        const val DEFAULT_AUTO_SCROLL_SPEED = 4
+
         /** The text size a song opens at, and the one a stored size that is not a size falls back on. */
         const val DEFAULT_FONT_SCALE = 1f
 
@@ -456,9 +471,24 @@ data class UserPreferences(
         }
     }
 
+    /** What the listen button of a song searches, each by the address its own site answers a search at. */
+    enum class MusicSearchService(val id: String) {
+        YOUTUBE("youtube"),
+        YOUTUBE_MUSIC("youtube_music"),
+        SPOTIFY("spotify"),
+    }
+
+    /** Where the diagrams of a song's chords stand: among the song's own sections, or pinned beside it while it scrolls. */
+    enum class PinnedChordsPosition(val id: String) {
+        IN_SONG("in_song"),
+        TOP("top"),
+        RIGHT("right"),
+    }
+
     enum class Language(val id: String) {
         ENGLISH("en"),
         HUNGARIAN("hu"),
+        SPANISH("es"),
         SYSTEM_DEFAULT("system_default"),
     }
 }

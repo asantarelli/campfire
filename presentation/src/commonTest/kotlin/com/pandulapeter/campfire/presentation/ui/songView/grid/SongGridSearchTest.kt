@@ -49,6 +49,37 @@ class SongGridSearchTest {
     }
 
     @Test
+    fun `a song is set in exactly the columns the reader asked for`() {
+        val sections = song(count = 6, lines = 4, lineWidth = 200)
+        val decided = search(sections, spec(availableHeight = 1_000, forcedColumnCount = 2)).decide(settledWidth = 2_000)
+        assertEquals(listOf(2), decided.grid.columnCounts.toList())
+    }
+
+    @Test
+    fun `a song set in one column never has two sections side by side`() {
+        // Sections as narrow as half a column are what a window with room for one column sets in pairs.
+        val sections = song(count = 6, lines = 2, lineWidth = 100)
+        val decided = search(sections, spec(availableHeight = 2_000, forcedColumnCount = 1)).decide(settledWidth = 2_000)
+        assertTrue(decided.grid.columnCounts.all { it == 1 }, "got ${decided.grid.columnCounts.toList()}")
+    }
+
+    @Test
+    fun `no row of a song has more columns than the reader asked for`() {
+        val sections = song(count = 9, lines = 6, lineWidth = 300)
+        (2..4).forEach { asked ->
+            val decided = search(sections, spec(availableHeight = 600, forcedColumnCount = asked)).decide(settledWidth = 2_000)
+            assertTrue(decided.grid.columnCounts.all { it <= asked }, "asked for $asked, got ${decided.grid.columnCounts.toList()}")
+        }
+    }
+
+    @Test
+    fun `a window too narrow for the columns asked for gets as many as its narrow columns allow`() {
+        val sections = song(count = 6, lines = 4, lineWidth = 200)
+        val decided = search(sections, spec(availableHeight = 1_000, forcedColumnCount = 4)).decide(settledWidth = 700)
+        assertTrue(decided.grid.columnCounts.all { it <= (700 + SECTION_GAP) / (288 + SECTION_GAP) })
+    }
+
+    @Test
     fun `a window with room for one column that is not cut searches no other count`() {
         val sections = song(count = 8, lines = 6, lineWidth = 450)
         val metrics = FakeSectionMetrics(unitLinesOf(sections))

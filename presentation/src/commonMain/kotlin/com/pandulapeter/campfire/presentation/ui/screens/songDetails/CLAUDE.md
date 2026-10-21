@@ -64,6 +64,33 @@ only), and nothing on the desktop.
 - Left and Right are unconsumed at the setlist's ends and for a single song; all four with Alt, Meta, or Ctrl (Alt + Left
   is the web's Back, Cmd + Left / Right a Mac's Back and Forward).
 
+### Listening to the song
+
+- `ListenToSongButton` opens `musicSearchUrl` (artist, then title, percent-encoded; tested) in the browser through the
+  screen's `urlOpener`: the app asks the service for nothing. The service is `UserPreferences.musicSearchService`
+  (YouTube, YouTube Music, Spotify), set in Settings → Preferences → Song view. It stands in the bar from 720dp of bar
+  (`showsListenInBar`, independent of `appBarButtons` and its tests) and in the song's menu below that.
+
+### Auto scroll
+
+- `AutoScrollControls` stands in the strip at the end of the screen the song leaves to its step buttons, above the
+  next one: play and pause, and while it runs the two speed buttons with the speed between them
+  (`UserPreferences.autoScrollSpeed`, kept for the next song). Only for a song with something to scroll to.
+- `AutoScrollEffect` moves the current page's `ScrollState` a frame at a time at `autoScrollDpPerSecond` (a step of the
+  speed, times the text size, so a speed is lines a second), carrying the pixels under one. **It lets go the moment
+  anything else scrolls** (`isScrollInProgress`: a drag, the wheel, a step, a key), at the end of the song, and when the
+  page changes; it never fights the reader.
+
+### Pinned chords
+
+- `UserPreferences.pinnedChordsPosition` (in the song, top, right; right by default) is provided app-wide
+  (`LocalPinnedChordsPosition`) and read by the page, which asks `pinnedChordsOf`: pinned only where the chords are
+  collected for the tuning being drawn, there are some, and the diagrams are not the song's definitions alone.
+- A page pins by **padding**, not by a second layout: the top strip adds its height to the page's `topPadding` and the
+  right panel its width (and the step buttons' strip) to the end padding, so rows, viewport and steps already count
+  them out. The Chords section is then left out of the song (`chordDiagrams` null for `SongLyrics`) and
+  `PinnedChordDiagrams` (`ui/chords/`) draws the same cells over the page. It moves with its page in a setlist's pager.
+
 ### The metronome button
 
 - `MetronomeButton` shows and hides the panel (`toggleMetronomePanel`): opening starts nothing, closing stops a playing

@@ -34,6 +34,15 @@ internal fun showsCoverInPerformanceMode(appBarWidth: Dp) = showsFontScaleInPerf
     appBarWidth - APP_BAR_NAVIGATION_WIDTH - APP_BAR_END_PADDING - FONT_SCALE_STEPPER_WIDTH - APP_BAR_STEPPER_END_PADDING -
     APP_BAR_COVER_SIZE - APP_BAR_COVER_GAP >= MIN_TITLE_WIDTH
 
+/**
+ * Whether the listen button stands in the bar rather than in the song's menu: only in a window wide enough to give it a
+ * button of its own besides everything [appBarButtons] fits, so that it never takes the room of the title or of a button
+ * that was there before it.
+ */
+internal fun showsListenInBar(appBarWidth: Dp) = appBarWidth >= LISTEN_IN_BAR_MIN_WIDTH
+
+private val LISTEN_IN_BAR_MIN_WIDTH = 720.dp
+
 /** What the song details app bar has the room for outside read only mode, see [appBarButtons]. */
 internal data class AppBarButtons(
     val isCoverShown: Boolean,

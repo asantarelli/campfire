@@ -85,6 +85,6 @@ fonts (Skia's Roboto on the web).
   web favicon, and a running Linux app's window icon. Not Windows (the Store package draws the taskbar) or the Mac Dock
   (a runtime icon is flat, without the system's clear, tinted, or dark styles).
 - `UserPreferences.isAppIconThemed` turns it off.
-- Every packaged icon is the diagonal gradient of the app's own colors, the promotional purple and orange.
-- Android's launcher and Play icons are drawn as they are; every other icon is the hand-drawn orange one in `app/icons`,
-  recolored by `app/generate_theme_icons.py` (outputs committed).
+- Every icon, of every theme color, is the guitar pick in `app/icons/sd_pick.png`, drawn onto each platform's sizes by
+  `app/generate_sd_icons.py` (outputs committed): the theme color changes nothing about the icon, so the machinery
+  that picks one by color keeps working and always lands on the pick.

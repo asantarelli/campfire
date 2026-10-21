@@ -15,7 +15,11 @@ The editor's Shortcuts toolbar and its control row.
 
 - **Two Shortcuts rows** (`EditorToolbar.kt`): a button for every directive `ChordProParser` understands and the app
   shows. First row: what the song *is* (header directives, then Tag, Language, Link, then Chord shape); second: the song
-  body (chords, sections, Tab and Grid, comments, then Key change, Tempo, and Time signature).
+  body (chords, then the Strum and Symbols menus, sections, Tab and Grid, comments, then Key change, Tempo, and Time
+  signature).
+- **Strum and Symbols** write characters a keyboard has no key for. A stroke is an annotation (`[*↓]`), not a line of a
+  grid: the specification's strum lines (`s` in a `{start_of_grid}`) are not read by the viewer. Every character is in
+  both bundled fonts but the natural sign in the editor's JetBrains Mono, which the system's font stands in for.
 
 ### Shortcut rules
 

@@ -22,7 +22,7 @@
     <string name="deselect_all">Kijelölés megszüntetése</string>
     <string name="retry">Újra</string>
     <string name="add_demo_library">Bemutató könyvtár hozzáadása</string>
-    <string name="confirm_exit_title">Bezárod a Campfire-t?</string>
+    <string name="confirm_exit_title">Bezárod a SDCancionero-t?</string>
     <string name="confirm_exit_message">Biztosan ki szeretnél lépni az alkalmazásból?</string>
 
     <!-- Import and export -->
@@ -33,7 +33,7 @@
     <string name="import_progress_importing">Fájlok hozzáadása a könyvtáradhoz</string>
     <string name="import_progress_finishing">Könyvtár frissítése</string>
     <string name="import_progress_count">%1$d / %2$d feldolgozva</string>
-    <string name="import_progress_wait">Kérjük, hagyd nyitva a Campfire-t az importálás végéig.</string>
+    <string name="import_progress_wait">Kérjük, hagyd nyitva a SDCancionero-t az importálás végéig.</string>
     <string name="import_status_title">Importálás kész</string>
     <string name="import_status_stopped">Importálás megszakadt</string>
     <string name="import_status_partial">Az importálás egy hiba miatt megszakadt. A már importált fájlok a könyvtáradban vannak; a hátralévő fájlok nem lettek feldolgozva.</string>
@@ -67,8 +67,8 @@
     <string name="import_converted">Átalakítva: %1$d — érdemes átnézni a szerkesztőben.</string>
     <string name="import_open">Megnyitás</string>
     <plurals name="import_unreadable_documents">
-        <item quantity="one">Egy dokumentumban nincs a Campfire számára olvasható szöveg (szkennelt oldal, védett PDF vagy régi Word-formátum).</item>
-        <item quantity="other">%1$d dokumentumban nincs a Campfire számára olvasható szöveg (szkennelt oldalak, védett PDF-ek vagy régi Word-formátum).</item>
+        <item quantity="one">Egy dokumentumban nincs a SDCancionero számára olvasható szöveg (szkennelt oldal, védett PDF vagy régi Word-formátum).</item>
+        <item quantity="other">%1$d dokumentumban nincs a SDCancionero számára olvasható szöveg (szkennelt oldalak, védett PDF-ek vagy régi Word-formátum).</item>
     </plurals>
     <string name="import_failed">Az importálás nem sikerült</string>
     <string name="import_interrupted">Az importálás megszakadt. Nyisd meg újra a fájlokat az importáláshoz.</string>
@@ -78,7 +78,7 @@
     <string name="export_setlist_saved">Lista exportálva</string>
     <string name="export_songs_saved">Dalok exportálva</string>
     <string name="export_library_saved">Könyvtár exportálva</string>
-    <string name="export_too_large_to_import">Ez az archívum nagyobb annál a 24 MB-nál, amennyit a Campfire egyszerre importálni tud. A könyvtárad teljes másolata; a visszatöltéshez csomagold ki, és importáld a dalokat néhány ezres adagokban.</string>
+    <string name="export_too_large_to_import">Ez az archívum nagyobb annál a 24 MB-nál, amennyit a SDCancionero egyszerre importálni tud. A könyvtárad teljes másolata; a visszatöltéshez csomagold ki, és importáld a dalokat néhány ezres adagokban.</string>
     <plurals name="export_skipped_files">
         <item quantity="one">Egy fájlt nem sikerült beolvasni, így nincs benne az archívumban: %2$s</item>
         <item quantity="other">%1$d fájlt nem sikerült beolvasni, így nincsenek benne az archívumban. Köztük: %2$s</item>
@@ -100,7 +100,7 @@
     <string name="import_progress_downloading">A fájl letöltése</string>
     <string name="import_failed_unreachable">%1$s nem érhető el. Ellenőrizd az internetkapcsolatot, és próbáld újra.</string>
     <string name="import_failed_not_found">Ezen a címen nincs mit letölteni. Lehet, hogy a link lejárt, vagy törölték.</string>
-    <string name="import_failed_too_large">Ez a fájl nagyobb annál a 24 MB-nál, amennyit a Campfire egyszerre importálni tud.</string>
+    <string name="import_failed_too_large">Ez a fájl nagyobb annál a 24 MB-nál, amennyit a SDCancionero egyszerre importálni tud.</string>
     <string name="import_failed_unreadable">A fájlokat nem sikerült beolvasni. Semmi sem lett importálva.</string>
     <string name="import_retry">Újrapróbálás</string>
     <string name="import_review_title">Importálás áttekintése</string>
@@ -170,20 +170,20 @@
     <string name="songs_paste_from_clipboard">Beillesztés a vágólapról</string>
     <string name="add_songs_hint_title">Saját dalok hozzáadása</string>
     <string name="add_songs_tip_paste_title">Másolj ki egy dalt bármelyik weboldalról</string>
-    <string name="add_songs_tip_paste_hint">Másold ki egy dal szövegét és akkordjait bármelyik weboldalról, akármilyen rendezetlen is, és illeszd be ide. A Campfire rendezett dalt készít belőle, amit elmenthetsz.</string>
+    <string name="add_songs_tip_paste_hint">Másold ki egy dal szövegét és akkordjait bármelyik weboldalról, akármilyen rendezetlen is, és illeszd be ide. A SDCancionero rendezett dalt készít belőle, amit elmenthetsz.</string>
     <string name="add_songs_tip_import_title">Hozd át a dalaidat egy másik alkalmazásból</string>
     <string name="add_songs_tip_import_hint">Exportáld a dalaidat egy másik daloskönyv-alkalmazásból, lehetőleg zip archívumként vagy biztonsági mentésként, és importáld ide. ChordPro-, PDF-, Word- és szövegfájlok is használhatók.</string>
-    <string name="songs_paste_converted">A dalszöveg fölé írt akkordokat a Campfire a szövegbe illesztette. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
+    <string name="songs_paste_converted">A dalszöveg fölé írt akkordokat a SDCancionero a szövegbe illesztette. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
     <string name="songs_paste_chordpro">A szöveg már ChordPro formátumú, így változatlan maradt. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
     <string name="songs_paste_no_chords">Nem található benne akkord, így ez csak a dalszöveg. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
     <string name="new_song_placeholder_title">Új dal</string>
     <string name="new_song_placeholder_artist">Ismeretlen előadó</string>
     <string name="paste_clipboard_empty">A vágólapon nincs beilleszthető szöveg.</string>
-    <string name="paste_only_links">Egy link nem dal, és a Campfire nem nyit meg weboldalakat. Magukat az akkordokat és a dalszöveget másold ki.</string>
+    <string name="paste_only_links">Egy link nem dal, és a SDCancionero nem nyit meg weboldalakat. Magukat az akkordokat és a dalszöveget másold ki.</string>
     <string name="paste_too_large">A szöveg hosszabb annál a 8 MB-nál, amennyit egy importálás feldolgoz.</string>
-    <string name="shared_link_not_imported">A Campfire nem nyit meg weboldalakat. Jelöld ki az akkordokat és a dalszöveget, és azt oszd meg.</string>
-    <string name="paste_refused_ios">A Campfire nem kapott engedélyt a beillesztésre. Ezt a Beállítások appban, a Campfire alatt a „Beillesztés más appokból” dönti el.</string>
-    <string name="paste_refused_web">A böngésző nem engedte, hogy a Campfire olvassa a vágólapot. Helyette nyomd meg a Ctrl+V-t (Macen a ⌘V-t) a dallistán.</string>
+    <string name="shared_link_not_imported">A SDCancionero nem nyit meg weboldalakat. Jelöld ki az akkordokat és a dalszöveget, és azt oszd meg.</string>
+    <string name="paste_refused_ios">A SDCancionero nem kapott engedélyt a beillesztésre. Ezt a Beállítások appban, a SDCancionero alatt a „Beillesztés más appokból” dönti el.</string>
+    <string name="paste_refused_web">A böngésző nem engedte, hogy a SDCancionero olvassa a vágólapot. Helyette nyomd meg a Ctrl+V-t (Macen a ⌘V-t) a dallistán.</string>
     <string name="songs_new_song">Új dal</string>
     <string name="optional_field_label">%1$s (nem kötelező)</string>
     <string name="songs_new_song_title">Cím</string>
@@ -324,9 +324,9 @@
     <string name="settings_library_storage">Tárhely</string>
     <string name="settings_library_storage_granted">A böngésző vállalta, hogy megőrzi a könyvtárat, amíg nem törlöd az oldal adatait.</string>
     <string name="settings_library_storage_best_effort">A böngésző megőrzi a könyvtárat, de még nem vállalta, hogy akkor is megtartja, ha kevés a szabad hely az eszközön. Ha könyvjelzőt teszel az oldalra, vagy rendszeresen használod, ez általában megváltozik; addig egy exportálás vagy a szinkronizálás máshol is megőriz egy másolatot.</string>
-    <string name="settings_library_storage_offline_granted">A Campfire internetkapcsolat nélkül is megnyílik ebben a böngészőben. A böngésző vállalta, hogy megőrzi az alkalmazást és a könyvtárat, amíg nem törlöd az oldal adatait.</string>
-    <string name="settings_library_storage_offline_best_effort">A Campfire internetkapcsolat nélkül is megnyílik ebben a böngészőben. A böngésző megőrzi az alkalmazást és a könyvtárat, de még nem vállalta, hogy akkor is megtartja őket, ha kevés a szabad hely az eszközön. Ha könyvjelzőt teszel az oldalra, vagy rendszeresen használod, ez általában megváltozik; addig egy exportálás vagy a szinkronizálás máshol is megőriz egy másolatot a könyvtárról.</string>
-    <string name="settings_library_storage_online_only">A Campfire-t nem sikerült elmenteni ebben a böngészőben, ezért csak internetkapcsolattal nyílik meg.</string>
+    <string name="settings_library_storage_offline_granted">A SDCancionero internetkapcsolat nélkül is megnyílik ebben a böngészőben. A böngésző vállalta, hogy megőrzi az alkalmazást és a könyvtárat, amíg nem törlöd az oldal adatait.</string>
+    <string name="settings_library_storage_offline_best_effort">A SDCancionero internetkapcsolat nélkül is megnyílik ebben a böngészőben. A böngésző megőrzi az alkalmazást és a könyvtárat, de még nem vállalta, hogy akkor is megtartja őket, ha kevés a szabad hely az eszközön. Ha könyvjelzőt teszel az oldalra, vagy rendszeresen használod, ez általában megváltozik; addig egy exportálás vagy a szinkronizálás máshol is megőriz egy másolatot a könyvtárról.</string>
+    <string name="settings_library_storage_online_only">A SDCancionero-t nem sikerült elmenteni ebben a böngészőben, ezért csak internetkapcsolattal nyílik meg.</string>
     <string name="settings_import">Dalok, dokumentumok vagy zip archívumok importálása…</string>
     <string name="settings_export_all">Könyvtár exportálása zipként</string>
     <string name="settings_preferences">Preferenciák</string>
@@ -337,7 +337,7 @@
     <string name="settings_read_only_mode_description_without_setlists">Előadás közben zárolja az alkalmazást: a szerkesztés, a törlés és a transzponálás eltűnik, így semmi sem változhat meg véletlenül</string>
     <string name="settings_songs_description">A Dalok és a Listák fül, ha csak metronómként, hangolóként, akkord- és skálatárként használnád. Kikapcsolva csak elrejti őket, egyetlen dal sem törlődik.</string>
     <string name="settings_songs_description_without_setlists">A Dalok fül, ha csak metronómként, hangolóként, akkord- és skálatárként használnád. Kikapcsolva csak elrejti a dalokat, egyetlen dal sem törlődik.</string>
-    <string name="settings_everything_off">Minden ki van kapcsolva, így a Campfire most egy alkalmazás a Campfire beállítására. Kapcsolj vissza valamit, hogy újra hasznos legyen.</string>
+    <string name="settings_everything_off">Minden ki van kapcsolva, így a SDCancionero most egy alkalmazás a SDCancionero beállítására. Kapcsolj vissza valamit, hogy újra hasznos legyen.</string>
     <string name="settings_chords">Akkordok</string>
     <string name="settings_chords_description">Az akkordok megjelenítése a szöveg fölött, a hangnemmel, a transzponálással és a capóval együtt. Kikapcsolva minden dalnak csak a szövege látszik.</string>
     <string name="settings_chord_diagrams">Akkordábrák</string>
@@ -361,13 +361,28 @@
     <string name="settings_group_sync">Szinkronizálás</string>
     <string name="settings_group_import_export">Importálás és exportálás</string>
     <string name="settings_group_on_this_device">Ezen az eszközön</string>
-    <string name="settings_group_campfire">Campfire</string>
+    <string name="settings_group_campfire">SDCancionero</string>
     <string name="settings_group_help">Súgó</string>
     <string name="settings_group_legal">Jogi információk</string>
     <string name="settings_number_sections">Szakaszok számozása</string>
     <string name="settings_number_sections_description">A saját név nélküli, ismétlődő szakaszok sorszámot kapnak, például Versszak 1 és Versszak 2</string>
     <string name="settings_song_cards">Dalkártyák</string>
     <string name="settings_song_cards_description">Mi jelenjen meg az előadó alatt az egyes dalokon a listákban.</string>
+    <string name="settings_group_song_view">Dalnézet</string>
+    <string name="settings_song_columns">Oszlopok</string>
+    <string name="settings_song_columns_description">Hány oszlopban jelenik meg egy dal. Az Auto az ablak szélességére bízza.</string>
+    <string name="settings_song_columns_automatic">Auto</string>
+    <string name="settings_pinned_chords">Rögzített akkorddiagramok</string>
+    <string name="settings_pinned_chords_description">Hol állnak a dal akkordjainak diagramjai, miközben a dal görög: a szakaszai között, vagy rögzítve felül vagy jobbra.</string>
+    <string name="settings_pinned_chords_in_song">A dalban</string>
+    <string name="settings_pinned_chords_top">Felül</string>
+    <string name="settings_pinned_chords_right">Jobbra</string>
+    <string name="settings_music_search">A dal meghallgatása</string>
+    <string name="settings_music_search_description">A dal meghallgatás gombja ezen a szolgáltatáson keresi az előadót és a címet, a böngészőben.</string>
+    <string name="music_search_youtube">YouTube</string>
+    <string name="music_search_youtube_music">YouTube Music</string>
+    <string name="music_search_spotify">Spotify</string>
+    <string name="song_details_listen">Meghallgatás: %1$s</string>
     <string name="card_detail_key">Hangnem</string>
     <string name="card_detail_tempo">Tempó</string>
     <string name="card_detail_duration">Időtartam</string>
@@ -385,7 +400,7 @@
     <string name="settings_notation_roman">Római számok</string>
     <string name="settings_notation_roman_description">I IV V vi, a dal hangnemétől számolva: dúr akkord nagy, moll akkord kis betűvel. A hangnem nélküli dal betűs marad, és a szerkesztő mindig betűket mutat.</string>
     <string name="settings_accidentals">Módosítójelek</string>
-    <string name="settings_accidentals_description">A fekete billentyűkre eső akkordok bével (%1$s) vagy kereszttel (%2$s) legyenek-e írva. Az eredeti beállítás mellett a Campfire a dal hangneméhez illőt választja.</string>
+    <string name="settings_accidentals_description">A fekete billentyűkre eső akkordok bével (%1$s) vagy kereszttel (%2$s) legyenek-e írva. Az eredeti beállítás mellett a SDCancionero a dal hangneméhez illőt választja.</string>
     <string name="settings_accidentals_original">Eredeti</string>
     <string name="settings_accidentals_flats">Bé (♭)</string>
     <string name="settings_accidentals_sharps">Kereszt (♯)</string>
@@ -415,7 +430,7 @@
     <string name="instrument_keyboard_description">Minden akkord hangjai, a capót a transzponálásba számolva</string>
     <string name="instrument_other_description">Nincsenek húrok és akkordábrák</string>
     <string name="settings_general">Általános</string>
-    <string name="settings_onboarding">A Campfire újbóli beállítása</string>
+    <string name="settings_onboarding">A SDCancionero újbóli beállítása</string>
     <string name="settings_onboarding_description">Válaszd ki újra a megjelenést, a hangszered és a funkciókat, lépésről lépésre</string>
     <string name="settings_user_interface_theme">Téma</string>
     <string name="settings_user_interface_theme_system_default">Rendszer</string>
@@ -425,14 +440,14 @@
     <string name="settings_background_warmth">Szépia</string>
     <string name="settings_background_warmth_description">A hátteret a régi papír meleg színe felé hangolja, ami kíméletesebb lehet a szemnek. A kontraszt minden fokozatban ugyanaz marad.</string>
     <string name="settings_app_icon_launcher">Indítóikon színezése</string>
-    <string name="settings_app_icon_launcher_description">A kezdőképernyő ikonja felveszi a fenti színt. Az első változtatás akkor lép életbe, amikor kilépsz a Campfire-ből, és egyes indítók ilyenkor leveszik az ikont a kezdőképernyőről.</string>
+    <string name="settings_app_icon_launcher_description">A kezdőképernyő ikonja felveszi a fenti színt. Az első változtatás akkor lép életbe, amikor kilépsz a SDCancionero-ből, és egyes indítók ilyenkor leveszik az ikont a kezdőképernyőről.</string>
     <string name="settings_app_icon_home_screen">Alkalmazásikon színezése</string>
     <string name="settings_app_icon_home_screen_description">A főképernyő ikonja felveszi a fenti színt. Az iOS minden változtatást egy üzenettel nyugtáz.</string>
     <string name="settings_app_icon_window">Ablakikon színezése</string>
-    <string name="settings_app_icon_window_description">Az ablak ikonja felveszi a fenti színt, amíg a Campfire nyitva van</string>
+    <string name="settings_app_icon_window_description">Az ablak ikonja felveszi a fenti színt, amíg a SDCancionero nyitva van</string>
     <string name="settings_app_icon_browser_tab">Lapikon színezése</string>
     <string name="settings_app_icon_browser_tab_description">A böngészőlap ikonja felveszi a fenti színt</string>
-    <string name="settings_user_interface_theme_color_campfire">Campfire</string>
+    <string name="settings_user_interface_theme_color_campfire">SDCancionero</string>
     <string name="settings_user_interface_theme_color_gray">Szürke</string>
     <string name="settings_user_interface_theme_color_system">Rendszer</string>
     <string name="settings_user_interface_theme_color_red">Piros</string>
@@ -448,33 +463,26 @@
     <string name="settings_user_interface_language_with_own_name">%1$s (%2$s)</string>
     <string name="settings_user_interface_language_english">Angol</string>
     <string name="settings_user_interface_language_hungarian">Magyar</string>
+    <string name="settings_user_interface_language_spanish">Spanyol</string>
     <string name="settings_user_interface_language_more_coming">Hamarosan további nyelvek is elérhetők lesznek</string>
-    <string name="settings_distributions_all">A Campfire összes változata</string>
-    <string name="settings_distributions_all_description">A campfire-songbook.com oldalon</string>
     <string name="settings_distribution_play_store">Google Play</string>
     <string name="settings_distribution_app_store">App Store</string>
     <string name="settings_distribution_mac_app_store">Mac App Store</string>
     <string name="settings_distribution_microsoft_store">Microsoft Store</string>
-    <string name="settings_rate">Értékeld a Campfire-t</string>
+    <string name="settings_rate">Értékeld a SDCancionero-t</string>
     <string name="settings_rate_description">Írj véleményt itt: %1$s</string>
     <string name="settings_about">Névjegy</string>
-    <string name="settings_git_hub">Campfire a GitHubon</string>
+    <string name="settings_git_hub">SDCancionero a GitHubon</string>
     <string name="settings_git_hub_description">Forráskód és hibajegyek</string>
-    <string name="settings_help">Súgó és támogatás</string>
-    <string name="settings_help_description">Gyakori kérdések, és hogyan jelezhetsz egy hibát</string>
-    <string name="settings_privacy_policy">Adatvédelmi nyilatkozat</string>
-    <string name="settings_privacy_policy_description">Mit kezel az alkalmazás az adataiddal</string>
     <string name="settings_open_source_licenses">Nyílt forráskódú licencek</string>
-    <string name="settings_open_source_licenses_description">A könyvtárak, betűtípusok és akkordfogások, amelyekre a Campfire épül, és a licenceik</string>
-    <string name="open_source_licenses_intro">A Campfire nyílt forráskódú, és mások munkájára épül. Válassz ki egy elemet a licence elolvasásához.</string>
+    <string name="settings_open_source_licenses_description">A könyvtárak, betűtípusok és akkordfogások, amelyekre a SDCancionero épül, és a licenceik</string>
+    <string name="open_source_licenses_intro">A SDCancionero nyílt forráskódú, és mások munkájára épül. Válassz ki egy elemet a licence elolvasásához.</string>
     <string name="open_source_licenses_show">Licenc megjelenítése</string>
     <string name="open_source_licenses_hide">Licenc elrejtése</string>
     <string name="open_source_licenses_project">A projekt oldala</string>
     <string name="open_source_licenses_license">Licenc</string>
-    <string name="settings_support">Hívj meg egy kávéra</string>
-    <string name="settings_support_description">Támogasd az alkalmazás fejlesztését</string>
     <string name="settings_version">%1$s verzió</string>
-    <string name="settings_created_by">Készítette Pandula Péter</string>
+    <string name="settings_created_by">A Campfire alapján, készítette Pandula Péter</string>
 
     <!-- Metronome screen -->
     <string name="metronome">Metronóm</string>
@@ -514,7 +522,7 @@
     <string name="metronome_stopped_interrupted">A metronóm egy hívás vagy egy másik alkalmazás miatt leállt.</string>
     <string name="metronome_stopped_disconnected">A metronóm leállt, mert a hangeszköz lecsatlakozott.</string>
     <string name="metronome_stopped_failed">A metronóm leállt, mert a hangkimenet hibát jelzett.</string>
-    <string name="metronome_stopped_silent">A metronóm leállt, amikor a Campfire a háttérbe került, mert nulla hangerőn vagy minden ütést elnémítva semmi sem hallatszott.</string>
+    <string name="metronome_stopped_silent">A metronóm leállt, amikor a SDCancionero a háttérbe került, mert nulla hangerőn vagy minden ütést elnémítva semmi sem hallatszott.</string>
     <!-- The channel of the notification a playing metronome keeps up, as the system's settings list it. -->
     <string name="metronome_notification_channel">Metronóm</string>
 
@@ -579,17 +587,17 @@
     <string name="tuner_reference_pitch_increase">Alaphang emelése</string>
     <string name="tuner_reference_pitch_reset">Alaphang visszaállítása 440 Hz-re</string>
     <string name="tuner_play_reference">A referencia %1$s lejátszása</string>
-    <string name="tuner_notice_not_asked">A Campfire a mikrofonon keresztül hallja a hangszert. A hangot ez az eszköz elemzi, és soha nem rögzíti vagy küldi el sehová.</string>
-    <string name="tuner_notice_refused">A mikrofon ki van kapcsolva a Campfire számára. Az alábbi hangok így is lejátszhatók.</string>
-    <string name="tuner_notice_refused_web">A mikrofon ki van kapcsolva a Campfire számára. A böngésző webhelybeállításaiban engedélyezhető, a cím mellett. Az alábbi hangok így is lejátszhatók.</string>
+    <string name="tuner_notice_not_asked">A SDCancionero a mikrofonon keresztül hallja a hangszert. A hangot ez az eszköz elemzi, és soha nem rögzíti vagy küldi el sehová.</string>
+    <string name="tuner_notice_refused">A mikrofon ki van kapcsolva a SDCancionero számára. Az alábbi hangok így is lejátszhatók.</string>
+    <string name="tuner_notice_refused_web">A mikrofon ki van kapcsolva a SDCancionero számára. A böngésző webhelybeállításaiban engedélyezhető, a cím mellett. Az alábbi hangok így is lejátszhatók.</string>
     <string name="tuner_notice_no_microphone">Nem található mikrofon.</string>
     <string name="tuner_notice_busy">A mikrofont egy hívás vagy egy másik alkalmazás használja.</string>
     <string name="tuner_notice_not_supported">Ez a böngésző nem engedi, hogy egy oldal a mikrofont használja.</string>
     <string name="tuner_notice_failed">A mikrofont nem sikerült megnyitni.</string>
-    <string name="tuner_notice_silent">Még semmi sem hallatszik. Ha szól egy húr, ellenőrizd, hogy a mikrofon nincs-e elnémítva vagy teljesen lehalkítva, és hogy a Campfire használhatja-e.</string>
+    <string name="tuner_notice_silent">Még semmi sem hallatszik. Ha szól egy húr, ellenőrizd, hogy a mikrofon nincs-e elnémítva vagy teljesen lehalkítva, és hogy a SDCancionero használhatja-e.</string>
     <string name="tuner_notice_waiting">Válassz ki bármit az oldalon, vagy nyomj meg egy billentyűt, hogy a böngésző hallgathasson.</string>
     <string name="tuner_use_microphone">Mikrofon használata</string>
-    <string name="tuner_notice_silent_enhancements">Ellenőrizd, hogy a mikrofon nincs-e elnémítva, és hogy a Campfire használhatja-e. A Windows a kitartott hangot zajként is eltávolíthatja: kapcsold ki a hangbeállításokban a mikrofon hangjavításait.</string>
+    <string name="tuner_notice_silent_enhancements">Ellenőrizd, hogy a mikrofon nincs-e elnémítva, és hogy a SDCancionero használhatja-e. A Windows a kitartott hangot zajként is eltávolíthatja: kapcsold ki a hangbeállításokban a mikrofon hangjavításait.</string>
     <string name="tuner_open_settings">Beállítások megnyitása</string>
     <string name="tuner_open_sound_settings">Hangbeállítások megnyitása</string>
     <string name="tuner_ask_again">Újbóli kérés</string>
@@ -797,6 +805,21 @@
     <string name="song_editor_insert_language">Nyelv</string>
     <string name="song_editor_insert_link">Hivatkozás</string>
     <string name="song_editor_insert_chord_shape">Akkordfogás</string>
+    <string name="song_editor_insert_strum">Pengetés</string>
+    <string name="song_editor_insert_symbols">Szimbólumok</string>
+    <string name="song_editor_strum_down">↓  Lefelé pengetés</string>
+    <string name="song_editor_strum_up">↑  Felfelé pengetés</string>
+    <string name="song_editor_strum_down_up">↓↑  Le és fel</string>
+    <string name="song_editor_strum_muted">×  Tompított pengetés</string>
+    <string name="song_editor_strum_accent">>  Hangsúly</string>
+    <string name="song_editor_symbol_sharp">♯  Kereszt</string>
+    <string name="song_editor_symbol_flat">♭  Bé</string>
+    <string name="song_editor_symbol_natural">♮  Feloldójel</string>
+    <string name="song_editor_symbol_bar">|  Ütemvonal</string>
+    <string name="song_editor_symbol_double_bar">||  Dupla ütemvonal</string>
+    <string name="song_editor_symbol_repeat_start">|:  Ismétlés kezdete</string>
+    <string name="song_editor_symbol_repeat_end">:|  Ismétlés vége</string>
+    <string name="song_editor_symbol_repeat_measure">%  Az előző ütem ismétlése</string>
     <string name="song_editor_transpose_text_up">Szöveg transzponálása fel</string>
     <string name="song_editor_transpose_text_down">Szöveg transzponálása le</string>
     <string name="song_editor_prettify">ChordPro formázása</string>
@@ -822,6 +845,41 @@
     <string name="song_editor_draft_restored">A nem mentett módosítások visszaállítva</string>
     <string name="song_editor_file_gone">A dal fájlja már nincs a könyvtáradban. Mentéssel visszakerül.</string>
     <string name="song_editor_untitled">Mentés előtt adj címet a dalnak</string>
+    <!-- ChordPro reference sheet of the editor -->
+    <string name="chordpro_reference_group_song">A dalról</string>
+    <string name="chordpro_reference_group_line">Soron belül</string>
+    <string name="chordpro_reference_group_sections">Szakaszok</string>
+    <string name="chordpro_reference_group_comments">Megjegyzések</string>
+    <string name="chordpro_reference_group_changes">Változások a dalban</string>
+    <string name="chordpro_reference_title">A dal címe.</string>
+    <string name="chordpro_reference_subtitle">A cím alatt megjelenő második sor.</string>
+    <string name="chordpro_reference_artist">Az előadó.</string>
+    <string name="chordpro_reference_composer">A zeneszerző.</string>
+    <string name="chordpro_reference_lyricist">A szövegíró.</string>
+    <string name="chordpro_reference_album">Az album, amelyen a dal megjelent.</string>
+    <string name="chordpro_reference_year">A megjelenés éve.</string>
+    <string name="chordpro_reference_key">A hangnem, amelyben az akkordok le vannak írva.</string>
+    <string name="chordpro_reference_capo">A fret, ahová a kapodaszter kerül.</string>
+    <string name="chordpro_reference_tempo">Ütés per perc; a metronóm ezt követi. Lejjebb újra leírva, az adott sortól megváltoztatja a tempót.</string>
+    <string name="chordpro_reference_time">Az ütemmutató, például 3/4 vagy 6/8. Lejjebb újra leírva, az adott sortól megváltozik.</string>
+    <string name="chordpro_reference_duration">A dal hossza percben és másodpercben.</string>
+    <string name="chordpro_reference_tag">Címke, amely szerint a könyvtár szűrhető. Soronként egyet írj.</string>
+    <string name="chordpro_reference_language">A szöveg nyelve kétbetűs kóddal (en, es, hu).</string>
+    <string name="chordpro_reference_cover">Az album borítóképének címe.</string>
+    <string name="chordpro_reference_link">Egy videóra, felvételre vagy tabra mutató hivatkozás, a cím után opcionális névvel.</string>
+    <string name="chordpro_reference_chord">Egy akkord szögletes zárójelben, közvetlenül azon szótag előtt, amelyre esik.</string>
+    <string name="chordpro_reference_annotation">Akkord helyett egy megjegyzés a szöveg felett, például egy útmutatás.</string>
+    <string name="chordpro_reference_section">Ilyen típusú blokkot nyit és zár. A két sor közötti rész mind a szakaszhoz tartozik.</string>
+    <string name="chordpro_reference_chorus_recall">Megismétli az utolsó refrént anélkül, hogy újra leírnád.</string>
+    <string name="chordpro_reference_tab">Tabulatúra: a sorai úgy jelennek meg, ahogy írtad, egyenközű betűtípussal, hogy az oszlopok egymás alá essenek.</string>
+    <string name="chordpro_reference_grid">Akkordrács, az ütemeket függőleges vonalak választják el.</string>
+    <string name="chordpro_reference_comment">Egy nem éneklendő szövegsor, például Kétszer ismételd.</string>
+    <string name="chordpro_reference_comment_italic">Dőlt betűvel megjelenő megjegyzés.</string>
+    <string name="chordpro_reference_comment_box">Keretben megjelenő megjegyzés.</string>
+    <string name="chordpro_reference_transpose">Ettől a sortól kezdve a leírt számú félhanggal feljebb (mínusszal lejjebb) viszi az akkordokat.</string>
+    <string name="chordpro_reference_full">Minden direktíva a chordpro.org oldalon</string>
+    <string name="chordpro_reference_insert">Beszúrás</string>
+    <string name="chordpro_reference_insert_description">%1$s beszúrása</string>
 
     <!-- Song details screen -->
     <string name="song_details_previous_song">Előző dal</string>
@@ -834,6 +892,11 @@
     <string name="song_details_step_progress_section">%1$d. szakasz (%2$d közül)</string>
     <string name="song_details_scroll_up">Görgetés felfelé</string>
     <string name="song_details_scroll_down">Görgetés lefelé</string>
+    <string name="song_details_auto_scroll_start">A dal automatikus görgetésének indítása</string>
+    <string name="song_details_auto_scroll_stop">A görgetés leállítása</string>
+    <string name="song_details_auto_scroll_slower">Lassabb görgetés</string>
+    <string name="song_details_auto_scroll_faster">Gyorsabb görgetés</string>
+    <string name="song_details_auto_scroll_speed">Görgetési sebesség: %1$d</string>
     <string name="song_details_song_position">%1$d / %2$d</string>
     <string name="song_details_transposition">Transzponálás</string>
     <string name="song_details_transpose_up">Transzponálás felfelé</string>
@@ -970,17 +1033,17 @@
     <string name="song_details_no_data_hint">A fájlt nem sikerült beolvasni.</string>
 
     <!-- Settings screen: sync -->
-    <string name="settings_sync_unavailable">Ez a Campfire build szinkronizálási azonosítók nélkül készült, így nincs mihez csatlakozni.</string>
-    <string name="settings_sync_description">Tartsd azonosan a könyvtárat minden eszközön egy saját felhőmappán keresztül, azzal együtt, hogy melyik dalt hogyan transzponálod, hányadik bundon capózod és milyen tempóban játszod. A Campfire-nek nincs szervere: a fájlok közvetlenül az eszközeid és a saját tárhelyed között mozognak.</string>
+    <string name="settings_sync_unavailable">Ez a SDCancionero build szinkronizálási azonosítók nélkül készült, így nincs mihez csatlakozni.</string>
+    <string name="settings_sync_description">Tartsd azonosan a könyvtárat minden eszközön egy saját felhőmappán keresztül, azzal együtt, hogy melyik dalt hogyan transzponálod, hányadik bundon capózod és milyen tempóban játszod. A SDCancionero-nek nincs szervere: a fájlok közvetlenül az eszközeid és a saját tárhelyed között mozognak.</string>
     <string name="settings_sync_connect_dropbox">Dropbox csatlakoztatása</string>
     <string name="settings_sync_connecting">Csatlakozás…</string>
     <string name="settings_sync_connection_failed_network">A szolgáltatás nem érhető el. Ellenőrizd az internetkapcsolatot, és próbáld újra.</string>
     <string name="settings_sync_connection_failed_authorization">A Dropbox elutasította a kapcsolódást.</string>
     <string name="settings_sync_connection_failed_unknown">A kapcsolódás nem sikerült.</string>
-    <string name="settings_sync_connection_failed_storage">A Campfire nem tudta beolvasni vagy elmenteni a kapcsolatot ezen az eszközön. A következő indításkor újra megpróbálja.</string>
+    <string name="settings_sync_connection_failed_storage">A SDCancionero nem tudta beolvasni vagy elmenteni a kapcsolatot ezen az eszközön. A következő indításkor újra megpróbálja.</string>
     <string name="settings_sync_connected_as">Csatlakozva: %1$s</string>
     <string name="settings_sync_disconnect">Leválasztás</string>
-    <string name="settings_sync_disconnect_confirmation">Leválasztod a következő fiókot: %1$s? A Campfire elfelejti a fiókot, és nem szinkronizál tovább. Sem a könyvtárból, sem a felhőmappából nem törlődik semmi.</string>
+    <string name="settings_sync_disconnect_confirmation">Leválasztod a következő fiókot: %1$s? A SDCancionero elfelejti a fiókot, és nem szinkronizál tovább. Sem a könyvtárból, sem a felhőmappából nem törlődik semmi.</string>
     <string name="settings_sync_now">Szinkronizálás most</string>
     <string name="settings_sync_never">Még nem volt szinkronizálva</string>
     <string name="settings_sync_last_synced_moments_ago">Legutóbb sikeresen szinkronizálva: pillanatokkal ezelőtt</string>
@@ -998,7 +1061,7 @@
         <item quantity="other">Legutóbb sikeresen szinkronizálva: %1$d napja</item>
     </plurals>
     <!-- A fenti sor dátum- és időrészének sorrendje: év, hónap, nap, óra, perc, mind előre kiegészítve. -->
-    <string name="settings_sync_failed_network">A szolgáltatás nem érhető el. A Campfire legközelebb újra megpróbálja.</string>
+    <string name="settings_sync_failed_network">A szolgáltatás nem érhető el. A SDCancionero legközelebb újra megpróbálja.</string>
     <string name="settings_sync_failed_authorization">A kapcsolatot elutasították. Csatlakoztasd újra a fiókot.</string>
     <string name="settings_sync_failed_storage">A könyvtárat nem sikerült olvasni vagy írni.</string>
     <string name="settings_sync_failed_unknown">A szinkronizálás nem fejeződött be.</string>
@@ -1007,7 +1070,7 @@
         <item quantity="one">Egy fájlt nem sikerült szinkronizálni: %2$s</item>
         <item quantity="other">%1$d fájlt nem sikerült szinkronizálni. Köztük: %2$s</item>
     </plurals>
-    <string name="settings_sync_preferences_failed">A dalok beállításait (transzponálás, capo és tempó) nem sikerült szinkronizálni. A Campfire legközelebb újra megpróbálja.</string>
+    <string name="settings_sync_preferences_failed">A dalok beállításait (transzponálás, capo és tempó) nem sikerült szinkronizálni. A SDCancionero legközelebb újra megpróbálja.</string>
     <plurals name="settings_sync_conflicts">
         <item quantity="one">Két helyen is módosult fájl mindkét változata megmaradt: %2$s</item>
         <item quantity="other">%1$d fájl két helyen is módosult, mindkét változatuk megmaradt. Köztük: %2$s</item>
@@ -1031,18 +1094,18 @@
     <string name="settings_sync_keep_and_download">Megtartás és letöltés</string>
     <string name="settings_sync_notification_channel">Szinkronizálás</string>
     <string name="settings_sync_notification_title">A könyvtár szinkronizálása</string>
-    <string name="settings_sync_redirect_page_title">Vissza a Campfire-höz</string>
+    <string name="settings_sync_redirect_page_title">Vissza a SDCancionero-höz</string>
     <string name="settings_sync_redirect_page_message">Bezárhatod ezt a lapot, és visszatérhetsz az alkalmazásba.</string>
 
     <!-- What's new, shown once per version after the first installed version -->
-    <string name="whats_new_title">Újdonságok a Campfire %1$s verziójában</string>
-    <string name="whats_new_message">• **Skálák fül** Az új fül a hangszereden és a hangolásodon mutatja és lejátssza az összes skálát és módust, és minden dal ajánlja a részeihez illő skálákat.\n• **Akkordok fül** Az új fül hangnemenként mutatja a hangszered és a hangolásod összes akkordját, és az itt választott fogás minden dalban érvényes.\n• **Több hangszer és hangolás** Az akkorddiagramok már mandolinra, bendzsóra és 12 húros gitárra is elkészülnek, például drop D hangolásban, a dalok tabulatúráit pedig a Campfire átírja a hangszeredre.\n• **Dal beillesztése, megosztása vagy behúzása** Illessz be egy weboldalról kimásolt akkordos dalt, húzd be, vagy oszd meg Androidon vagy iOS-en, és az a szerkesztőben nyílik meg.\n• **Importálás más alkalmazásokból** Az OpenSong és az OnSong dalai, valamint más alkalmazások JSON exportjai is importálhatók, és minden importálás felsorolja a dalokat, mielőtt bármit kiírna.\n• **Keresés és csere, daladatok online** A szerkesztőben szöveget kereshetsz és cserélhetsz, a Daladatok szerkesztése pedig megkeresi a dal előadóját, albumát, évét és szerzőit a MusicBrainzen és az iTunes-on.</string>
+    <string name="whats_new_title">Újdonságok a SDCancionero %1$s verziójában</string>
+    <string name="whats_new_message">• **Skálák fül** Az új fül a hangszereden és a hangolásodon mutatja és lejátssza az összes skálát és módust, és minden dal ajánlja a részeihez illő skálákat.\n• **Akkordok fül** Az új fül hangnemenként mutatja a hangszered és a hangolásod összes akkordját, és az itt választott fogás minden dalban érvényes.\n• **Több hangszer és hangolás** Az akkorddiagramok már mandolinra, bendzsóra és 12 húros gitárra is elkészülnek, például drop D hangolásban, a dalok tabulatúráit pedig a SDCancionero átírja a hangszeredre.\n• **Dal beillesztése, megosztása vagy behúzása** Illessz be egy weboldalról kimásolt akkordos dalt, húzd be, vagy oszd meg Androidon vagy iOS-en, és az a szerkesztőben nyílik meg.\n• **Importálás más alkalmazásokból** Az OpenSong és az OnSong dalai, valamint más alkalmazások JSON exportjai is importálhatók, és minden importálás felsorolja a dalokat, mielőtt bármit kiírna.\n• **Keresés és csere, daladatok online** A szerkesztőben szöveget kereshetsz és cserélhetsz, a Daladatok szerkesztése pedig megkeresi a dal előadóját, albumát, évét és szerzőit a MusicBrainzen és az iTunes-on.</string>
 
     <!-- Onboarding, shown once on the first run and again from Settings -->
     <string name="onboarding_skip">Kihagyás</string>
     <string name="onboarding_next">Tovább</string>
     <string name="onboarding_start_playing">Zenéljünk</string>
-    <string name="onboarding_welcome_title">Üdv a Campfire-ben!</string>
+    <string name="onboarding_welcome_title">Üdv a SDCancionero-ben!</string>
     <string name="onboarding_welcome_message">Néhány gyors kérdés, hogy az alkalmazás igazán a tiéd legyen.\nElőször nézd meg, hogy a saját nyelveden olvasod-e őket.</string>
     <string name="onboarding_language">Nyelv: %1$s</string>
     <string name="onboarding_settings_note">Minden itt meghozott döntésedet később megváltoztathatod a Beállításokban.</string>
@@ -1067,15 +1130,15 @@
 
     <!-- In-app updates, which only the Play build ever has anything to show -->
     <string name="app_update_available">Elérhető frissítés</string>
-    <string name="app_update_available_hint">A Campfire újabb verziója letölthető. A háttérben érkezik, így addig is folytathatod.</string>
+    <string name="app_update_available_hint">A SDCancionero újabb verziója letölthető. A háttérben érkezik, így addig is folytathatod.</string>
     <string name="app_update_update">Frissítés</string>
     <string name="app_update_continue_offline">Folytatás offline</string>
     <string name="app_update_later">Később</string>
     <string name="app_update_downloaded">A frissítés letöltődött</string>
-    <string name="app_update_downloaded_hint">A telepítés befejezéséhez a Campfire újraindul.</string>
+    <string name="app_update_downloaded_hint">A telepítés befejezéséhez a SDCancionero újraindul.</string>
     <string name="app_update_restart">Újraindítás</string>
     <string name="app_update_required">Frissítés szükséges</string>
-    <string name="app_update_required_hint">A Campfire ezen verziója már nem használható. A könyvtárad pontosan ott marad, ahol van. A frissítéshez internetkapcsolat kell.</string>
+    <string name="app_update_required_hint">A SDCancionero ezen verziója már nem használható. A könyvtárad pontosan ott marad, ahol van. A frissítéshez internetkapcsolat kell.</string>
 
     <!-- Export -->
     <string name="print_save">Mentés</string>
@@ -1085,9 +1148,9 @@
     <string name="print_format_chordpro">ChordPro</string>
     <string name="print_format_zip">Zip</string>
     <string name="print_format_pdf_description">Nyomtatáshoz ideális. Bármilyen eszközön megnyitható, de utólag nem szerkeszthető és nem transzponálható.</string>
-    <string name="print_format_chordpro_song_description">Más Campfire-felhasználóknak ideális: importálhatják, szerkeszthetik és transzponálhatják a dalt.</string>
-    <string name="print_format_zip_description">Más Campfire-felhasználóknak ideális: a lista-leírófájl és a dalok ChordPro-fájlként.</string>
-    <string name="print_format_zip_songs_description">Más Campfire-felhasználóknak ideális: a kiválasztott dalok ChordPro-fájlként.</string>
+    <string name="print_format_chordpro_song_description">Más SDCancionero-felhasználóknak ideális: importálhatják, szerkeszthetik és transzponálhatják a dalt.</string>
+    <string name="print_format_zip_description">Más SDCancionero-felhasználóknak ideális: a lista-leírófájl és a dalok ChordPro-fájlként.</string>
+    <string name="print_format_zip_songs_description">Más SDCancionero-felhasználóknak ideális: a kiválasztott dalok ChordPro-fájlként.</string>
     <string name="print_zip_contents">A zip-fájl tartalma</string>
     <string name="print_zip_manifest">Lista-leírófájl</string>
     <string name="print_zip_manifest_description">%1$s, a sorrenddel és minden dal hangnemével</string>

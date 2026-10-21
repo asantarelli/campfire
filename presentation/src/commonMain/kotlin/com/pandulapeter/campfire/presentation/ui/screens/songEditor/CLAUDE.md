@@ -66,7 +66,7 @@ numbers nothing to count from.
 
 - Find and Find and replace first (promoted to buttons where the bar keeps the title 160dp wide, `editorMenuMaxWidth`);
   then the About the song sheet over the draft (`SongEditTarget.EditorDraft`), in every pane; Prettify; the ChordPro
-  directives reference link; and Revert last.
+  reference (a side panel, below); and Revert last.
 - Revert is in the menu, behind `DialogType.RevertChanges`, so it can't be mistapped next to Save. The screen answers
   it through the field's own editing, so it is undoable.
 - Sheets opened from the menu or the preview's card edit a snapshot of the draft (`toEditorSong`,
@@ -90,6 +90,18 @@ numbers nothing to count from.
 - Insertion rows leave whenever only the preview shows.
 - `ChordProOutputTransformation` colours tokens like the viewer (and draws search matches); unreadable directive values
   (`{time: 5/7}`) are drawn whole in the error colour.
+
+## The ChordPro reference
+
+- `reference/ChordProReferenceSheet`, opened from the overflow menu, is a **panel on the right edge of the panes**
+  (`LoadedSongEditor`), not a dialog: it takes no scrim and no focus, so the field stays typeable while it is open, and
+  it stands over the preview where there is one. Its open state is `rememberSaveable`.
+- Its rows (`chordProReferenceGroups`) use the toolbar's own titles and build their insertions with the same
+  `EditorInsertion` factories, so **Insert writes exactly what the toolbar button of that name writes**
+  (`TextFieldState.insert`), and the field takes the focus back unless only the preview shows.
+- Descriptions are strings without braces (the localization plugin reads `{name}` as an argument); the syntax shown is a
+  literal in code, never translated. The full reference link is the one way out to the ChordPro site, for the directives
+  the app does not write.
 
 ## Preview
 

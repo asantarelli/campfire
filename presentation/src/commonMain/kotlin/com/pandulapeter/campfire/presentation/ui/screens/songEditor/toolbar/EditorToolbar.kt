@@ -49,12 +49,28 @@ import com.pandulapeter.campfire.presentation.resources.song_editor_insert_key_c
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_language
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_link
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_lyricist
+import com.pandulapeter.campfire.presentation.resources.song_editor_insert_strum
+import com.pandulapeter.campfire.presentation.resources.song_editor_insert_symbols
+import com.pandulapeter.campfire.presentation.resources.song_editor_strum_accent
+import com.pandulapeter.campfire.presentation.resources.song_editor_strum_down
+import com.pandulapeter.campfire.presentation.resources.song_editor_strum_down_up
+import com.pandulapeter.campfire.presentation.resources.song_editor_strum_muted
+import com.pandulapeter.campfire.presentation.resources.song_editor_strum_up
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_bar
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_double_bar
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_flat
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_natural
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_repeat_end
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_repeat_measure
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_repeat_start
+import com.pandulapeter.campfire.presentation.resources.song_editor_symbol_sharp
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_subtitle
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_tag
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_tempo
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_time
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_title
 import com.pandulapeter.campfire.presentation.resources.song_editor_insert_year
+import org.jetbrains.compose.resources.StringResource
 import com.pandulapeter.campfire.presentation.resources.song_editor_section_bridge
 import com.pandulapeter.campfire.presentation.resources.song_editor_section_chorus
 import com.pandulapeter.campfire.presentation.resources.song_editor_section_grid
@@ -203,6 +219,7 @@ private fun contentInsertions(tabStaff: (UserPreferences.Instrument?) -> List<St
         EditorInsertion(stringResource(Res.string.song_editor_insert_chord), prefix = "[", suffix = "]", isOwnLine = false),
         EditorInsertion(stringResource(Res.string.song_editor_insert_annotation), prefix = "[*", suffix = "]", isOwnLine = false),
     ),
+    symbolInsertions(),
     listOf(
         EditorInsertion.section(stringResource(Res.string.song_editor_section_intro), name = "intro"),
         EditorInsertion.section(stringResource(Res.string.song_editor_section_verse), name = "verse"),
@@ -232,6 +249,46 @@ private fun contentInsertions(tabStaff: (UserPreferences.Instrument?) -> List<St
         EditorInsertion.metadata(stringResource(Res.string.song_editor_insert_time), name = "time"),
     ),
 )
+
+/**
+ * The characters a keyboard has no key for: the strokes of a strumming pattern, written as annotations (`[*↓]`) over the
+ * words they fall on, and the symbols of music and of a grid. Each is a menu of its own, whose entries are named by the
+ * character they write and by what it means, so that none has to be remembered.
+ *
+ * A strum is an annotation rather than a line of a grid: the specification's strum lines (`s` in a `{start_of_grid}`)
+ * are not read by the viewer yet, and an annotation is drawn over the syllable in every pane, in the font the app is set
+ * in, which has every one of these characters.
+ */
+@Composable
+private fun symbolInsertions(): List<EditorInsertion> = listOf(
+    EditorInsertion.menu(
+        label = stringResource(Res.string.song_editor_insert_strum),
+        choices = listOf(
+            symbol(Res.string.song_editor_strum_down, "[*↓]"),
+            symbol(Res.string.song_editor_strum_up, "[*↑]"),
+            symbol(Res.string.song_editor_strum_down_up, "[*↓↑]"),
+            symbol(Res.string.song_editor_strum_muted, "[*×]"),
+            symbol(Res.string.song_editor_strum_accent, "[*>]"),
+        ),
+    ),
+    EditorInsertion.menu(
+        label = stringResource(Res.string.song_editor_insert_symbols),
+        choices = listOf(
+            symbol(Res.string.song_editor_symbol_sharp, "♯"),
+            symbol(Res.string.song_editor_symbol_flat, "♭"),
+            symbol(Res.string.song_editor_symbol_natural, "♮"),
+            symbol(Res.string.song_editor_symbol_bar, "|"),
+            symbol(Res.string.song_editor_symbol_double_bar, "||"),
+            symbol(Res.string.song_editor_symbol_repeat_start, "|:"),
+            symbol(Res.string.song_editor_symbol_repeat_end, ":|"),
+            symbol(Res.string.song_editor_symbol_repeat_measure, "%"),
+        ),
+    ),
+)
+
+/** [text] written where the caret is, inside the line it is in, named [label] in the menu it is offered in. */
+@Composable
+private fun symbol(label: StringResource, text: String) = EditorInsertion(stringResource(label), prefix = text, suffix = "", isOwnLine = false)
 
 /**
  * What the song says about itself: every metadata directive the parser reads and the app then shows somewhere, in

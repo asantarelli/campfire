@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.pandulapeter.campfire.presentation.resources.Res
-import com.pandulapeter.campfire.presentation.resources.ic_campfire
+import com.pandulapeter.campfire.presentation.resources.ic_sd_mark
 import com.pandulapeter.campfire.presentation.ui.theme.LaunchScreenColors
 import org.jetbrains.compose.resources.painterResource
 
@@ -58,7 +58,7 @@ internal fun LaunchScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        val painter = painterResource(Res.drawable.ic_campfire)
+        val painter = painterResource(Res.drawable.ic_sd_mark)
         Box(
             modifier = Modifier
                 .size(LAUNCH_MARK_SIZE)

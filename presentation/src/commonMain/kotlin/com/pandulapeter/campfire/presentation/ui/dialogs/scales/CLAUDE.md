@@ -20,6 +20,8 @@
 - The chord rows (seven-note scales only) follow Chord diagrams and need an instrument with shapes; shapes come from the
   tables only, never a search during composition. A chord tap opens its `ChordReference` sheet over this one, without
   scales; opened from a chord sheet, this sheet has no chord rows (`showsChords`), so dialogs never stack deeper than two.
+- The sheet is 960dp wide at most (`SCALE_SHEET_MAX_WIDTH`), half as wide again as the usual sheet: the neck, the formula
+  and the chord rows are cramped in 640dp. A narrower window still gets the window's width.
 - The sheet's neck gives the dots the room: rows about a fret tall (`sheetHeight`), a narrow open column, fret numbers
   sized from the frets; inlays stay faint and small.
 - A play toggle beside the formula (balanced by an empty space so the formula stays centered) plays the scale once up,

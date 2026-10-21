@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
-import com.pandulapeter.campfire.presentation.resources.ic_campfire
+import com.pandulapeter.campfire.presentation.resources.ic_sd_mark
 import com.pandulapeter.campfire.presentation.resources.settings_app_icon_browser_tab
 import com.pandulapeter.campfire.presentation.resources.settings_app_icon_browser_tab_description
 import com.pandulapeter.campfire.presentation.resources.settings_app_icon_home_screen
@@ -109,7 +109,7 @@ private fun SetupSection(
     LinkListItem(
         title = stringResource(Res.string.settings_onboarding),
         description = stringResource(Res.string.settings_onboarding_description),
-        icon = painterResource(Res.drawable.ic_campfire),
+        icon = painterResource(Res.drawable.ic_sd_mark),
         onClick = onOnboardingClicked,
     )
 }

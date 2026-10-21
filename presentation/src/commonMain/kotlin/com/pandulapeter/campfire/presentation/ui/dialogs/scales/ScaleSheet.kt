@@ -120,6 +120,7 @@ internal fun ScaleSheet(
         title = scaleTitle(scale, rootName, notation),
         subtitle = shownScaleNoteNames(scale, rootName, notation).joinToString(" "),
         titleMaxLines = 2,
+        sheetMaxWidth = SCALE_SHEET_MAX_WIDTH,
         // A keyboard carries no labels, so only a neck has the toggle: the subtitle names a keyboard's notes.
         actions = if (geometry is ScaleDiagramGeometry.Fretboard) {
             {
@@ -368,6 +369,12 @@ private val ScaleDiagramGeometry.sheetHeight: Dp
         is ScaleDiagramGeometry.Fretboard -> (16 + 22 * strings).dp
         is ScaleDiagramGeometry.Keyboard -> 96.dp
     }
+
+/**
+ * Half as wide again as a sheet usually is (Material's 640dp): a neck with its frets and fingering labels, and the
+ * formula and the chords beside it, are laid out for a width that a sheet of the usual one leaves them cramped in.
+ */
+private val SCALE_SHEET_MAX_WIDTH = 960.dp
 
 private const val MAJOR_ID = "major"
 private const val NATURAL_MINOR_ID = "natural_minor"

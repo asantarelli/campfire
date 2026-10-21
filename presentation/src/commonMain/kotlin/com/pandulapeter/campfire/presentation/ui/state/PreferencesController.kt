@@ -182,6 +182,18 @@ internal class PreferencesController(
 
     fun setLanguageSortingMode(value: UserPreferences.LabelSortingMode) = changeUserPreferences { copy(languageSortingMode = value) }
 
+    fun setMusicSearchService(value: UserPreferences.MusicSearchService) = changeUserPreferences { copy(musicSearchService = value) }
+
+    fun setSongColumns(value: Int) = changeUserPreferences {
+        copy(songColumns = value.coerceIn(UserPreferences.AUTOMATIC_SONG_COLUMNS, UserPreferences.MAX_SONG_COLUMNS))
+    }
+
+    fun setPinnedChordsPosition(value: UserPreferences.PinnedChordsPosition) = changeUserPreferences { copy(pinnedChordsPosition = value) }
+
+    fun setAutoScrollSpeed(value: Int) = changeUserPreferences {
+        copy(autoScrollSpeed = value.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED))
+    }
+
     fun setUiMode(value: UserPreferences.UiMode) = changeUserPreferences { copy(uiMode = value) }
 
     fun setThemeColor(value: UserPreferences.ThemeColor) = changeUserPreferences { copy(themeColor = value) }

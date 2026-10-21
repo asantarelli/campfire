@@ -64,6 +64,13 @@ internal fun SettingsTabPage(
                 ) {
                     SongDisplaySection(viewModel = viewModel, userPreferences = userPreferences)
                 }
+                AnimatedVisibility(
+                    visible = userPreferences?.areSongsEnabled != false,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically(),
+                ) {
+                    SongReadingSection(viewModel = viewModel, userPreferences = userPreferences)
+                }
             }
             SettingsTab.LIBRARY -> {
                 SyncSection(viewModel = viewModel)

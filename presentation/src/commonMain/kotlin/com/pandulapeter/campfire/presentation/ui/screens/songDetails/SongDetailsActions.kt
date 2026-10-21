@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.data.model.song.Song
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
@@ -56,6 +57,9 @@ internal fun RowScope.SongDetailsActions(
     showsFontScaleInBar: Boolean,
     showsSetlistAssignmentsInBar: Boolean,
     tunerAction: ActionsMenuItem?,
+    musicSearchService: UserPreferences.MusicSearchService,
+    urlOpener: (String) -> Unit,
+    showsListenInBar: Boolean,
 ) {
     val songFileNamesInSetlists by viewModel.libraryState.songFileNamesInSetlists.collectAsStateWithLifecycle()
     // The text size is in the bar wherever the title leaves it the room, and at the end of a menu where not:
@@ -95,6 +99,13 @@ internal fun RowScope.SongDetailsActions(
     currentSong?.takeIf { !isPerformanceModeEnabled }?.let { song ->
         val isInSetlist = song.fileName in songFileNamesInSetlists
         AnimatedVisibility(
+            visible = showsListenInBar,
+            enter = fadeIn() + expandHorizontally(),
+            exit = fadeOut() + shrinkHorizontally(),
+        ) {
+            ListenToSongButton(song = song, service = musicSearchService, urlOpener = urlOpener)
+        }
+        AnimatedVisibility(
             visible = showsSetlistAssignmentsInBar,
             enter = fadeIn() + expandHorizontally(),
             exit = fadeOut() + shrinkHorizontally(),
@@ -130,6 +141,7 @@ internal fun RowScope.SongDetailsActions(
                         )
                     },
                     tunerAction,
+                    if (showsListenInBar) null else listenToSongAction(song = song, service = musicSearchService, urlOpener = urlOpener),
                 )
             },
             // The transposition, the capo and the tempo are set in the song's own first section now; what

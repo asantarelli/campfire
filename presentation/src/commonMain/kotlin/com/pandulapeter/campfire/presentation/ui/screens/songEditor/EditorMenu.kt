@@ -16,7 +16,7 @@ import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.ic_find_replace
 import com.pandulapeter.campfire.presentation.resources.ic_info
 import com.pandulapeter.campfire.presentation.resources.ic_refresh
-import com.pandulapeter.campfire.presentation.resources.ic_open_in_new
+import com.pandulapeter.campfire.presentation.resources.ic_license
 import com.pandulapeter.campfire.presentation.resources.ic_prettify
 import com.pandulapeter.campfire.presentation.resources.ic_search
 import com.pandulapeter.campfire.presentation.resources.song_details_song_info
@@ -80,7 +80,7 @@ internal fun EditorMenu(
         ),
         ActionsMenuItem(
             title = stringResource(Res.string.song_editor_chordpro_reference),
-            icon = painterResource(Res.drawable.ic_open_in_new),
+            icon = painterResource(Res.drawable.ic_license),
             isAlwaysInMenu = true,
             onClick = onOpenChordProReference,
         ),

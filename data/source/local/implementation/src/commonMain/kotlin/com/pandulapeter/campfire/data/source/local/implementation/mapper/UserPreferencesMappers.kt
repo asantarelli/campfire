@@ -80,6 +80,10 @@ internal fun UserPreferencesDocument.toModel() = UserPreferences(
     seenWhatsNewVersions = seenWhatsNewVersions,
     isOnboardingPending = isOnboardingPending,
     demoLibraryContentHashes = demoLibraryContentHashes.filterValues { it.isNotBlank() },
+    musicSearchService = UserPreferences.MusicSearchService.entries.firstOrNull { it.id == musicSearchService } ?: UserPreferences.MusicSearchService.YOUTUBE,
+    songColumns = songColumns.coerceIn(UserPreferences.AUTOMATIC_SONG_COLUMNS, UserPreferences.MAX_SONG_COLUMNS),
+    pinnedChordsPosition = UserPreferences.PinnedChordsPosition.entries.firstOrNull { it.id == pinnedChordsPosition } ?: UserPreferences.PinnedChordsPosition.RIGHT,
+    autoScrollSpeed = autoScrollSpeed.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED),
 )
 
 internal fun UserPreferences.toDocument() = UserPreferencesDocument(
@@ -133,6 +137,10 @@ internal fun UserPreferences.toDocument() = UserPreferencesDocument(
     seenWhatsNewVersions = seenWhatsNewVersions,
     isOnboardingPending = isOnboardingPending,
     demoLibraryContentHashes = demoLibraryContentHashes,
+    musicSearchService = musicSearchService.id,
+    songColumns = songColumns,
+    pinnedChordsPosition = pinnedChordsPosition.id,
+    autoScrollSpeed = autoScrollSpeed,
 )
 
 internal fun PrintSettingsDocument.toModel() = PrintSettings(

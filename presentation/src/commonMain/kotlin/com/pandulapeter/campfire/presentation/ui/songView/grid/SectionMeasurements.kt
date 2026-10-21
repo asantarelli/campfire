@@ -91,6 +91,7 @@ internal data class SectionGridKey(
     val maxColumnCount: Int,
     val endInset: Int,
     val keepsEndInset: Boolean,
+    val forcedColumnCount: Int = 0,
 )
 
 /** The grid [SongSectionsLayout] decided on, and whether it was decided for the width less the end inset. */

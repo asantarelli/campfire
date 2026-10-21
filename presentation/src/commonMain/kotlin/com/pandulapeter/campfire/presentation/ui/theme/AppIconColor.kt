@@ -21,8 +21,8 @@ val UserPreferences?.appIconThemeColor
 
 /**
  * The color of the app icon that goes with a theme color, the one the platforms name their icon files by (its
- * [UserPreferences.ThemeColor.id]). Every color the app offers has an icon of its own, generated from the hand-drawn orange ones
- * by `app/generate_theme_icons.py`, except [UserPreferences.ThemeColor.SYSTEM]: only Android honors it, and has an icon
+ * [UserPreferences.ThemeColor.id]). Every color the app offers has an icon of its own, which in SDCancionero are all the same
+ * guitar pick (`app/generate_sd_icons.py`), except [UserPreferences.ThemeColor.SYSTEM]: only Android honors it, and has an icon
  * the system colors for it (see `AppIconSwitcher` in `:app:android`), and everywhere else the theme falls back to the
  * app's own palette, so the icon does too. So does a preference that has not been read yet.
  *

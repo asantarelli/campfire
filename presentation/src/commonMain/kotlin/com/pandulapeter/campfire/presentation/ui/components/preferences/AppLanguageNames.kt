@@ -15,6 +15,7 @@ import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.settings_user_interface_language_english
 import com.pandulapeter.campfire.presentation.resources.settings_user_interface_language_hungarian
+import com.pandulapeter.campfire.presentation.resources.settings_user_interface_language_spanish
 import com.pandulapeter.campfire.presentation.resources.settings_user_interface_language_system_default
 
 /** What [language] is called in the language the app is set to. */
@@ -27,4 +28,5 @@ internal val UserPreferences.Language.nameResource
         UserPreferences.Language.SYSTEM_DEFAULT -> Res.string.settings_user_interface_language_system_default
         UserPreferences.Language.ENGLISH -> Res.string.settings_user_interface_language_english
         UserPreferences.Language.HUNGARIAN -> Res.string.settings_user_interface_language_hungarian
+        UserPreferences.Language.SPANISH -> Res.string.settings_user_interface_language_spanish
     }

@@ -75,6 +75,12 @@ Definitions:
 - `ChordDiagramGeometry` (pure, tested) draws the shape: at least four frets, up to 24; the root in the second accent; a
   keyboard of two to four octaves.
 
+## Pinned diagrams
+
+`PinnedChordDiagrams`: the same cells (`ChordLibraryCell`, the shape `selectShape` picks) in a strip across the top (one
+row, scrolls sideways) or a panel down the right (two columns for a neck, one for a keyboard), over the song details
+page (see `ui/screens/songDetails/CLAUDE.md`); a tap opens the chord's sheet like the Chords section's.
+
 ## The chord sheet
 
 `ChordShapeSheet` (`DialogType.ChordShape`) finds the chord by name in the song as the page plays it, and closes if it

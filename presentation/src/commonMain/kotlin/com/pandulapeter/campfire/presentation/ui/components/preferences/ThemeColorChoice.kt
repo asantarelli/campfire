@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
-import com.pandulapeter.campfire.presentation.resources.ic_campfire
+import com.pandulapeter.campfire.presentation.resources.ic_sd_mark
 import com.pandulapeter.campfire.presentation.resources.ic_phone
 import com.pandulapeter.campfire.presentation.resources.settings_user_interface_theme_color_blue
 import com.pandulapeter.campfire.presentation.resources.settings_user_interface_theme_color_campfire
@@ -107,7 +107,7 @@ private fun UserPreferences.ThemeColor.label() = stringResource(
  */
 @Composable
 private fun UserPreferences.ThemeColor.icon(): Painter? = when (this) {
-    UserPreferences.ThemeColor.CAMPFIRE -> painterResource(Res.drawable.ic_campfire)
+    UserPreferences.ThemeColor.CAMPFIRE -> painterResource(Res.drawable.ic_sd_mark)
     UserPreferences.ThemeColor.SYSTEM -> painterResource(Res.drawable.ic_phone)
     else -> null
 }

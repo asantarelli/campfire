@@ -85,6 +85,10 @@ internal data class UserPreferencesDocument(
     val seenWhatsNewVersions: Set<String> = emptySet(),
     val isOnboardingPending: Boolean = false,
     val demoLibraryContentHashes: Map<String, String> = emptyMap(),
+    val musicSearchService: String = "",
+    val songColumns: Int = 0,
+    val pinnedChordsPosition: String = "",
+    val autoScrollSpeed: Int = 4,
 )
 
 @Serializable

@@ -35,7 +35,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -48,6 +51,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import com.pandulapeter.campfire.data.model.preferences.UserPreferences
+import com.pandulapeter.campfire.presentation.ui.chords.PinnedChordDiagrams
+import com.pandulapeter.campfire.presentation.ui.songView.LocalPinnedChordsPosition
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -57,7 +63,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import com.pandulapeter.campfire.chordpro.model.ChordProSong
 import com.pandulapeter.campfire.data.model.song.Song
-import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.metronome.api.model.TimeSignature
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
@@ -228,7 +233,12 @@ internal fun SongDetailsPage(
             }
             return@AnimatedContent
         }
-        val topPadding = PAGE_TOP_PADDING
+        // The chords the reader pinned stand beside the song rather than in it, and what they take of its height or its
+        // width is padding the page already counts out of everything it measures of itself.
+        val pinnedChords = pinnedChordsOf(position = LocalPinnedChordsPosition.current, chordDiagrams = chordDiagrams, model = model)
+        val topPadding = PAGE_TOP_PADDING + pinnedChords.heightInset
+        val stepButtonStrip = STEP_BUTTON_SIZE + STEP_BUTTON_GAP
+        val pinnedEndPadding = if (pinnedChords.widthInset > 0.dp) pinnedChords.widthInset + stepButtonStrip + PAGE_HORIZONTAL_PADDING else 0.dp
         val topPaddingPx = with(LocalDensity.current) { topPadding.roundToPx() }
         LaunchedEffect(flingBehavior) { flingBehavior.keepReaderInPlace() }
         val timings = remember(model.sections) { model.sections.filterIsInstance<RenderSection.Timing>() }
@@ -296,7 +306,7 @@ internal fun SongDetailsPage(
                     .bounceVerticalScroll(state = scrollState, flingBehavior = flingBehavior)
                     .padding(
                         start = contentPadding.calculateStartPadding(layoutDirection) + PAGE_HORIZONTAL_PADDING,
-                        end = contentPadding.calculateEndPadding(layoutDirection) + PAGE_HORIZONTAL_PADDING,
+                        end = contentPadding.calculateEndPadding(layoutDirection) + PAGE_HORIZONTAL_PADDING + pinnedEndPadding,
                         top = topPadding,
                         bottom = bottomPadding,
                     ),
@@ -329,12 +339,36 @@ internal fun SongDetailsPage(
                 rowViewportBottomPadding = bottomPadding,
                 // The buttons are as far from the end of the screen as the text is, so the text only has to leave
                 // them their own width and a gap.
-                stepButtonInset = STEP_BUTTON_SIZE + STEP_BUTTON_GAP,
+                stepButtonInset = if (pinnedEndPadding > 0.dp) 0.dp else stepButtonStrip,
                 keepsStepButtonInset = keepsStepButtonInset,
                 canCutSections = true,
-                chordDiagrams = chordDiagrams,
+                chordDiagrams = chordDiagrams.takeIf { pinnedChords == null },
                 scaleSuggestions = scaleSuggestions,
             )
+            pinnedChords?.let { pinned ->
+                val isAtTop = pinned.position == UserPreferences.PinnedChordsPosition.TOP
+                val endMargin = contentPadding.calculateEndPadding(layoutDirection) + PAGE_HORIZONTAL_PADDING + stepButtonStrip
+                PinnedChordDiagrams(
+                    modifier = if (isAtTop) {
+                        Modifier
+                            .align(Alignment.TopStart)
+                            .fillMaxWidth()
+                            .height(pinned.topInset)
+                            .padding(start = contentPadding.calculateStartPadding(layoutDirection), end = endMargin)
+                    } else {
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .fillMaxHeight()
+                            .width(pinned.endInset)
+                            .padding(end = endMargin, top = PAGE_TOP_PADDING, bottom = bottomPadding)
+                    },
+                    position = pinned.position,
+                    chords = pinned.chords,
+                    tuning = pinned.tuning,
+                    storedShapes = pinned.storedShapes,
+                    onChordClicked = pinned.onChordClicked,
+                )
+            }
         }
     }
 }

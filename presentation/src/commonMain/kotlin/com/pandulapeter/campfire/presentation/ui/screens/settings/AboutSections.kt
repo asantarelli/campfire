@@ -13,56 +13,39 @@ import androidx.compose.runtime.Composable
 import com.pandulapeter.campfire.presentation.CAMPFIRE_VERSION_NAME
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
-import com.pandulapeter.campfire.presentation.resources.ic_bug
-import com.pandulapeter.campfire.presentation.resources.ic_campfire
-import com.pandulapeter.campfire.presentation.resources.ic_coffee
+import com.pandulapeter.campfire.presentation.resources.ic_sd_mark
 import com.pandulapeter.campfire.presentation.resources.ic_git_hub
 import com.pandulapeter.campfire.presentation.resources.ic_license
-import com.pandulapeter.campfire.presentation.resources.ic_phone
-import com.pandulapeter.campfire.presentation.resources.ic_privacy_policy
 import com.pandulapeter.campfire.presentation.resources.ic_star
 import com.pandulapeter.campfire.presentation.resources.settings_created_by
 import com.pandulapeter.campfire.presentation.resources.settings_distribution_app_store
 import com.pandulapeter.campfire.presentation.resources.settings_distribution_mac_app_store
 import com.pandulapeter.campfire.presentation.resources.settings_distribution_microsoft_store
 import com.pandulapeter.campfire.presentation.resources.settings_distribution_play_store
-import com.pandulapeter.campfire.presentation.resources.settings_distributions_all
-import com.pandulapeter.campfire.presentation.resources.settings_distributions_all_description
 import com.pandulapeter.campfire.presentation.resources.settings_git_hub
 import com.pandulapeter.campfire.presentation.resources.settings_git_hub_description
 import com.pandulapeter.campfire.presentation.resources.settings_group_campfire
 import com.pandulapeter.campfire.presentation.resources.settings_group_help
 import com.pandulapeter.campfire.presentation.resources.settings_group_legal
-import com.pandulapeter.campfire.presentation.resources.settings_help
-import com.pandulapeter.campfire.presentation.resources.settings_help_description
 import com.pandulapeter.campfire.presentation.resources.settings_open_source_licenses
 import com.pandulapeter.campfire.presentation.resources.settings_open_source_licenses_description
-import com.pandulapeter.campfire.presentation.resources.settings_privacy_policy
-import com.pandulapeter.campfire.presentation.resources.settings_privacy_policy_description
 import com.pandulapeter.campfire.presentation.resources.settings_rate
 import com.pandulapeter.campfire.presentation.resources.settings_rate_description
-import com.pandulapeter.campfire.presentation.resources.settings_support
-import com.pandulapeter.campfire.presentation.resources.settings_support_description
 import com.pandulapeter.campfire.presentation.resources.settings_version
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
 import com.pandulapeter.campfire.presentation.ui.screens.settings.LinkListItem
 import com.pandulapeter.campfire.presentation.ui.dialogs.DialogType
 import com.pandulapeter.campfire.presentation.ui.platform.Distribution
-import com.pandulapeter.campfire.presentation.ui.platform.canAskForDonations
 import com.pandulapeter.campfire.presentation.ui.platform.platformStore
 import com.pandulapeter.campfire.presentation.ui.settingsPage.SettingsSection
 import org.jetbrains.compose.resources.painterResource
 
 /**
- * What the app is and where it lives, in three groups: the app itself (where every build of it is, how to give
- * something back, and, last, who made it and which version this is); help (the website's support page, and the source code
- * and issue tracker); and the fine print. The row that names the author is the link to the
- * author's own site, since that is what a name with a link on it is expected to lead to. campfire-songbook.com is the
- * app's home page: every build of Campfire is listed there, which is the whole of what the app says about the other
- * platforms, since a page can be kept up to date without a release and it is the one place App Review has nothing to
- * say about; and its support page answers the common questions and says how to reach the author, by email or on
- * GitHub. GitHub comes after those, as the source code and the issue tracker, since that is what it is to somebody who
- * has never used it.
+ * What the app is and where it lives, in three groups: the app itself (how to give something back, and, last, whose
+ * work it is built on and which version this is); help (the source code and issue tracker of this fork); and the fine
+ * print. The row that credits the work leads to the original Campfire project, since the license asks for it to stay
+ * named and that is where its author is found. There is no website, privacy policy page or donation link: the app
+ * is not published anywhere but through the source code, which is also what GitHub is to somebody who has never used it.
  *
  * The rating row leads to the store of the platform the app is running on, and only once that listing exists. It
  * says "rate", never "get it from the store": a store page has an install button on it, and somebody who has the
@@ -82,12 +65,6 @@ internal fun AboutSections(
 private fun AppSection(
     urlOpener: (String) -> Unit,
 ) = SettingsSection(title = stringResource(Res.string.settings_group_campfire)) {
-    LinkListItem(
-        title = stringResource(Res.string.settings_distributions_all),
-        description = stringResource(Res.string.settings_distributions_all_description),
-        icon = painterResource(Res.drawable.ic_phone),
-        onClick = { urlOpener("$WEBSITE_URL#download") },
-    )
     platformStore?.let { store ->
         store.listingUrl?.let { listingUrl ->
             LinkListItem(
@@ -98,19 +75,11 @@ private fun AppSection(
             )
         }
     }
-    if (canAskForDonations) {
-        LinkListItem(
-            title = stringResource(Res.string.settings_support),
-            description = stringResource(Res.string.settings_support_description),
-            icon = painterResource(Res.drawable.ic_coffee),
-            onClick = { urlOpener("https://buymeacoffee.com/pandulapeter") },
-        )
-    }
     LinkListItem(
         title = stringResource(Res.string.settings_created_by),
         description = stringResource(Res.string.settings_version, CAMPFIRE_VERSION_NAME),
-        icon = painterResource(Res.drawable.ic_campfire),
-        onClick = { urlOpener("https://pandulapeter.com/") },
+        icon = painterResource(Res.drawable.ic_sd_mark),
+        onClick = { urlOpener(CAMPFIRE_URL) },
     )
 }
 
@@ -119,16 +88,10 @@ private fun HelpSection(
     urlOpener: (String) -> Unit,
 ) = SettingsSection(title = stringResource(Res.string.settings_group_help)) {
     LinkListItem(
-        title = stringResource(Res.string.settings_help),
-        description = stringResource(Res.string.settings_help_description),
-        icon = painterResource(Res.drawable.ic_bug),
-        onClick = { urlOpener("${WEBSITE_URL}support/") },
-    )
-    LinkListItem(
         title = stringResource(Res.string.settings_git_hub),
         description = stringResource(Res.string.settings_git_hub_description),
         icon = painterResource(Res.drawable.ic_git_hub),
-        onClick = { urlOpener("https://github.com/pandulapeter/campfire") },
+        onClick = { urlOpener(GIT_HUB_URL) },
     )
 }
 
@@ -143,12 +106,6 @@ private fun LegalSection(
         icon = painterResource(Res.drawable.ic_license),
         onClick = onOpenSourceLicensesClicked,
     )
-    LinkListItem(
-        title = stringResource(Res.string.settings_privacy_policy),
-        description = stringResource(Res.string.settings_privacy_policy_description),
-        icon = painterResource(Res.drawable.ic_privacy_policy),
-        onClick = { urlOpener("${WEBSITE_URL}privacy/") },
-    )
 }
 
 /** The name a rating is left under, which is the one thing the app still has to call a store. */
@@ -160,4 +117,5 @@ private val Distribution.storeName
         Distribution.MICROSOFT_STORE -> Res.string.settings_distribution_microsoft_store
     }
 
-private const val WEBSITE_URL = "https://campfire-songbook.com/"
+private const val GIT_HUB_URL = "https://github.com/asantarelli/campfire"
+private const val CAMPFIRE_URL = "https://github.com/pandulapeter/campfire"

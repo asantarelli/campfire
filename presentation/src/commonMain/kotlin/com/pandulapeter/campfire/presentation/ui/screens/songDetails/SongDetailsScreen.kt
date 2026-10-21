@@ -99,6 +99,7 @@ internal fun SongDetailsScreen(
     destination: CampfireDestination.SongDetails,
     settledWidth: Dp,
     contentPadding: PaddingValues,
+    urlOpener: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val setlists by viewModel.libraryState.setlists.collectAsStateWithLifecycle()
@@ -262,6 +263,8 @@ internal fun SongDetailsScreen(
             scrollBehavior = if (isCompactHeight) appBarScrollBehavior else null,
             contentPadding = contentPadding,
             coroutineScope = coroutineScope,
+            musicSearchService = userPreferences?.musicSearchService ?: UserPreferences.MusicSearchService.YOUTUBE,
+            urlOpener = urlOpener,
             onBack = onBack,
         )
         // The paging bar sits below the pager and covers the bottom inset for it, so the pages only keep the

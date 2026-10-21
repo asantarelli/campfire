@@ -12,6 +12,8 @@ package com.pandulapeter.campfire.presentation.ui.screens.songEditor
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.EditorChordShapes
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.EditorControlRow
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.EditorToolbar
+import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.insert
+import com.pandulapeter.campfire.presentation.ui.screens.songEditor.reference.ChordProReferenceSheet
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.search.EditorSearchMode
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.search.EditorSearchSheet
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.search.editorSearchShortcuts
@@ -23,6 +25,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -49,6 +52,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -217,6 +221,7 @@ internal fun LoadedSongEditor(
     // changes the panes, before the old field is disposed and reports losing it.
     val focusRequester = remember { FocusRequester() }
     val fieldFocusRequester = remember { FocusRequester() }
+    var isReferenceOpen by rememberSaveable { mutableStateOf(false) }
     val fieldFocus = remember { FieldFocus() }
     val wasFieldFocused = remember(panes) { fieldFocus.hasFocus }
     LaunchedEffect(panes) {
@@ -276,7 +281,7 @@ internal fun LoadedSongEditor(
                     },
                     canRevert = hasUnsavedChanges && hasSavedText && !isSaving,
                     onRevert = { viewModel.dialogHost.showDialog(DialogType.RevertChanges) },
-                    onOpenChordProReference = { urlOpener(CHORDPRO_REFERENCE_URL) },
+                    onOpenChordProReference = { isReferenceOpen = !isReferenceOpen },
                 )
             },
             bottomContent = {
@@ -355,20 +360,32 @@ internal fun LoadedSongEditor(
         // The panes take what the app bar and the toggle above them leave, rather than the whole window: a Column
         // measures a child that does not weigh anything against an unbounded height, and a song longer than the
         // screen then lays the field out past the bottom edge of it instead of scrolling inside it.
-        if (hasSideBySidePreview) {
-            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                editor(Modifier.weight(1f).fillMaxHeight())
-                VerticalDivider()
-                preview(Modifier.weight(1f).fillMaxHeight())
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            if (hasSideBySidePreview) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    editor(Modifier.weight(1f).fillMaxHeight())
+                    VerticalDivider()
+                    preview(Modifier.weight(1f).fillMaxHeight())
+                }
+            } else {
+                AnimatedContent(
+                    modifier = Modifier.fillMaxSize(),
+                    targetState = panes == EditorPanes.PREVIEW,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                ) { showPreview ->
+                    if (showPreview) preview(Modifier.fillMaxSize()) else editor(Modifier.fillMaxSize())
+                }
             }
-        } else {
-            AnimatedContent(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                targetState = panes == EditorPanes.PREVIEW,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-            ) { showPreview ->
-                if (showPreview) preview(Modifier.fillMaxSize()) else editor(Modifier.fillMaxSize())
-            }
+            ChordProReferenceSheet(
+                modifier = Modifier.align(Alignment.CenterEnd),
+                isVisible = isReferenceOpen,
+                onInsert = { insertion ->
+                    textFieldState.insert(insertion)
+                    if (panes != EditorPanes.PREVIEW) fieldFocusRequester.requestFocus()
+                },
+                onOpenFullReference = { urlOpener(CHORDPRO_REFERENCE_URL) },
+                onClose = { isReferenceOpen = false },
+            )
         }
     }
     if (search.mode != null) {

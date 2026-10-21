@@ -61,6 +61,11 @@ builds what it draws, `grid/` places it.
 
 ### Layout (`SongSectionsLayout`)
 
+- **The reader may fix the number of columns** (`UserPreferences.songColumns`, read as `LocalForcedSongColumns`): the
+  search then takes exactly that many, or as many as the window holds of the narrow columns where it holds fewer, and
+  makes neither the search for the fewest columns a song fits in nor the narrow-column pass. A song set in one column
+  keeps being paged as it always was, except that one column means one: no two narrow sections are paired beside each other
+  (`flowIntoPages`'s `isNarrow`). The editor's preview and a songbook ignore it.
 - **A fold holds the columns in place for 900 ms** (`ColumnCenteringHold`) before re-centering, or the header just
   tapped would move and a second tap miss.
 - The editor's preview and a songbook (over `MAX_CUT_SECTION_COUNT`, 200 sections) keep a plain, unmeasured single

@@ -46,6 +46,8 @@ internal data class SongGridSpec(
     val lyricsLineHeight: Int,
     val canCutSections: Boolean,
     val isSingleColumn: Boolean,
+    /** How many columns the reader asked for, or 0 where the width of the window decides: see [SongGridSearch]. */
+    val forcedColumnCount: Int = 0,
 )
 
 /**
@@ -69,6 +71,11 @@ internal data class SongGridSpec(
  * allows, and of the sections whole, the layout taken is the one of the fewest pages and then of the lowest score (see
  * [LayoutScoring]), the sections whole keeping a full tie and the most columns the rest. The cards of the sections
  * drawn on one are placed here, one behind every piece, from as many as each section could be cut into ([cardKeys]).
+ *
+ * Where the reader asked for a number of columns ([SongGridSpec.forcedColumnCount]) the song is set in exactly that many
+ * - or in as many as the window holds of the narrow columns, where it holds fewer - and none of the searches that find
+ * the fewest columns a song fits in, or the best of them, is made: what is chosen is where the sections go, not how
+ * many columns there are.
  *
  * A song that is stepped through all the same may be set in columns narrower than [minColumnWidth], down to
  * [narrowColumnWidth], wherever its lines mostly fit them and that takes a page away - read without stepping at all
@@ -106,14 +113,14 @@ internal class SongGridSearch(
     // A songbook too long to be cut into pages is stepped by rows where it has columns, each named by its first section,
     // so a change of tempo or time in a row's second column would only be heard on the next row: one that changes is a
     // single column, stepped by its sections, which the click follows past every change.
-    private fun widthColumnCountFor(totalWidth: Int) = if (isPagedBySections) {
-        1
-    } else {
-        ((totalWidth + columnGapPx) / (spec.minColumnWidth + columnGapPx)).coerceAtLeast(1)
+    private fun widthColumnCountFor(totalWidth: Int) = when {
+        isPagedBySections -> 1
+        spec.forcedColumnCount > 0 -> spec.forcedColumnCount.coerceAtMost(((totalWidth + columnGapPx) / (spec.narrowColumnWidth + columnGapPx)).coerceAtLeast(1))
+        else -> ((totalWidth + columnGapPx) / (spec.minColumnWidth + columnGapPx)).coerceAtLeast(1)
     }
     // Columns narrower than a readable one are only ever set where a song is cut into pages, since that is where they
     // can save one.
-    private fun narrowColumnCountFor(totalWidth: Int) = if (isPagedBySections || !spec.canCutSections || sectionCount > MAX_CUT_SECTION_COUNT) {
+    private fun narrowColumnCountFor(totalWidth: Int) = if (isPagedBySections || spec.forcedColumnCount > 0 || !spec.canCutSections || sectionCount > MAX_CUT_SECTION_COUNT) {
         widthColumnCountFor(totalWidth)
     } else {
         maxOf(widthColumnCountFor(totalWidth), (totalWidth + columnGapPx) / (spec.narrowColumnWidth + columnGapPx))
@@ -160,6 +167,7 @@ internal class SongGridSearch(
         maxColumnCount = narrowColumnCountFor(settledWidth).coerceAtMost(maxOf(1, unitCount)),
         endInset = endInsetPx,
         keepsEndInset = spec.keepsEndInset,
+        forcedColumnCount = spec.forcedColumnCount,
     )
 
     // The grid of the sections of [segment], the units of a stretch of the song that starts at [sectionOffset], every
@@ -331,7 +339,8 @@ internal class SongGridSearch(
             val paged = flowIntoPages(
                 sectionStarts = segment.sectionStarts,
                 heightAt = { unit, columns -> unitHeightAt(unit, columnWidthFor(totalWidth, columns)) },
-                isNarrow = { section -> isNarrowSection(section + sectionOffset, halfColumnWidth) },
+                // A song the reader asked to be set in one column has no two sections side by side either.
+                isNarrow = { section -> spec.forcedColumnCount != 1 && isNarrowSection(section + sectionOffset, halfColumnWidth) },
                 isCuttableBefore = { unit -> segment.isCuttableBefore[unit] },
                 piecePadding = piecePadding,
                 sectionGap = sectionGapPx,
@@ -343,7 +352,13 @@ internal class SongGridSearch(
             return withNarrowColumns(paged.scored())
         }
 
-        val searched = if (availableHeightPx > 0) {
+        val searched = if (availableHeightPx > 0 && spec.forcedColumnCount > 0 && maxColumnCount > 1) {
+            // The reader chose the number of columns, so there is none to find: the sections go into that many.
+            gridFor(maxColumnCount).let { grid ->
+                val height = grid.height()
+                SearchedGrid(grid, fits = grid.pageCount == 1 && height <= availableHeightPx, height = height)
+            }
+        } else if (availableHeightPx > 0) {
             searchColumnCount(
                 maxColumnCount = maxColumnCount,
                 availableHeight = availableHeightPx,
@@ -366,7 +381,7 @@ internal class SongGridSearch(
         // not cut to look the same. Then every count of columns, the most first, a narrower count being taken only
         // where its wider columns, which wrap less, score better.
         var best = searched.grid.scored()
-        for (columnCount in cutColumnCount downTo 2) {
+        for (columnCount in cutColumnCount downTo if (spec.forcedColumnCount > 0) cutColumnCount.coerceAtLeast(2) else 2) {
             val candidate = magazine(columnCount).scored()
             if (candidate.isBetterThan(best)) best = candidate
         }

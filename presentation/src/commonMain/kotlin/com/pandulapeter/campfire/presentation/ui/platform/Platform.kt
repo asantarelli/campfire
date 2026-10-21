@@ -51,24 +51,13 @@ internal expect val appIconSurface: AppIconSurface?
 /**
  * The app store of the platform the app is **running on**, which is the one official way to get Campfire there: every
  * platform has exactly one, and a build made by hand is still a build of that platform. The settings screen's rating
- * row opens its listing, and it decides [canAskForDonations]. Null where the platform has no store - Linux has none,
+ * row opens its listing. Null where the platform has no store - Linux has none,
  * and the web build runs on all of them, so any one choice would be a guess.
  *
  * A build that goes through App Review only ever runs on an Apple platform, so this never names another company's
  * store to one (guideline 2.3.10) without a rule of its own having to say so.
  */
 internal expect val platformStore: Distribution?
-
-/**
- * Whether the settings screen may offer a link that asks for money: everywhere but on Apple's platforms.
- *
- * The App Store and the Mac App Store forbid pointing at any way of paying the developer other than an in-app
- * purchase (guideline 3.1.1), and a tip is such a payment. Their builds are the only official ones on iOS and macOS,
- * so the platform decides it rather than the build. Play's billing is only required for purchases of digital content,
- * which a donation that buys nothing is not; the Microsoft Store has no such rule; and the Linux package and the web
- * build answer to no store at all.
- */
-internal val canAskForDonations get() = platformStore?.isApple != true
 
 /**
  * How far a scroll wheel event turned the wheel vertically, in notches (positive towards the user), which is the unit a
@@ -84,16 +73,14 @@ internal expect fun PointerEvent.verticalWheelNotches(): Float
  *   filled in on the day the listing goes live, which is the whole of what publishing costs the app. It is an https
  *   address rather than a store's own scheme (`market://`, `ms-windows-store://`) so that it also opens in a
  *   browser, on a desktop where the store app may not be installed at all.
- * @property isApple Whether the store is one of Apple's, which is what decides [canAskForDonations].
  */
 internal enum class Distribution(
     val listingUrl: String?,
-    val isApple: Boolean = false,
 ) {
-    PLAY_STORE(listingUrl = "https://play.google.com/store/apps/details?id=com.pandulapeter.campfire"),
-    APP_STORE(listingUrl = "https://apps.apple.com/app/id6815160850", isApple = true),
-    MAC_APP_STORE(listingUrl = "https://apps.apple.com/app/id6815160850", isApple = true),
-    MICROSOFT_STORE(listingUrl = "https://apps.microsoft.com/detail/9MSR62F288M1"),
+    PLAY_STORE(listingUrl = null),
+    APP_STORE(listingUrl = null),
+    MAC_APP_STORE(listingUrl = null),
+    MICROSOFT_STORE(listingUrl = null),
 }
 
 /** The builds Campfire is handed out as, each shipping a different set of libraries and assets. */

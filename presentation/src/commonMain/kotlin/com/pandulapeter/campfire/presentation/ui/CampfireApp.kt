@@ -38,9 +38,12 @@ import com.pandulapeter.campfire.presentation.ui.components.menu.LocalMenuRoom
 import com.pandulapeter.campfire.presentation.ui.components.menu.LocalOverlayState
 import com.pandulapeter.campfire.presentation.ui.components.menu.rememberMenuRoom
 import com.pandulapeter.campfire.presentation.ui.components.labels.LocalTagColors
+import com.pandulapeter.campfire.presentation.ui.songView.LocalForcedSongColumns
+import com.pandulapeter.campfire.presentation.ui.songView.LocalPinnedChordsPosition
 import com.pandulapeter.campfire.presentation.ui.components.coverArt.ProvideCoverArtImageLoader
 import com.pandulapeter.campfire.presentation.ui.platform.isDesktopPlatform
 import com.pandulapeter.campfire.presentation.ui.platform.isLibraryEditableOutsideApp
+import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.localization.ApplyLanguagePreference
 import com.pandulapeter.campfire.presentation.ui.theme.CampfireTheme
 import com.pandulapeter.campfire.presentation.ui.theme.ProvideInterfaceScale
@@ -131,6 +134,8 @@ fun CampfireApp(
         LocalOverlayState provides viewModel.dialogHost.overlayState,
         LocalMenuRoom provides rememberMenuRoom(),
         LocalTagColors provides (userPreferences?.tagColors ?: emptyMap()),
+        LocalForcedSongColumns provides (userPreferences?.songColumns ?: UserPreferences.AUTOMATIC_SONG_COLUMNS),
+        LocalPinnedChordsPosition provides (userPreferences?.pinnedChordsPosition ?: UserPreferences.PinnedChordsPosition.IN_SONG),
     ) {
         CampfireTheme(
             uiMode = userPreferences?.uiMode,

@@ -131,6 +131,7 @@ internal fun SongSectionsLayout(
 ) {
     // Read in composition, so that a theme cross-fade draws the dividers again in its new color.
     val dividerColor = DividerDefaults.color
+    val forcedColumnCount = LocalForcedSongColumns.current
     // State rather than a plain field: a measure that moves the tops without changing the layout's size (a centering
     // hold released, a fold elsewhere in the row) does not otherwise draw this node again.
     val dividerTops = remember { mutableStateOf(emptyList<Int>()) }
@@ -185,6 +186,7 @@ internal fun SongSectionsLayout(
                 lyricsLineHeight = lyricsLineHeight,
                 canCutSections = canCutSections,
                 isSingleColumn = isSingleColumn,
+                forcedColumnCount = forcedColumnCount,
             ),
         )
         val decidedGrid = sectionMeasurements.grid(search.gridKey(settledWidth)) { search.decide(settledWidth) }

@@ -73,7 +73,7 @@ internal object DesktopFilePicker : FilePicker {
         }
     }
 
-    private const val DIALOG_TITLE = "Campfire"
+    private const val DIALOG_TITLE = "SDCancionero"
 }
 
 /**

@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.pandulapeter.campfire.presentation.resources.Res
-import com.pandulapeter.campfire.presentation.resources.ic_campfire
+import com.pandulapeter.campfire.presentation.resources.ic_sd_mark
 import com.pandulapeter.campfire.presentation.resources.ic_cloud
 import com.pandulapeter.campfire.presentation.resources.ic_palette
 import com.pandulapeter.campfire.presentation.resources.ic_songs
@@ -108,7 +108,7 @@ private fun lerp(start: Float, stop: Float, fraction: Float) = start + (stop - s
 
 private val OnboardingStep.markIcon
     get() = when (this) {
-        OnboardingStep.WELCOME -> Res.drawable.ic_campfire
+        OnboardingStep.WELCOME -> Res.drawable.ic_sd_mark
         OnboardingStep.LOOK -> Res.drawable.ic_palette
         OnboardingStep.INSTRUMENT -> Res.drawable.ic_tuner
         OnboardingStep.FEATURES -> Res.drawable.ic_tune

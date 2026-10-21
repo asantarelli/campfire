@@ -22,7 +22,7 @@
     <string name="deselect_all">Deselect all</string>
     <string name="retry">Retry</string>
     <string name="add_demo_library">Add the demo library</string>
-    <string name="confirm_exit_title">Close Campfire?</string>
+    <string name="confirm_exit_title">Close SDCancionero?</string>
     <string name="confirm_exit_message">Are you sure you want to leave the app?</string>
 
     <!-- Import and export -->
@@ -33,7 +33,7 @@
     <string name="import_progress_importing">Adding files to your library</string>
     <string name="import_progress_finishing">Updating your library</string>
     <string name="import_progress_count">%1$d of %2$d processed</string>
-    <string name="import_progress_wait">Please keep Campfire open until the import finishes.</string>
+    <string name="import_progress_wait">Please keep SDCancionero open until the import finishes.</string>
     <string name="import_status_title">Import complete</string>
     <string name="import_status_stopped">Import stopped</string>
     <string name="import_status_partial">The import stopped after a failure. Files already imported are in your library; the remaining files were not processed.</string>
@@ -67,8 +67,8 @@
     <string name="import_converted">Converted: %1$d — worth a look in the editor.</string>
     <string name="import_open">Open</string>
     <plurals name="import_unreadable_documents">
-        <item quantity="one">One document has no text Campfire can read (a scan, a protected PDF, or an old Word format).</item>
-        <item quantity="other">%1$d documents have no text Campfire can read (scans, protected PDFs, or an old Word format).</item>
+        <item quantity="one">One document has no text SDCancionero can read (a scan, a protected PDF, or an old Word format).</item>
+        <item quantity="other">%1$d documents have no text SDCancionero can read (scans, protected PDFs, or an old Word format).</item>
     </plurals>
     <string name="import_failed">Import failed</string>
     <string name="import_interrupted">The import was interrupted. Open the files again to import them.</string>
@@ -78,7 +78,7 @@
     <string name="export_setlist_saved">Setlist exported</string>
     <string name="export_songs_saved">Songs exported</string>
     <string name="export_library_saved">Library exported</string>
-    <string name="export_too_large_to_import">This archive is larger than the 24 MB Campfire can import at once. It is a complete copy of your library; to bring it back, unzip it and import the songs a few thousand at a time.</string>
+    <string name="export_too_large_to_import">This archive is larger than the 24 MB SDCancionero can import at once. It is a complete copy of your library; to bring it back, unzip it and import the songs a few thousand at a time.</string>
     <plurals name="export_skipped_files">
         <item quantity="one">One file could not be read and is not in the archive: %2$s</item>
         <item quantity="other">%1$d files could not be read and are not in the archive. Among them: %2$s</item>
@@ -100,7 +100,7 @@
     <string name="import_progress_downloading">Downloading the file</string>
     <string name="import_failed_unreachable">%1$s could not be reached. Check the internet connection and try again.</string>
     <string name="import_failed_not_found">There is nothing to download at that address. The link may have expired or been removed.</string>
-    <string name="import_failed_too_large">This file is larger than the 24 MB Campfire can import at once.</string>
+    <string name="import_failed_too_large">This file is larger than the 24 MB SDCancionero can import at once.</string>
     <string name="import_failed_unreadable">The files could not be read. Nothing was imported.</string>
     <string name="import_retry">Try again</string>
     <string name="import_review_title">Review the import</string>
@@ -170,7 +170,7 @@
     <string name="songs_paste_from_clipboard">Paste from clipboard</string>
     <string name="add_songs_hint_title">Add your own songs</string>
     <string name="add_songs_tip_paste_title">Copy a song from any website</string>
-    <string name="add_songs_tip_paste_hint">Copy a song\'s lyrics and chords from any web page, however messy, and paste them here. Campfire tidies them into a song you can save.</string>
+    <string name="add_songs_tip_paste_hint">Copy a song\'s lyrics and chords from any web page, however messy, and paste them here. SDCancionero tidies them into a song you can save.</string>
     <string name="add_songs_tip_import_title">Bring your songs from another app</string>
     <string name="add_songs_tip_import_hint">Export your songs from another songbook app, ideally as a zip archive or a backup, and import them here. ChordPro, PDF, Word, and text files work too.</string>
     <string name="songs_paste_converted">Converted from chords written over the lyrics. Check the title and the artist, then save.</string>
@@ -179,11 +179,11 @@
     <string name="new_song_placeholder_title">New song</string>
     <string name="new_song_placeholder_artist">Unknown artist</string>
     <string name="paste_clipboard_empty">There is no text on the clipboard to paste.</string>
-    <string name="paste_only_links">A link is not a song, and Campfire does not open pages. Copy the chords and the lyrics themselves.</string>
+    <string name="paste_only_links">A link is not a song, and SDCancionero does not open pages. Copy the chords and the lyrics themselves.</string>
     <string name="paste_too_large">The text is longer than the 8 MB one import can take.</string>
-    <string name="shared_link_not_imported">Campfire does not open web pages. Select the chord sheet\'s text and share that instead.</string>
-    <string name="paste_refused_ios">Campfire was not allowed to paste. Paste from Other Apps, under Campfire in the Settings app, decides this.</string>
-    <string name="paste_refused_web">The browser did not let Campfire read the clipboard. Press Ctrl+V (⌘V on a Mac) on the song list instead.</string>
+    <string name="shared_link_not_imported">SDCancionero does not open web pages. Select the chord sheet\'s text and share that instead.</string>
+    <string name="paste_refused_ios">SDCancionero was not allowed to paste. Paste from Other Apps, under SDCancionero in the Settings app, decides this.</string>
+    <string name="paste_refused_web">The browser did not let SDCancionero read the clipboard. Press Ctrl+V (⌘V on a Mac) on the song list instead.</string>
     <string name="songs_new_song">New song</string>
     <string name="optional_field_label">%1$s (optional)</string>
     <string name="songs_new_song_title">Title</string>
@@ -324,9 +324,9 @@
     <string name="settings_library_storage">Storage</string>
     <string name="settings_library_storage_granted">Your browser has agreed to keep the library until you clear this site\'s data.</string>
     <string name="settings_library_storage_best_effort">Your browser keeps the library, but has not yet promised to hold on to it if the device runs low on space. Bookmarking this page or using it regularly usually earns that promise; until then, an export or sync keeps a copy elsewhere.</string>
-    <string name="settings_library_storage_offline_granted">Campfire opens in this browser without a connection. Your browser has agreed to keep it and the library until you clear this site\'s data.</string>
-    <string name="settings_library_storage_offline_best_effort">Campfire opens in this browser without a connection. Your browser keeps it and the library, but has not yet promised to hold on to them if the device runs low on space. Bookmarking this page or using it regularly usually earns that promise; until then, an export or sync keeps a copy of the library elsewhere.</string>
-    <string name="settings_library_storage_online_only">Campfire could not be saved in this browser, so opening it needs a connection.</string>
+    <string name="settings_library_storage_offline_granted">SDCancionero opens in this browser without a connection. Your browser has agreed to keep it and the library until you clear this site\'s data.</string>
+    <string name="settings_library_storage_offline_best_effort">SDCancionero opens in this browser without a connection. Your browser keeps it and the library, but has not yet promised to hold on to them if the device runs low on space. Bookmarking this page or using it regularly usually earns that promise; until then, an export or sync keeps a copy of the library elsewhere.</string>
+    <string name="settings_library_storage_online_only">SDCancionero could not be saved in this browser, so opening it needs a connection.</string>
     <string name="settings_import">Import songs, documents, or zip archives…</string>
     <string name="settings_export_all">Export library as zip</string>
     <string name="settings_preferences">Preferences</string>
@@ -335,9 +335,9 @@
     <string name="settings_read_only_mode">Read only</string>
     <string name="settings_read_only_mode_description">Locks the app while you play: editing, deleting, reordering, and transposing are hidden, so nothing can be changed by accident</string>
     <string name="settings_read_only_mode_description_without_setlists">Locks the app while you play: editing, deleting, and transposing are hidden, so nothing can be changed by accident</string>
-    <string name="settings_songs_description">The Songs and Setlists tabs. Switch them off to use Campfire only as a metronome, a tuner, and a chord and scale reference: your songs are only hidden, none is deleted.</string>
-    <string name="settings_songs_description_without_setlists">The Songs tab. Switch it off to use Campfire only as a metronome, a tuner, and a chord and scale reference: your songs are only hidden, none is deleted.</string>
-    <string name="settings_everything_off">Everything is switched off, so Campfire is now an app for changing the settings of Campfire. Switch something back on to make it useful again.</string>
+    <string name="settings_songs_description">The Songs and Setlists tabs. Switch them off to use SDCancionero only as a metronome, a tuner, and a chord and scale reference: your songs are only hidden, none is deleted.</string>
+    <string name="settings_songs_description_without_setlists">The Songs tab. Switch it off to use SDCancionero only as a metronome, a tuner, and a chord and scale reference: your songs are only hidden, none is deleted.</string>
+    <string name="settings_everything_off">Everything is switched off, so SDCancionero is now an app for changing the settings of SDCancionero. Switch something back on to make it useful again.</string>
     <string name="settings_chords">Chords</string>
     <string name="settings_chords_description">Show the chords with the words, along with the key, the transposition, and the capo. Off, every song is lyrics only.</string>
     <string name="settings_chord_diagrams">Chord diagrams</string>
@@ -361,13 +361,28 @@
     <string name="settings_group_sync">Sync</string>
     <string name="settings_group_import_export">Import and export</string>
     <string name="settings_group_on_this_device">On this device</string>
-    <string name="settings_group_campfire">Campfire</string>
+    <string name="settings_group_campfire">SDCancionero</string>
     <string name="settings_group_help">Help</string>
     <string name="settings_group_legal">Legal</string>
     <string name="settings_number_sections">Number sections</string>
     <string name="settings_number_sections_description">Tell apart repeated sections that have no name of their own, such as Verse 1 and Verse 2</string>
     <string name="settings_song_cards">Song cards</string>
     <string name="settings_song_cards_description">What each song shows under its artist in the lists.</string>
+    <string name="settings_group_song_view">Song view</string>
+    <string name="settings_song_columns">Columns</string>
+    <string name="settings_song_columns_description">How many columns a song is set in. Automatic leaves it to the width of the window.</string>
+    <string name="settings_song_columns_automatic">Auto</string>
+    <string name="settings_pinned_chords">Pinned chord diagrams</string>
+    <string name="settings_pinned_chords_description">Where the diagrams of a song's chords stand while it scrolls: among its sections, or pinned at the top or on the right.</string>
+    <string name="settings_pinned_chords_in_song">In the song</string>
+    <string name="settings_pinned_chords_top">At the top</string>
+    <string name="settings_pinned_chords_right">On the right</string>
+    <string name="settings_music_search">Listen to the song</string>
+    <string name="settings_music_search_description">The song's listen button searches for its artist and title on this service, in your browser.</string>
+    <string name="music_search_youtube">YouTube</string>
+    <string name="music_search_youtube_music">YouTube Music</string>
+    <string name="music_search_spotify">Spotify</string>
+    <string name="song_details_listen">Listen on %1$s</string>
     <string name="card_detail_key">Key</string>
     <string name="card_detail_tempo">Tempo</string>
     <string name="card_detail_duration">Duration</string>
@@ -385,7 +400,7 @@
     <string name="settings_notation_roman">Roman numerals</string>
     <string name="settings_notation_roman_description">I IV V vi, counted from the song\'s key: capitals for major chords, small letters for minor. A song with no key keeps its letters, and the editor is always in letters.</string>
     <string name="settings_accidentals">Accidentals</string>
-    <string name="settings_accidentals_description">Whether a chord on a black key is written as a flat (%1$s) or as a sharp (%2$s). Left as written, Campfire picks whichever fits the key of the song.</string>
+    <string name="settings_accidentals_description">Whether a chord on a black key is written as a flat (%1$s) or as a sharp (%2$s). Left as written, SDCancionero picks whichever fits the key of the song.</string>
     <string name="settings_accidentals_original">As written</string>
     <string name="settings_accidentals_flats">Flats (♭)</string>
     <string name="settings_accidentals_sharps">Sharps (♯)</string>
@@ -415,7 +430,7 @@
     <string name="instrument_keyboard_description">The notes of each chord, with the capo counted into the transposition</string>
     <string name="instrument_other_description">No strings, no chord diagrams</string>
     <string name="settings_general">General</string>
-    <string name="settings_onboarding">Set up Campfire again</string>
+    <string name="settings_onboarding">Set up SDCancionero again</string>
     <string name="settings_onboarding_description">Choose your look, instrument, and features again, step by step</string>
     <string name="settings_user_interface_theme">Theme</string>
     <string name="settings_user_interface_theme_system_default">System</string>
@@ -425,14 +440,14 @@
     <string name="settings_background_warmth">Sepia</string>
     <string name="settings_background_warmth_description">Turns the background towards the warm color of old paper, which can be easier on the eyes. The contrast stays the same at every step.</string>
     <string name="settings_app_icon_launcher">Color the launcher icon</string>
-    <string name="settings_app_icon_launcher_description">The home screen icon takes the color above. The first change takes effect once you leave Campfire, and some launchers take the icon off the home screen when it changes.</string>
+    <string name="settings_app_icon_launcher_description">The home screen icon takes the color above. The first change takes effect once you leave SDCancionero, and some launchers take the icon off the home screen when it changes.</string>
     <string name="settings_app_icon_home_screen">Color the app icon</string>
     <string name="settings_app_icon_home_screen_description">The home screen icon takes the color above. iOS confirms every change with a message.</string>
     <string name="settings_app_icon_window">Color the window icon</string>
-    <string name="settings_app_icon_window_description">The window icon takes the color above while Campfire is open</string>
+    <string name="settings_app_icon_window_description">The window icon takes the color above while SDCancionero is open</string>
     <string name="settings_app_icon_browser_tab">Color the tab icon</string>
     <string name="settings_app_icon_browser_tab_description">The browser tab\'s icon takes the color above</string>
-    <string name="settings_user_interface_theme_color_campfire">Campfire</string>
+    <string name="settings_user_interface_theme_color_campfire">SDCancionero</string>
     <string name="settings_user_interface_theme_color_gray">Gray</string>
     <string name="settings_user_interface_theme_color_system">System</string>
     <string name="settings_user_interface_theme_color_red">Red</string>
@@ -448,33 +463,26 @@
     <string name="settings_user_interface_language_with_own_name">%1$s (%2$s)</string>
     <string name="settings_user_interface_language_english">English</string>
     <string name="settings_user_interface_language_hungarian">Hungarian</string>
+    <string name="settings_user_interface_language_spanish">Spanish</string>
     <string name="settings_user_interface_language_more_coming">More languages coming soon</string>
-    <string name="settings_distributions_all">Every version of Campfire</string>
-    <string name="settings_distributions_all_description">On campfire-songbook.com</string>
     <string name="settings_distribution_play_store">Google Play</string>
     <string name="settings_distribution_app_store">App Store</string>
     <string name="settings_distribution_mac_app_store">Mac App Store</string>
     <string name="settings_distribution_microsoft_store">Microsoft Store</string>
-    <string name="settings_rate">Rate Campfire</string>
+    <string name="settings_rate">Rate SDCancionero</string>
     <string name="settings_rate_description">Leave a review on %1$s</string>
     <string name="settings_about">About</string>
-    <string name="settings_git_hub">Campfire on GitHub</string>
+    <string name="settings_git_hub">SDCancionero on GitHub</string>
     <string name="settings_git_hub_description">Source code and issue tracker</string>
-    <string name="settings_help">Help and support</string>
-    <string name="settings_help_description">Common questions, and how to report a problem</string>
-    <string name="settings_privacy_policy">Privacy Policy</string>
-    <string name="settings_privacy_policy_description">What the app does with your data</string>
     <string name="settings_open_source_licenses">Open-source licenses</string>
-    <string name="settings_open_source_licenses_description">The libraries, fonts, and chord shapes Campfire is built with, and their licenses</string>
-    <string name="open_source_licenses_intro">Campfire is open source, and it is built with the work of others. Select an entry to read its license.</string>
+    <string name="settings_open_source_licenses_description">The libraries, fonts, and chord shapes SDCancionero is built with, and their licenses</string>
+    <string name="open_source_licenses_intro">SDCancionero is open source, and it is built with the work of others. Select an entry to read its license.</string>
     <string name="open_source_licenses_show">Show the license</string>
     <string name="open_source_licenses_hide">Hide the license</string>
     <string name="open_source_licenses_project">Project page</string>
     <string name="open_source_licenses_license">License</string>
-    <string name="settings_support">Buy me a coffee</string>
-    <string name="settings_support_description">Support the development of the app</string>
     <string name="settings_version">Version %1$s</string>
-    <string name="settings_created_by">Created by Péter Pandula</string>
+    <string name="settings_created_by">Based on Campfire by Péter Pandula</string>
 
     <!-- Metronome screen -->
     <string name="metronome">Metronome</string>
@@ -514,7 +522,7 @@
     <string name="metronome_stopped_interrupted">The metronome stopped for a call or another app.</string>
     <string name="metronome_stopped_disconnected">The metronome stopped because the audio device went away.</string>
     <string name="metronome_stopped_failed">The metronome stopped because the sound output failed.</string>
-    <string name="metronome_stopped_silent">The metronome stopped when Campfire went out of sight, since with the volume at zero or every beat muted there was nothing to hear.</string>
+    <string name="metronome_stopped_silent">The metronome stopped when SDCancionero went out of sight, since with the volume at zero or every beat muted there was nothing to hear.</string>
     <!-- The channel of the notification a playing metronome keeps up, as the system's settings list it. -->
     <string name="metronome_notification_channel">Metronome</string>
 
@@ -579,17 +587,17 @@
     <string name="tuner_reference_pitch_increase">Raise the reference pitch</string>
     <string name="tuner_reference_pitch_reset">Reset the reference pitch to 440 Hz</string>
     <string name="tuner_play_reference">Play the reference %1$s</string>
-    <string name="tuner_notice_not_asked">Campfire listens through the microphone to hear the instrument. The sound is analyzed on this device, and is never recorded or sent anywhere.</string>
-    <string name="tuner_notice_refused">The microphone is switched off for Campfire. The tones below can still be played.</string>
-    <string name="tuner_notice_refused_web">The microphone is switched off for Campfire. It is allowed in the browser\'s site settings, next to the address. The tones below can still be played.</string>
+    <string name="tuner_notice_not_asked">SDCancionero listens through the microphone to hear the instrument. The sound is analyzed on this device, and is never recorded or sent anywhere.</string>
+    <string name="tuner_notice_refused">The microphone is switched off for SDCancionero. The tones below can still be played.</string>
+    <string name="tuner_notice_refused_web">The microphone is switched off for SDCancionero. It is allowed in the browser\'s site settings, next to the address. The tones below can still be played.</string>
     <string name="tuner_notice_no_microphone">No microphone was found.</string>
     <string name="tuner_notice_busy">The microphone is in use by a call or another app.</string>
     <string name="tuner_notice_not_supported">This browser does not let a page use the microphone.</string>
     <string name="tuner_notice_failed">The microphone could not be opened.</string>
-    <string name="tuner_notice_silent">Nothing is heard yet. If a string is playing, check that the microphone is not muted or turned all the way down, and that Campfire may use it.</string>
+    <string name="tuner_notice_silent">Nothing is heard yet. If a string is playing, check that the microphone is not muted or turned all the way down, and that SDCancionero may use it.</string>
     <string name="tuner_notice_waiting">Select anything on the page or press a key to let the browser listen.</string>
     <string name="tuner_use_microphone">Use the microphone</string>
-    <string name="tuner_notice_silent_enhancements">Check that the microphone is not muted and that Campfire may use it. Windows can also remove a held note as noise: turn off Audio enhancements for this microphone in the sound settings.</string>
+    <string name="tuner_notice_silent_enhancements">Check that the microphone is not muted and that SDCancionero may use it. Windows can also remove a held note as noise: turn off Audio enhancements for this microphone in the sound settings.</string>
     <string name="tuner_open_settings">Open settings</string>
     <string name="tuner_open_sound_settings">Open sound settings</string>
     <string name="tuner_ask_again">Ask again</string>
@@ -798,6 +806,21 @@
     <string name="song_editor_insert_language">Language</string>
     <string name="song_editor_insert_link">Link</string>
     <string name="song_editor_insert_chord_shape">Chord shape</string>
+    <string name="song_editor_insert_strum">Strum</string>
+    <string name="song_editor_insert_symbols">Symbols</string>
+    <string name="song_editor_strum_down">↓  Down strum</string>
+    <string name="song_editor_strum_up">↑  Up strum</string>
+    <string name="song_editor_strum_down_up">↓↑  Down and up</string>
+    <string name="song_editor_strum_muted">×  Muted strum</string>
+    <string name="song_editor_strum_accent">>  Accent</string>
+    <string name="song_editor_symbol_sharp">♯  Sharp</string>
+    <string name="song_editor_symbol_flat">♭  Flat</string>
+    <string name="song_editor_symbol_natural">♮  Natural</string>
+    <string name="song_editor_symbol_bar">|  Bar line</string>
+    <string name="song_editor_symbol_double_bar">||  Double bar line</string>
+    <string name="song_editor_symbol_repeat_start">|:  Start of a repeat</string>
+    <string name="song_editor_symbol_repeat_end">:|  End of a repeat</string>
+    <string name="song_editor_symbol_repeat_measure">%  Repeat the last measure</string>
     <string name="song_editor_transpose_text_up">Transpose text up</string>
     <string name="song_editor_transpose_text_down">Transpose text down</string>
     <string name="song_editor_prettify">Prettify ChordPro</string>
@@ -823,6 +846,41 @@
     <string name="song_editor_draft_restored">The unsaved changes were restored</string>
     <string name="song_editor_file_gone">This song\'s file is no longer in the library. Save to put it back.</string>
     <string name="song_editor_untitled">Give the song a title to save it</string>
+    <!-- ChordPro reference sheet of the editor -->
+    <string name="chordpro_reference_group_song">About the song</string>
+    <string name="chordpro_reference_group_line">Inside a line</string>
+    <string name="chordpro_reference_group_sections">Sections</string>
+    <string name="chordpro_reference_group_comments">Comments</string>
+    <string name="chordpro_reference_group_changes">Changes along the song</string>
+    <string name="chordpro_reference_title">The title of the song.</string>
+    <string name="chordpro_reference_subtitle">A second line shown under the title.</string>
+    <string name="chordpro_reference_artist">Who performs the song.</string>
+    <string name="chordpro_reference_composer">Who wrote the music.</string>
+    <string name="chordpro_reference_lyricist">Who wrote the words.</string>
+    <string name="chordpro_reference_album">The album the song comes from.</string>
+    <string name="chordpro_reference_year">The year it came out.</string>
+    <string name="chordpro_reference_key">The key the chords are written in.</string>
+    <string name="chordpro_reference_capo">The fret the capo goes on.</string>
+    <string name="chordpro_reference_tempo">Beats per minute, which the metronome follows. Written again lower down, it changes the tempo from that line on.</string>
+    <string name="chordpro_reference_time">The time signature, such as 3/4 or 6/8. Written again lower down, it changes from that line on.</string>
+    <string name="chordpro_reference_duration">How long the song lasts, in minutes and seconds.</string>
+    <string name="chordpro_reference_tag">A label to filter the library by. Write one per line.</string>
+    <string name="chordpro_reference_language">The language of the words, as a two-letter code (en, es, hu).</string>
+    <string name="chordpro_reference_cover">The address of the album cover image.</string>
+    <string name="chordpro_reference_link">A link to a video, a recording or a tab, with an optional name after the address.</string>
+    <string name="chordpro_reference_chord">A chord, in square brackets right before the syllable it falls on.</string>
+    <string name="chordpro_reference_annotation">A note over the words instead of a chord, such as a hint or a cue.</string>
+    <string name="chordpro_reference_section">Opens and closes a block of this kind. Everything between the two lines belongs to the section.</string>
+    <string name="chordpro_reference_chorus_recall">Repeats the last chorus without writing it out again.</string>
+    <string name="chordpro_reference_tab">Tablature: its lines are shown as written, in a monospaced face, so that the columns line up.</string>
+    <string name="chordpro_reference_grid">A chord grid, with the bars separated by vertical lines.</string>
+    <string name="chordpro_reference_comment">A line of text that is not sung, such as Repeat twice.</string>
+    <string name="chordpro_reference_comment_italic">A comment shown in italics.</string>
+    <string name="chordpro_reference_comment_box">A comment shown inside a box.</string>
+    <string name="chordpro_reference_transpose">From this line on, moves the chords up (or down, with a minus sign) by the number of semitones written.</string>
+    <string name="chordpro_reference_full">Every directive, on chordpro.org</string>
+    <string name="chordpro_reference_insert">Insert</string>
+    <string name="chordpro_reference_insert_description">Insert %1$s</string>
 
     <!-- Song details screen -->
     <string name="song_details_previous_song">Previous song</string>
@@ -835,6 +893,11 @@
     <string name="song_details_step_progress_section">Section %1$d of %2$d</string>
     <string name="song_details_scroll_up">Scroll up</string>
     <string name="song_details_scroll_down">Scroll down</string>
+    <string name="song_details_auto_scroll_start">Start scrolling the song by itself</string>
+    <string name="song_details_auto_scroll_stop">Stop scrolling</string>
+    <string name="song_details_auto_scroll_slower">Scroll slower</string>
+    <string name="song_details_auto_scroll_faster">Scroll faster</string>
+    <string name="song_details_auto_scroll_speed">Scroll speed %1$d</string>
     <string name="song_details_song_position">%1$d / %2$d</string>
     <string name="song_details_transposition">Transposition</string>
     <string name="song_details_transpose_up">Transpose up</string>
@@ -971,17 +1034,17 @@
     <string name="song_details_no_data_hint">The file could not be read.</string>
 
     <!-- Settings screen: sync -->
-    <string name="settings_sync_unavailable">This build of Campfire was made without sync credentials, so there is nothing to connect to.</string>
-    <string name="settings_sync_description">Keep the library the same on every device through a cloud folder you own, along with how each song is transposed, capoed, and played. Campfire has no server: the files go straight between your devices and your own storage.</string>
+    <string name="settings_sync_unavailable">This build of SDCancionero was made without sync credentials, so there is nothing to connect to.</string>
+    <string name="settings_sync_description">Keep the library the same on every device through a cloud folder you own, along with how each song is transposed, capoed, and played. SDCancionero has no server: the files go straight between your devices and your own storage.</string>
     <string name="settings_sync_connect_dropbox">Connect Dropbox</string>
     <string name="settings_sync_connecting">Connecting…</string>
     <string name="settings_sync_connection_failed_network">Could not reach the service. Check the internet connection and try again.</string>
     <string name="settings_sync_connection_failed_authorization">Dropbox refused the connection.</string>
     <string name="settings_sync_connection_failed_unknown">The connection did not go through.</string>
-    <string name="settings_sync_connection_failed_storage">Campfire could not read or save the connection on this device. It will try again the next time it starts.</string>
+    <string name="settings_sync_connection_failed_storage">SDCancionero could not read or save the connection on this device. It will try again the next time it starts.</string>
     <string name="settings_sync_connected_as">Connected as %1$s</string>
     <string name="settings_sync_disconnect">Disconnect</string>
-    <string name="settings_sync_disconnect_confirmation">Disconnect %1$s? Campfire forgets the account and stops syncing. Nothing is removed from the library or from the cloud folder.</string>
+    <string name="settings_sync_disconnect_confirmation">Disconnect %1$s? SDCancionero forgets the account and stops syncing. Nothing is removed from the library or from the cloud folder.</string>
     <string name="settings_sync_now">Sync now</string>
     <string name="settings_sync_never">Not synced yet</string>
     <string name="settings_sync_last_synced_moments_ago">Last synced successfully moments ago</string>
@@ -999,7 +1062,7 @@
         <item quantity="other">Last synced successfully %1$d days ago</item>
     </plurals>
     <!-- The order of the date and time parts of the line above: year, month, day, hour, minute, each already padded. -->
-    <string name="settings_sync_failed_network">Could not reach the service. Campfire will try again next time.</string>
+    <string name="settings_sync_failed_network">Could not reach the service. SDCancionero will try again next time.</string>
     <string name="settings_sync_failed_authorization">The connection was refused. Connect the account again.</string>
     <string name="settings_sync_failed_storage">The library could not be read or written.</string>
     <string name="settings_sync_failed_unknown">The sync did not finish.</string>
@@ -1008,7 +1071,7 @@
         <item quantity="one">One file could not be synced: %2$s</item>
         <item quantity="other">%1$d files could not be synced. Among them: %2$s</item>
     </plurals>
-    <string name="settings_sync_preferences_failed">The song settings (transposition, capo, and tempo) could not be synced. Campfire will try again next time.</string>
+    <string name="settings_sync_preferences_failed">The song settings (transposition, capo, and tempo) could not be synced. SDCancionero will try again next time.</string>
     <plurals name="settings_sync_conflicts">
         <item quantity="one">Kept both versions of a file that changed in two places: %2$s</item>
         <item quantity="other">Kept both versions of %1$d files that changed in two places. Among them: %2$s</item>
@@ -1032,18 +1095,18 @@
     <string name="settings_sync_keep_and_download">Keep them and download</string>
     <string name="settings_sync_notification_channel">Sync</string>
     <string name="settings_sync_notification_title">Syncing the library</string>
-    <string name="settings_sync_redirect_page_title">Back to Campfire</string>
+    <string name="settings_sync_redirect_page_title">Back to SDCancionero</string>
     <string name="settings_sync_redirect_page_message">You can close this tab and go back to the app.</string>
 
     <!-- What's new, shown once per version after the first installed version -->
-    <string name="whats_new_title">What's new in Campfire %1$s</string>
+    <string name="whats_new_title">What's new in SDCancionero %1$s</string>
     <string name="whats_new_message">• **Scales tab** A new tab draws and plays every scale and mode on your instrument and tuning, and each song suggests the scales that fit its parts.\n• **Chords tab** A new tab lists every chord for your instrument and tuning by key, and a shape you pick there is used in every song.\n• **More instruments and tunings** Chord diagrams now cover mandolin, banjo, and 12-string guitar in tunings such as drop D, and a song\'s tabs are moved to your instrument.\n• **Paste, share, or drop a song** Paste a chord sheet copied from a website, drag it in, or share it on Android or iOS, and it opens in the editor.\n• **Import from more apps** OpenSong, OnSong, and other apps\' JSON exports can be imported, and every import lists its songs for review before anything is written.\n• **Find and replace, online song details** The editor can find and replace text, and Edit song details can look up a song\'s artist, album, year, and songwriters on MusicBrainz and iTunes.</string>
 
     <!-- Onboarding, shown once on the first run and again from Settings -->
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_start_playing">Start playing</string>
-    <string name="onboarding_welcome_title">Welcome to Campfire!</string>
+    <string name="onboarding_welcome_title">Welcome to SDCancionero!</string>
     <string name="onboarding_welcome_message">A few quick questions to make the app yours.\nFirst, make sure you\'re reading them in your language.</string>
     <string name="onboarding_language">Language: %1$s</string>
     <string name="onboarding_settings_note">Every choice you make in these steps can be changed later in Settings.</string>
@@ -1068,15 +1131,15 @@
 
     <!-- In-app updates, which only the Play build ever has anything to show -->
     <string name="app_update_available">Update available</string>
-    <string name="app_update_available_hint">A newer version of Campfire is ready to download. It arrives in the background, so you can carry on in the meantime.</string>
+    <string name="app_update_available_hint">A newer version of SDCancionero is ready to download. It arrives in the background, so you can carry on in the meantime.</string>
     <string name="app_update_update">Update</string>
     <string name="app_update_continue_offline">Continue offline</string>
     <string name="app_update_later">Later</string>
     <string name="app_update_downloaded">Update downloaded</string>
-    <string name="app_update_downloaded_hint">Campfire needs to restart to finish installing it.</string>
+    <string name="app_update_downloaded_hint">SDCancionero needs to restart to finish installing it.</string>
     <string name="app_update_restart">Restart</string>
     <string name="app_update_required">Update required</string>
-    <string name="app_update_required_hint">This version of Campfire can no longer be used. Your library stays exactly where it is. Updating needs an internet connection.</string>
+    <string name="app_update_required_hint">This version of SDCancionero can no longer be used. Your library stays exactly where it is. Updating needs an internet connection.</string>
 
     <!-- Export -->
     <string name="print_save">Save</string>
@@ -1086,9 +1149,9 @@
     <string name="print_format_chordpro">ChordPro</string>
     <string name="print_format_zip">Zip</string>
     <string name="print_format_pdf_description">Ideal for printing. It opens on any device, but cannot be edited or transposed afterwards.</string>
-    <string name="print_format_chordpro_song_description">Ideal for sharing with other Campfire users, who can import, edit, and transpose the song.</string>
-    <string name="print_format_zip_description">Ideal for other Campfire users: the setlist manifest and its songs as ChordPro files.</string>
-    <string name="print_format_zip_songs_description">Ideal for other Campfire users: the chosen songs as ChordPro files.</string>
+    <string name="print_format_chordpro_song_description">Ideal for sharing with other SDCancionero users, who can import, edit, and transpose the song.</string>
+    <string name="print_format_zip_description">Ideal for other SDCancionero users: the setlist manifest and its songs as ChordPro files.</string>
+    <string name="print_format_zip_songs_description">Ideal for other SDCancionero users: the chosen songs as ChordPro files.</string>
     <string name="print_zip_contents">In the zip file</string>
     <string name="print_zip_manifest">Setlist manifest</string>
     <string name="print_zip_manifest_description">%1$s, with the running order and the key of every song</string>

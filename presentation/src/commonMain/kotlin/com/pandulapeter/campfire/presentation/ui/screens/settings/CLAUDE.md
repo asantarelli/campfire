@@ -17,11 +17,14 @@ as do the wide layout's pages.
 ## Tab contents (rules not obvious from the code)
 
 - **General**: Performance (the Read only switch) leads, since General is the tab Settings opens on, and only while
-  the songs are on (it fades out with them). Setup ("Set up Campfire again", the onboarding) follows.
+  the songs are on (it fades out with them). Setup ("Set up SDCancionero again", the onboarding) follows.
 - **Preferences**: how chords are written (they are in the Chords and Scales tabs too), then a Display section about
   songs alone, which leaves with the Songs switch. No instrument row; the instrument is picked where it is used
   (`ui/instrument`). Accidentals stay enabled under a numbering notation (they still spell its key). Examples are
   written in the picked notation, never in the language.
+- **Song view** (after Display, leaving with the Songs switch too): the number of columns (Auto, 1 to 4), where the
+  chord diagrams are pinned (in the song, top, right; off with the chords or their diagrams), and which service the
+  listen button searches.
 - **Library**: Sync, Import and export, then On this device last, since its rows can't be undone. Deleting the library
   goes through `DeleteLibraryDialog`, which wants `DELETE` typed in every language (into a capitalizing field).
 - **Features**: Playing switches first, in the navigation's tab order (songs, setlists, metronome, tuner, chords, chord
@@ -70,14 +73,13 @@ as do the wide layout's pages.
 
 ## The About section
 
-### The app says nothing about the other builds but where to find them
+### The app links to its source and to the project it is built on
 
-- "Every version of Campfire" links to https://campfire-songbook.com/#download, which can change without a release.
-- A null `Distribution.listingUrl` (`ui/platform/Platform.kt`) means not on that store yet (publishing fills it in).
+- There is no website, privacy policy page or donation link. Every `Distribution.listingUrl` (`ui/platform/Platform.kt`)
+  is null, since the app is on no store, so the rating row never shows (a listing, once there is one, fills it in).
 - `platformStore` is the store of the platform the app **runs** on (a hand-built Mac build is still a Mac build). It
-  decides the one "Rate Campfire" row (absent on Linux, the web, and where the listing is null) and
-  `canAskForDonations` (never on Apple platforms, guideline 3.1.1).
+  decides the one rating row (absent on Linux, the web, and where the listing is null).
 - The row says *rate*, never *install*: a second copy would have its own library.
-- **campfire-songbook.com is the website** (downloads, support page, privacy policy) and is linked first; **GitHub is
-  the source code and issue tracker**, after it. Nothing else is linked but the author's site and the donation page.
+- **GitHub is this fork's source code and issue tracker**; the row that credits the work leads to the original
+  Campfire project, which the license asks to keep named. Nothing else is linked.
 - Every About row has a description and a leading icon, none a trailing mark.

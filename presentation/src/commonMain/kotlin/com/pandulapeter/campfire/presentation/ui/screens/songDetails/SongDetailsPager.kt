@@ -188,6 +188,12 @@ internal fun SongDetailsPager(
         onStepBack = { stepBack(null) },
         onStepForward = { stepForward(null) },
     )
+    AutoScrollControls(
+        viewModel = viewModel,
+        scrollState = currentPageScrollState(),
+        end = stepButtonsEnd,
+        bottom = stepButtonsBottom + STEP_BUTTON_SIZE + STEP_BUTTON_GAP,
+    )
 }
 
 /**

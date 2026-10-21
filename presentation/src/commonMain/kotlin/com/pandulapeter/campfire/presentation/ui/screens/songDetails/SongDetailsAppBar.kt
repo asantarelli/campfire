@@ -77,6 +77,8 @@ internal fun SongDetailsAppBar(
     scrollBehavior: TopAppBarScrollBehavior?,
     contentPadding: PaddingValues,
     coroutineScope: CoroutineScope,
+    musicSearchService: UserPreferences.MusicSearchService,
+    urlOpener: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val songActions = rememberSongActionHandler(viewModel)
@@ -135,6 +137,9 @@ internal fun SongDetailsAppBar(
                 showsFontScaleInBar = showsFontScaleInBar,
                 showsSetlistAssignmentsInBar = showsSetlistAssignmentsInBar,
                 tunerAction = tunerAction,
+                musicSearchService = musicSearchService,
+                urlOpener = urlOpener,
+                showsListenInBar = showsListenInBar(appBarWidth),
             )
         },
         bottomContent = {
