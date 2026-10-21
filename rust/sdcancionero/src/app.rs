@@ -429,19 +429,11 @@ impl App {
         let Some(text) = pasted else {
             return;
         };
-        match chordpro::convert::convert_song(&text) {
-            Some(song) => {
-                self.editor = Some(Editor::new(None, song));
-                self.screen = Screen::Editor;
-                self.say("Hoja de acordes convertida a ChordPro. Revisá el título y guardá.");
-            }
-            None => {
-                let song = format!("{{title: }}\n{{artist: }}\n{{key: }}\n\n{}", text.replace("\r\n", "\n"));
-                self.editor = Some(Editor::new(None, song));
-                self.screen = Screen::Editor;
-                self.say("Texto pegado como canción nueva. No encontré acordes para colocar.");
-            }
-        }
+        let song = chordpro::convert::prepare_pasted_song(&text);
+        let was_chordpro = chordpro::convert::looks_like_chordpro(&text);
+        self.editor = Some(Editor::new(None, song));
+        self.screen = Screen::Editor;
+        self.say(if was_chordpro { "Canción ChordPro pegada. Revisá el título y guardá." } else { "Hoja de acordes convertida a ChordPro. Revisá el título y guardá." });
     }
 
     fn songs_screen(&mut self, ui: &mut egui::Ui) {

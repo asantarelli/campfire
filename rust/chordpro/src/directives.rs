@@ -67,6 +67,11 @@ pub fn match_delegated_directive(trimmed_line: &str) -> Option<Directive> {
     }
 }
 
+/// Whether `trimmed_line` is a directive ChordPro defines (or a custom `x_` one), which `{Verse 2}` and `{unknown: value}` are not.
+pub fn is_known_directive(trimmed_line: &str) -> bool {
+    walk_directive(trimmed_line).is_some_and(|(name, _)| is_known_name(&name))
+}
+
 /// Where the value of the directive on `trimmed_line` starts, as a character index: right after its colon, or at the first
 /// character after the whitespace that separates it from a name written without one. `None` for a line that is not a directive
 /// and for one with no value.

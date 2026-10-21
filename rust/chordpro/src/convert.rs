@@ -157,20 +157,119 @@ pub fn convert_fragment(text: &str) -> Option<String> {
     Some(output.join("\n"))
 }
 
+/// Whether `text` is already ChordPro: a line that is a directive ChordPro defines, or two lines with chords in brackets.
+pub fn looks_like_chordpro(text: &str) -> bool {
+    let lines = directives::split_lines(text);
+    if lines.iter().any(|line| directives::is_known_directive(line.trim())) {
+        return true;
+    }
+    let with_chords = lines.iter().filter(|line| directives::brackets(line).iter().any(|bracket| chord_names::is_chord_name(bracket.content.trim()))).count();
+    with_chords >= 2
+}
+
+/// The directive a line of a chord sheet that says something about the song stands for (`Tono: G` is `{key: G}`), `None` for any
+/// other line.
+fn field_directive(line: &str) -> Option<String> {
+    const FIELDS: [(&str, &str); 14] = [
+        ("title", "title"),
+        ("titulo", "title"),
+        ("título", "title"),
+        ("artist", "artist"),
+        ("artista", "artist"),
+        ("key", "key"),
+        ("tono", "key"),
+        ("capo", "capo"),
+        ("cejilla", "capo"),
+        ("tempo", "tempo"),
+        ("bpm", "tempo"),
+        ("time", "time"),
+        ("compas", "time"),
+        ("compás", "time"),
+    ];
+    let trimmed = line.trim();
+    let (label, value) = trimmed.split_once(':').or_else(|| trimmed.split_once('='))?;
+    let name = label.trim().to_lowercase();
+    let (_, directive) = FIELDS.iter().find(|(word, _)| *word == name)?;
+    let value = value.trim();
+    (!value.is_empty() && chord_row(trimmed).is_none()).then(|| format!("{{{directive}: {value}}}"))
+}
+
+/// The lines a chord sheet opens with that say something about the song, as the directives they stand for, and how many lines
+/// they take, the blank ones before them included.
+fn leading_fields(lines: &[String]) -> (Vec<String>, usize) {
+    let mut found = Vec::new();
+    let mut consumed = 0;
+    for line in lines.iter().take(12) {
+        if line.trim().is_empty() {
+            if found.is_empty() {
+                consumed += 1;
+                continue;
+            }
+            break;
+        }
+        let Some(directive) = field_directive(line) else {
+            break;
+        };
+        found.push(directive);
+        consumed += 1;
+    }
+    (found, consumed)
+}
+
+/// The text of a song to open in the editor from what was pasted over the list of songs, whatever it is: ChordPro is kept as it is
+/// (its directives and its chords are the song), a chord sheet is converted, and anything else is the words of a new song. A
+/// song with no `{title}` gets an empty one to be filled in, which saving asks for.
+pub fn prepare_pasted_song(text: &str) -> String {
+    // A page copied from the web is full of no-break spaces, and a file of every kind of line break.
+    let cleaned = text.replace('\u{a0}', " ").replace('\u{feff}', "");
+    let normalized = directives::split_lines(&cleaned).join("\n");
+    let has_title = directives::split_lines(&normalized).iter().any(|line| directives::match_directive(line.trim()).is_some_and(|directive| matches!(directive.name.as_str(), "title" | "t")));
+    let with_header = |body: String, has_title: bool| if has_title { body } else { format!("{{title: }}\n{body}") };
+    if looks_like_chordpro(&normalized) {
+        return with_header(normalized, has_title);
+    }
+    convert_song(&normalized).unwrap_or_else(|| format!("{{title: }}\n{{artist: }}\n{{key: }}\n\n{normalized}"))
+}
+
 /// The ChordPro of a whole pasted chord sheet as a new song: the body as [`convert_fragment`] writes it under a header with a
 /// title, which is the first line where that is a short line of words, else left for the player to write.
 pub fn convert_song(text: &str) -> Option<String> {
-    let body = convert_fragment(text)?;
-    let lines: Vec<&str> = body.lines().collect();
-    let first = lines.iter().position(|line| !line.trim().is_empty())?;
-    let candidate = lines[first].trim();
-    let is_title = !candidate.starts_with('{') && !candidate.contains('[') && candidate.chars().count() <= 60 && lines.get(first + 1).is_some_and(|next| next.trim().is_empty());
-    if is_title {
-        let rest = lines[first + 1..].join("\n");
-        Some(format!("{{title: {candidate}}}\n{{artist: }}\n{{key: }}\n\n{}", rest.trim_start_matches('\n')))
-    } else {
-        Some(format!("{{title: }}\n{{artist: }}\n{{key: }}\n\n{body}"))
+    let mut lines = directives::split_lines(text);
+    while lines.first().is_some_and(|line| line.trim().is_empty()) {
+        lines.remove(0);
     }
+    let mut header: Vec<String> = Vec::new();
+    // The first line names the song where it is a short line of words, alone or over the fields: `Sola`, `Alguien - Sola`.
+    if let Some(first) = lines.first() {
+        let candidate = first.trim();
+        let next_is_field_or_blank = lines.get(1).map_or(true, |next| next.trim().is_empty() || field_directive(next).is_some());
+        let is_title = chord_row(candidate).is_none()
+            && heading(candidate).is_none()
+            && !candidate.contains([':', '[', '{'])
+            && candidate.chars().count() <= 80
+            && next_is_field_or_blank;
+        if is_title {
+            match candidate.split_once(" - ") {
+                Some((artist, title)) => {
+                    header.push(format!("{{title: {}}}", title.trim()));
+                    header.push(format!("{{artist: {}}}", artist.trim()));
+                }
+                None => header.push(format!("{{title: {candidate}}}")),
+            }
+            lines.remove(0);
+        }
+    }
+    let (fields, consumed) = leading_fields(&lines);
+    header.extend(fields);
+    let rest = lines[consumed..].join("\n");
+    let body = convert_fragment(&rest)?;
+    if header.is_empty() {
+        return Some(format!("{{title: }}\n{{artist: }}\n{{key: }}\n\n{body}"));
+    }
+    if !header.iter().any(|line| line.starts_with("{title:")) {
+        header.insert(0, "{title: }".to_string());
+    }
+    Some(format!("{}\n\n{}", header.join("\n"), body.trim_start_matches('\n')))
 }
 
 #[cfg(test)]
@@ -222,10 +321,31 @@ mod tests {
     fn a_pasted_song_gets_a_header() {
         let sheet = "Sound of Silence\n\nAm   G\nHello darkness\n";
         let song = convert_song(sheet).unwrap();
-        assert!(song.starts_with("{title: Sound of Silence}\n{artist: }\n{key: }\n\n"), "{song}");
+        assert!(song.starts_with("{title: Sound of Silence}\n\n"), "{song}");
         assert!(song.ends_with("[Am]Hello[G] darkness"), "{song}");
         let untitled = convert_song("Am   G\nHello darkness\n").unwrap();
         assert!(untitled.starts_with("{title: }\n"));
+    }
+
+    #[test]
+    fn a_pasted_chordpro_song_keeps_its_directives_and_gets_no_second_header() {
+        let pasted = "{title: Sola}\r\n{artist: Alguien}\r\n{key: Am}\r\n\r\n[Am]Hola [G]mundo\r\n";
+        assert_eq!(prepare_pasted_song(pasted), "{title: Sola}\n{artist: Alguien}\n{key: Am}\n\n[Am]Hola [G]mundo");
+        // Without a title it is given an empty one to fill in, and nothing else is added.
+        assert_eq!(prepare_pasted_song("[Am]Hola [G]mundo\n[C]otra [F]linea\n"), "{title: }\n[Am]Hola [G]mundo\n[C]otra [F]linea");
+        assert!(looks_like_chordpro("{c: Estribillo}\nla la"));
+        assert!(!looks_like_chordpro("{Verse 2}\nla la"));
+        assert!(!looks_like_chordpro("Am G\nHola mundo"));
+    }
+
+    #[test]
+    fn a_sheet_with_fields_over_it_gets_them_as_directives() {
+        let pasted = "Tono: Am\nCapo: 2\nArtista: Alguien\n\nAm        G\nHola mundo cruel\n";
+        let song = prepare_pasted_song(pasted);
+        assert!(song.starts_with("{title: }\n{key: Am}\n{capo: 2}\n{artist: Alguien}\n"), "{song}");
+        assert!(song.ends_with("{artist: Alguien}\n\n[Am]Hola mundo[G] cruel"), "{song}");
+        let titled = prepare_pasted_song("Alguien - Sola\nTono: G\n\nG   C\nla la la\n");
+        assert!(titled.starts_with("{key: G}") || titled.starts_with("{title: Sola}"), "{titled}");
     }
 
     #[test]
