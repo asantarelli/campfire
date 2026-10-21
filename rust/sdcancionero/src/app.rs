@@ -49,6 +49,16 @@ enum Screen {
     Settings,
 }
 
+/// What the menu of a song in the list asks for.
+enum SongAction {
+    Open(String),
+    Edit(String),
+    AddToSetlist(String, String),
+    Export(String),
+    Duplicate(String),
+    Delete(String),
+}
+
 /// The song on the screen, as it is on disk and as it is shown.
 struct OpenSong {
     file_name: String,
@@ -100,6 +110,8 @@ pub struct App {
     from_setlist: Option<(String, usize)>,
     /// The chord whose shapes are shown over the song, as the file writes it.
     chord_window: Option<String>,
+    /// The song the player asked to delete, until they confirm.
+    song_to_delete: Option<String>,
     status: Option<(String, Instant)>,
     is_dark_applied: Option<bool>,
     fonts_applied: Option<(String, String)>,
@@ -129,6 +141,7 @@ impl App {
             current_setlist: None,
             from_setlist: None,
             chord_window: None,
+            song_to_delete: None,
             status: None,
             is_dark_applied: None,
             fonts_applied: None,
@@ -479,30 +492,176 @@ impl App {
             return;
         }
         let mut chosen: Option<String> = None;
+        let mut action: Option<SongAction> = None;
+        let colors = SongColors::of(self.settings.is_dark);
         ScrollArea::vertical().auto_shrink([false, false]).show_rows(ui, 46.0, matching.len(), |ui, range| {
             for &index in &matching[range] {
                 let entry = &self.songs[index];
-                let response = ui.allocate_response(Vec2::new(ui.available_width(), 42.0), egui::Sense::click());
-                let painter = ui.painter();
-                if response.hovered() {
-                    painter.rect_filled(response.rect, 6.0, ui.visuals().widgets.hovered.bg_fill);
-                }
-                let colors = SongColors::of(self.settings.is_dark);
-                painter.text(response.rect.left_top() + Vec2::new(10.0, 4.0), egui::Align2::LEFT_TOP, entry.display_title(), egui::FontId::new(16.0, theme::bold()), colors.text);
-                let detail = entry.metadata.artist.clone().unwrap_or_default();
-                let detail = match (&entry.metadata.key, detail.is_empty()) {
-                    (Some(key), false) => format!("{detail} · {key}"),
-                    (Some(key), true) => key.clone(),
-                    (None, _) => detail,
-                };
-                painter.text(response.rect.left_top() + Vec2::new(10.0, 24.0), egui::Align2::LEFT_TOP, detail, egui::FontId::proportional(12.5), colors.muted);
-                if response.clicked() {
-                    chosen = Some(entry.file_name.clone());
-                }
+                ui.horizontal(|ui| {
+                    let response = ui.allocate_response(Vec2::new((ui.available_width() - 44.0).max(60.0), 42.0), egui::Sense::click());
+                    let painter = ui.painter();
+                    if response.hovered() {
+                        painter.rect_filled(response.rect, 6.0, ui.visuals().widgets.hovered.bg_fill);
+                    }
+                    painter.text(response.rect.left_top() + Vec2::new(10.0, 4.0), egui::Align2::LEFT_TOP, entry.display_title(), egui::FontId::new(16.0, theme::bold()), colors.text);
+                    let detail = entry.metadata.artist.clone().unwrap_or_default();
+                    let detail = match (&entry.metadata.key, detail.is_empty()) {
+                        (Some(key), false) => format!("{detail} · {key}"),
+                        (Some(key), true) => key.clone(),
+                        (None, _) => detail,
+                    };
+                    painter.text(response.rect.left_top() + Vec2::new(10.0, 24.0), egui::Align2::LEFT_TOP, detail, egui::FontId::proportional(12.5), colors.muted);
+                    if response.clicked() {
+                        chosen = Some(entry.file_name.clone());
+                    }
+                    // The menu of the song, three dots at the end of its row.
+                    let (dots, button) = ui.allocate_exact_size(Vec2::new(36.0, 42.0), egui::Sense::click());
+                    let button = button.on_hover_text("Acciones");
+                    if button.hovered() {
+                        ui.painter().rect_filled(dots, 18.0, ui.visuals().widgets.hovered.bg_fill);
+                    }
+                    for step in [-1.0, 0.0, 1.0] {
+                        ui.painter().circle_filled(dots.center() + Vec2::new(0.0, step * 7.0), 2.2, colors.text);
+                    }
+                    egui::Popup::menu(&button).show(|ui| {
+                        if ui.button("Editar").clicked() {
+                            action = Some(SongAction::Edit(entry.file_name.clone()));
+                            ui.close();
+                        }
+                        if ui.button("Duplicar").clicked() {
+                            action = Some(SongAction::Duplicate(entry.file_name.clone()));
+                            ui.close();
+                        }
+                        if ui.button("Exportar").clicked() {
+                            action = Some(SongAction::Export(entry.file_name.clone()));
+                            ui.close();
+                        }
+                        if ui.button(RichText::new("Eliminar").color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
+                            action = Some(SongAction::Delete(entry.file_name.clone()));
+                            ui.close();
+                        }
+                        ui.separator();
+                        if ui.button("Abrir").clicked() {
+                            action = Some(SongAction::Open(entry.file_name.clone()));
+                            ui.close();
+                        }
+                        ui.menu_button("Agregar a un repertorio", |ui| {
+                            if self.setlists.is_empty() {
+                                ui.label("No hay repertorios todavía.");
+                            }
+                            for (setlist_file, setlist) in &self.setlists {
+                                let title = if setlist.title.is_empty() { setlist_file.trim_end_matches(".setlist.json").to_string() } else { setlist.title.clone() };
+                                if ui.button(title).clicked() {
+                                    action = Some(SongAction::AddToSetlist(entry.file_name.clone(), setlist_file.clone()));
+                                    ui.close();
+                                }
+                            }
+                        });
+                    });
+                });
             }
         });
         if let Some(file_name) = chosen {
             self.open_song(&file_name);
+        }
+        match action {
+            Some(SongAction::Open(file_name)) => self.open_song(&file_name),
+            Some(SongAction::Edit(file_name)) => self.edit_song(&file_name),
+            Some(SongAction::AddToSetlist(file_name, setlist_file)) => self.add_to_setlist(&file_name, &setlist_file),
+            Some(SongAction::Export(file_name)) => self.export_song(&file_name),
+            Some(SongAction::Duplicate(file_name)) => self.duplicate_song(&file_name),
+            Some(SongAction::Delete(file_name)) => self.song_to_delete = Some(file_name),
+            None => {}
+        }
+    }
+
+    /// Adds a song to the end of a repertoire.
+    fn add_to_setlist(&mut self, file_name: &str, setlist_file: &str) {
+        match self.library.read_setlist(setlist_file) {
+            Ok(Some(mut setlist)) => {
+                if setlist.songs.iter().any(|song| song.file == file_name) {
+                    self.say("La canción ya está en ese repertorio.");
+                    return;
+                }
+                setlist.songs.push(library::SetlistSong { file: file_name.to_string(), ..library::SetlistSong::default() });
+                match self.library.write_setlist(setlist_file, &setlist) {
+                    Ok(()) => {
+                        self.say(format!("Agregada a «{}».", setlist.title));
+                        self.reload_setlists();
+                    }
+                    Err(error) => self.say(format!("No se pudo guardar el repertorio: {error}")),
+                }
+            }
+            Ok(None) => self.say("El repertorio ya no existe."),
+            Err(error) => self.say(format!("No se pudo abrir el repertorio: {error}")),
+        }
+    }
+
+    /// Saves one song as the `.cho` file it is.
+    fn export_song(&mut self, file_name: &str) {
+        let text = match self.library.read_song(file_name) {
+            Ok(Some(text)) => text,
+            Ok(None) => {
+                self.say("La canción ya no existe.");
+                return;
+            }
+            Err(error) => {
+                self.say(format!("No se pudo leer la canción: {error}"));
+                return;
+            }
+        };
+        let Some(path) = rfd::FileDialog::new().set_title("Exportar canción").set_file_name(file_name).add_filter("ChordPro", &["cho"]).save_file() else {
+            return;
+        };
+        match std::fs::write(&path, text) {
+            Ok(()) => self.say(format!("Canción exportada a {}", path.display())),
+            Err(error) => self.say(format!("No se pudo guardar el archivo: {error}")),
+        }
+    }
+
+    /// Makes a copy of a song under a free file name, its title ending in « (copia)» so that the two can be told apart.
+    fn duplicate_song(&mut self, file_name: &str) {
+        let text = match self.library.read_song(file_name) {
+            Ok(Some(text)) => text,
+            Ok(None) => {
+                self.say("La canción ya no existe.");
+                return;
+            }
+            Err(error) => {
+                self.say(format!("No se pudo leer la canción: {error}"));
+                return;
+            }
+        };
+        let taken: std::collections::HashSet<String> = match self.library.song_names() {
+            Ok(names) => names.iter().map(|name| library::names::identity_key(name)).collect(),
+            Err(error) => {
+                self.say(format!("No se pudo leer la biblioteca: {error}"));
+                return;
+            }
+        };
+        let new_name = library::names::unique_name(&taken, file_name);
+        let copy = chordpro::text_rewriter::with_title_suffix(&text, " (copia)");
+        match self.library.write_song(&new_name, &copy) {
+            Ok(()) => {
+                self.reload_songs();
+                self.say(format!("Canción duplicada como {new_name}"));
+            }
+            Err(error) => self.say(format!("No se pudo duplicar: {error}")),
+        }
+    }
+
+    /// Deletes a song, and takes it out of every repertoire that named it.
+    fn delete_song(&mut self, file_name: &str) {
+        match self.library.remove_song(file_name) {
+            Ok(()) => {
+                if self.open.as_ref().is_some_and(|open| open.file_name == file_name) {
+                    self.open = None;
+                }
+                self.reload_songs();
+                self.reload_setlists();
+                self.say("Canción eliminada.");
+            }
+            Err(error) => self.say(format!("No se pudo eliminar: {error}")),
         }
     }
 
@@ -829,6 +988,23 @@ impl eframe::App for App {
                     egui::Panel::right("reference").resizable(true).default_size(360.0).size_range(260.0..=520.0).show(ui, |ui| editor.show_reference(ui));
                 }
             }
+        }
+        if let Some(file_name) = self.song_to_delete.clone() {
+            let title = self.songs.iter().find(|entry| entry.file_name == file_name).map(SongEntry::display_title).unwrap_or_else(|| file_name.clone());
+            egui::Window::new("Eliminar canción").collapsible(false).resizable(false).anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]).show(ui.ctx(), |ui| {
+                ui.label(format!("¿Eliminar «{title}»?"));
+                ui.label(RichText::new("Se borra el archivo y se quita de los repertorios que la nombran. No se puede deshacer.").small().weak());
+                ui.add_space(6.0);
+                ui.horizontal(|ui| {
+                    if ui.button(RichText::new("Eliminar").color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
+                        self.song_to_delete = None;
+                        self.delete_song(&file_name);
+                    }
+                    if ui.button("Cancelar").clicked() {
+                        self.song_to_delete = None;
+                    }
+                });
+            });
         }
         if let Some(name) = self.chord_window.clone() {
             let colors = SongColors::of(self.settings.is_dark);

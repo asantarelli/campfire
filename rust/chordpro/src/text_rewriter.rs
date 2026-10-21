@@ -40,6 +40,35 @@ pub fn join_lines(lines: &[String], original: &str) -> String {
     }
 }
 
+/// `text` with `suffix` added to the end of its `{title}`, or the text as it is where it has none. Every other byte stays.
+pub fn with_title_suffix(text: &str, suffix: &str) -> String {
+    let mut done = false;
+    let lines: Vec<String> = directives::scan(text)
+        .iter()
+        .map(|line| {
+            let is_title = !done
+                && !line.is_source_comment
+                && line.environment.is_none()
+                && line.directive.as_ref().is_some_and(|directive| matches!(directive.name.as_str(), "title" | "t") && directive.value.as_deref().is_some_and(|value| !value.trim().is_empty()));
+            let Some(value_start) = directives::value_start(&line.trimmed).filter(|_| is_title) else {
+                return line.raw.clone();
+            };
+            done = true;
+            let raw: Vec<char> = line.raw.chars().collect();
+            let leading = raw.iter().take_while(|c| c.is_whitespace()).count();
+            let value_to = leading + line.trimmed.chars().count() - 1;
+            let value_from = leading + value_start;
+            let value: String = raw[value_from..value_to].iter().collect();
+            let mut result: String = raw[..value_from].iter().collect();
+            result.push_str(value.trim_end());
+            result.push_str(suffix);
+            result.extend(&raw[value_to..]);
+            result
+        })
+        .collect();
+    join_lines(&lines, text)
+}
+
 /// `text` with `rename` applied to every chord name it writes: the chords in brackets over its lyrics and in its comments and
 /// labels, the cells of its grids and the `{key}`. A tab, an environment handed to another program, a `#` comment and every
 /// other directive are left as they are.
@@ -150,6 +179,14 @@ mod tests {
     fn delegated_text_is_never_a_chord() {
         let text = "{start_of_abc}\n[CEG]\n{end_of_abc}\n";
         assert_eq!(rewrite_chord_names_in_text(text, &upper), text);
+    }
+
+    #[test]
+    fn a_copy_has_a_title_that_tells_it_apart() {
+        assert_eq!(with_title_suffix("{title: Sola}\n{artist: X}\n[Am]hi\n", " (copia)"), "{title: Sola (copia)}\n{artist: X}\n[Am]hi\n");
+        assert_eq!(with_title_suffix("{t:Sola}\r\n[Am]hi", " (copia)"), "{t:Sola (copia)}\r\n[Am]hi");
+        assert_eq!(with_title_suffix("{title: A}\n{title: B}\n", "!"), "{title: A!}\n{title: B}\n");
+        assert_eq!(with_title_suffix("[Am]no title\n", " (copia)"), "[Am]no title\n");
     }
 
     #[test]
