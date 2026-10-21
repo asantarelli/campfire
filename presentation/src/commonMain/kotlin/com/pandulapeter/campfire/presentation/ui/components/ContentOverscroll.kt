@@ -128,6 +128,16 @@ private class ShortContentOverscroll(
     private var releaseJob: Job? = null
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        // Sideways, what a child could not scroll is pulled after it has had its turn (onPostScroll): a pager that cannot
+        // turn its page would otherwise take every sideways drag of the row of diagrams pinned over a song before it moved.
+        if (orientation == Orientation.Horizontal) return Offset.Zero
+        return pullOrZero(available, source)
+    }
+
+    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset =
+        if (orientation == Orientation.Horizontal) pullOrZero(available, source) else Offset.Zero
+
+    private fun pullOrZero(available: Offset, source: NestedScrollSource): Offset {
         if (state.canScrollForward || state.canScrollBackward || source != NestedScrollSource.UserInput) return Offset.Zero
         val delta = if (orientation == Orientation.Vertical) Offset(0f, available.y) else Offset(available.x, 0f)
         // The parents are offered the drag first, as they would be offered what a list left over: a bottom sheet is
