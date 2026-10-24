@@ -45,6 +45,7 @@ import com.pandulapeter.campfire.presentation.ui.platform.isDesktopPlatform
 import com.pandulapeter.campfire.presentation.ui.platform.isLibraryEditableOutsideApp
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.localization.ApplyLanguagePreference
+import com.pandulapeter.campfire.presentation.ui.songView.LocalSongFont
 import com.pandulapeter.campfire.presentation.ui.theme.CampfireTheme
 import com.pandulapeter.campfire.presentation.ui.theme.ProvideInterfaceScale
 import com.pandulapeter.campfire.presentation.ui.update.AppUpdateGate
@@ -136,6 +137,7 @@ fun CampfireApp(
         LocalTagColors provides (userPreferences?.tagColors ?: emptyMap()),
         LocalForcedSongColumns provides (userPreferences?.songColumns ?: UserPreferences.AUTOMATIC_SONG_COLUMNS),
         LocalPinnedChordsPosition provides (userPreferences?.pinnedChordsPosition ?: UserPreferences.PinnedChordsPosition.IN_SONG),
+        LocalSongFont provides (userPreferences?.songFont ?: UserPreferences.SongFont.DEFAULT),
     ) {
         CampfireTheme(
             uiMode = userPreferences?.uiMode,

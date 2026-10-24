@@ -232,6 +232,8 @@ data class UserPreferences(
     val pinnedChordsPosition: PinnedChordsPosition = PinnedChordsPosition.RIGHT,
     /** How fast a song scrolls itself, from [MIN_AUTO_SCROLL_SPEED] to [MAX_AUTO_SCROLL_SPEED]. */
     val autoScrollSpeed: Int = DEFAULT_AUTO_SCROLL_SPEED,
+    /** The face the lyrics and the chords of a song are set in while it is read. */
+    val songFont: SongFont = SongFont.DEFAULT,
 ) {
 
     /**
@@ -483,6 +485,15 @@ data class UserPreferences(
         IN_SONG("in_song"),
         TOP("top"),
         RIGHT("right"),
+    }
+
+    /**
+     * The face a song is read in: the app's own, or one whose characters are all the same width, in which a chord set
+     * over a word stays exactly over it however the line is written.
+     */
+    enum class SongFont(val id: String) {
+        DEFAULT("default"),
+        MONOSPACE("monospace"),
     }
 
     enum class Language(val id: String) {

@@ -84,6 +84,7 @@ internal fun UserPreferencesDocument.toModel() = UserPreferences(
     songColumns = songColumns.coerceIn(UserPreferences.AUTOMATIC_SONG_COLUMNS, UserPreferences.MAX_SONG_COLUMNS),
     pinnedChordsPosition = UserPreferences.PinnedChordsPosition.entries.firstOrNull { it.id == pinnedChordsPosition } ?: UserPreferences.PinnedChordsPosition.RIGHT,
     autoScrollSpeed = autoScrollSpeed.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED),
+    songFont = UserPreferences.SongFont.entries.firstOrNull { it.id == songFont } ?: UserPreferences.SongFont.DEFAULT,
 )
 
 internal fun UserPreferences.toDocument() = UserPreferencesDocument(
@@ -141,6 +142,7 @@ internal fun UserPreferences.toDocument() = UserPreferencesDocument(
     songColumns = songColumns,
     pinnedChordsPosition = pinnedChordsPosition.id,
     autoScrollSpeed = autoScrollSpeed,
+    songFont = songFont.id,
 )
 
 internal fun PrintSettingsDocument.toModel() = PrintSettings(

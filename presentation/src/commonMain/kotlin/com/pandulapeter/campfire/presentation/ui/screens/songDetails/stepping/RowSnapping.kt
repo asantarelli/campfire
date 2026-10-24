@@ -151,12 +151,18 @@ internal fun nextStepTarget(scroll: Int, rows: SongRows, viewportHeight: Int, wi
 /** One step of [nextStepTarget], however small. */
 private fun nextStepTargetOnce(scroll: Int, rows: SongRows, viewportHeight: Int, window: ReadingWindow, maxValue: Int): Int? {
     if (rows.stepOffsets.isEmpty()) return null
-    val next = nextStepOffset(scroll, rows.stepOffsets, maxValue)
+    var next = nextStepOffset(scroll, rows.stepOffsets, maxValue)
     var limit = minOf(maxValue, next ?: Int.MAX_VALUE)
     // Where the last of the stop's content is at the bottom of what can be read, from which on there is nothing left to
     // page to. Past the last stop that is short of the end of the song by the space after it, so that a fling that
     // stopped a few pixels short has shown all there is and the next press goes on to the next song rather than
     // nudging this one; a page that reaches that space still goes on to the end, where the song always ends.
+    // A song that is one continuous column has no stop to step to before a page has been read: the next stop is only a
+    // place on the way, and a step goes as far down as a page, to the start of a stanza.
+    if (!rows.isSteppedByRow && rows.stanzaTops.isNotEmpty()) {
+        limit = maxValue
+        next = null
+    }
     var lastContent = if (next != null) next - window.visibleHeight(viewportHeight) else maxValue - window.end
     if (rows.isSteppedByRow) {
         val stop = stopAt(scroll, rows.stepOffsets)
@@ -176,7 +182,14 @@ private fun nextStepTargetOnce(scroll: Int, rows: SongRows, viewportHeight: Int,
         val candidate = top - window.top
         if (candidate > scroll + pageHeight / 2 && candidate <= page && (lineStart == null || candidate > lineStart)) lineStart = candidate
     }
-    page = lineStart ?: page
+    // And with the start of a stanza where one is within reach, so that a verse is not cut between two pages: the furthest one
+    // that still moves the song by a good part of a page. A stanza taller than that is cut at a line, as before.
+    var stanzaStart: Int? = null
+    for (top in rows.stanzaTops) {
+        val candidate = top - window.top
+        if (candidate > scroll + pageHeight / 3 && candidate <= page && (stanzaStart == null || candidate > stanzaStart)) stanzaStart = candidate
+    }
+    page = stanzaStart ?: lineStart ?: page
     return minOf(page, limit)
 }
 
@@ -214,7 +227,14 @@ private fun previousStepTargetOnce(scroll: Int, rows: SongRows, viewportHeight: 
         val candidate = top - window.top
         if (candidate >= scroll - pageHeight && candidate < scroll - pageHeight / 2 && (lineStart == null || candidate < lineStart)) lineStart = candidate
     }
-    var target = maxOf(lineStart ?: (scroll - pageHeight), previous)
+    // The start of a stanza within reach is where the page back begins when there is one, the furthest back that is no more
+    // than a page above, so that the stanza is read from its first line.
+    var stanzaStart: Int? = null
+    for (top in rows.stanzaTops) {
+        val candidate = top - window.top
+        if (candidate >= scroll - pageHeight && candidate < scroll - pageHeight / 3 && (stanzaStart == null || candidate < stanzaStart)) stanzaStart = candidate
+    }
+    var target = maxOf(stanzaStart ?: lineStart ?: (scroll - pageHeight), previous)
     if (rows.isSteppedByRow) {
         val stop = stopAt(target, rows.stepOffsets)
         val bottom = if (stop >= 0) rows.bottoms.getOrNull(stop) else null

@@ -45,7 +45,7 @@ internal fun PinnedChordDiagrams(
     onChordClicked: ((String) -> Unit)?,
 ) {
     val cells = remember(chords, tuning, storedShapes) { chords.map { it to selectShape(it, tuning, storedShapes) } }
-    val cellWidth = chordCellMinWidth(tuning.instrument)
+    val cellWidth = chordCellMinWidth(tuning.instrument, PINNED_CHORDS_SCALE)
     Surface(modifier = modifier, color = MaterialTheme.colorScheme.background) {
         when (position) {
             UserPreferences.PinnedChordsPosition.TOP -> LazyRow(
@@ -59,6 +59,7 @@ internal fun PinnedChordDiagrams(
                         tuning = tuning,
                         selection = selection,
                         onClick = { onChordClicked?.invoke(chord.name) },
+                        scale = PINNED_CHORDS_SCALE,
                     )
                 }
             }
@@ -75,6 +76,7 @@ internal fun PinnedChordDiagrams(
                         tuning = tuning,
                         selection = selection,
                         onClick = { onChordClicked?.invoke(chord.name) },
+                        scale = PINNED_CHORDS_SCALE,
                     )
                 }
             }
@@ -88,10 +90,16 @@ internal fun pinnedChordsColumns(instrument: ChordInstrument) = if (instrument.i
 /** The width of the panel on the right for [instrument]: its columns of cells and the gaps between and around them. */
 internal fun pinnedChordsPanelWidth(instrument: ChordInstrument): Dp {
     val columns = pinnedChordsColumns(instrument)
-    return chordCellMinWidth(instrument) * columns + PINNED_CHORDS_GAP * (columns + 1)
+    return chordCellMinWidth(instrument, PINNED_CHORDS_SCALE) * columns + PINNED_CHORDS_GAP * (columns + 1)
 }
 
-/** The height of the strip across the top: one cell (a name over its diagram) and the gaps above and below it. */
-internal val PINNED_CHORDS_STRIP_HEIGHT = 156.dp
+/**
+ * How much smaller than the Chords tab's the pinned diagrams are drawn: they stay in view for the whole song, so what
+ * they take from it counts, and a smaller diagram is still every finger of its shape.
+ */
+private const val PINNED_CHORDS_SCALE = 0.72f
 
-private val PINNED_CHORDS_GAP = 8.dp
+/** The height of the strip across the top: one cell (a name over its diagram) and the gaps above and below it. */
+internal val PINNED_CHORDS_STRIP_HEIGHT = 116.dp
+
+private val PINNED_CHORDS_GAP = 4.dp

@@ -36,7 +36,9 @@ The song details screen's pedal stepping and snapping, over the `SongRows` the l
   long press, a right or middle click, a fling-stopping press, or one the system cancelled. A drag under 250 ms and a
   tenth of the height is still a tap (a strumming hand slides), stepping from where the song was at finger-down and
   replacing the fling.
-- **A fling goes no further than one step** (`oneStepCappedTarget`); a drag goes anywhere.
+- **A fling goes no further than one step** (`oneStepCappedTarget`); a drag goes anywhere. Only where the song is read in pages: a single column is one continuous
+  column (no pages, no padding under a row, no dots), flung as far as the finger takes it, and a step there begins at the
+  start of a stanza (`stanzaTops`) within a page.
 - Focus: the buttons take none; the screen retakes lost focus while uncovered, or the next arrow is spent on a focus
   search.
 - **A held step key is one step until released** (window focus loss counts as a release): key repeats would chain pages.

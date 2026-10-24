@@ -50,7 +50,7 @@ class MusicBrainzRemoteSourceTest {
 
     @Test
     fun `the user agent names the app, its version and where to reach its maintainers`() {
-        assertEquals("Campfire/4.5.0 ( https://github.com/pandulapeter/campfire )", userAgent("4.5.0"))
+        assertEquals("Campfire/4.5.0 ( https://github.com/asantarelli/campfire )", userAgent("4.5.0"))
     }
 
     @Test

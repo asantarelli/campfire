@@ -89,6 +89,7 @@ internal data class UserPreferencesDocument(
     val songColumns: Int = 0,
     val pinnedChordsPosition: String = "",
     val autoScrollSpeed: Int = 4,
+    val songFont: String = "",
 )
 
 @Serializable

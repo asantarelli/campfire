@@ -58,7 +58,8 @@ internal fun StepProgressIndicator(
     stepper: SongStepper?,
 ) {
     val stopCount = stepper?.stopCount ?: 0
-    val isShown = stopCount >= MIN_STOP_COUNT
+    // Only pages are counted: a song read as one continuous column has none, and its sections are no places to be counted.
+    val isShown = stopCount >= MIN_STOP_COUNT && stepper?.isSteppedByRow == true
     val visibility by animateFloatAsState(
         targetValue = if (isShown) 1f else 0f,
         animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec(),

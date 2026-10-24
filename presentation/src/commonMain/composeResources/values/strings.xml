@@ -318,6 +318,7 @@
     <string name="settings_library_cover_art_cache_clear_confirmation">The cover images kept on this device will be deleted. Each one is downloaded again the next time it is shown.</string>
     <string name="settings_library_cover_art_cache_clear_action">Clear</string>
     <string name="settings_library_delete">Delete library</string>
+    <string name="settings_library_empty">Empty the library</string>
     <string name="settings_library_delete_confirmation">Every song and setlist on this device will be deleted. This cannot be undone.</string>
     <string name="settings_library_delete_confirmation_sync">Dropbox sync starts as soon as they are deleted, and deletes them from your Dropbox folder and from every device synced with it as well.</string>
     <string name="settings_library_delete_prompt">Type %1$s to confirm</string>
@@ -377,6 +378,10 @@
     <string name="settings_pinned_chords_in_song">In the song</string>
     <string name="settings_pinned_chords_top">At the top</string>
     <string name="settings_pinned_chords_right">On the right</string>
+    <string name="settings_song_font">Typeface</string>
+    <string name="settings_song_font_description">The typeface of the lyrics and the chords. Monospaced keeps every chord exactly over its word.</string>
+    <string name="settings_song_font_default">Default</string>
+    <string name="settings_song_font_monospace">Monospaced</string>
     <string name="settings_music_search">Listen to the song</string>
     <string name="settings_music_search_description">The song's listen button searches for its artist and title on this service, in your browser.</string>
     <string name="music_search_youtube">YouTube</string>
@@ -895,6 +900,7 @@
     <string name="song_details_scroll_down">Scroll down</string>
     <string name="song_details_auto_scroll_start">Start scrolling the song by itself</string>
     <string name="song_details_auto_scroll_stop">Stop scrolling</string>
+    <string name="song_details_external_player">Play or pause the music player</string>
     <string name="song_details_auto_scroll_slower">Scroll slower</string>
     <string name="song_details_auto_scroll_faster">Scroll faster</string>
     <string name="song_details_auto_scroll_speed">Scroll speed %1$d</string>

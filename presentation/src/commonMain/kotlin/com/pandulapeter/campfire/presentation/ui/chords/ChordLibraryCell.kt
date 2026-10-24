@@ -44,6 +44,8 @@ internal fun ChordLibraryCell(
     tuning: ChordTuning,
     selection: SelectedShape,
     onClick: () -> Unit,
+    /** How much of its usual size the cell is drawn at, for the places that need many of them in little room. */
+    scale: Float = 1f,
 ) {
     val description = chordCellDescription(
         ChordCell(name = chord.name, letterName = chord.letterName, tuning = tuning, root = chord.chord.root, selection = selection),
@@ -57,13 +59,13 @@ internal fun ChordLibraryCell(
         color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clearAndSetSemantics { },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp * scale).clearAndSetSemantics { },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = 8.dp * scale),
                 text = chord.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = if (scale < 1f) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
                 color = LocalSecondAccentColor.current,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
@@ -75,7 +77,7 @@ internal fun ChordLibraryCell(
                 label = "chordLibraryShape",
             ) { (shape, shapeTuning) ->
                 ChordDiagram(
-                    modifier = Modifier.size(width = shapeTuning.instrument.diagramWidth, height = shapeTuning.instrument.diagramHeight),
+                    modifier = Modifier.size(width = shapeTuning.instrument.diagramWidth * scale, height = shapeTuning.instrument.diagramHeight * scale),
                     geometry = remember(shape, shapeTuning, chord.chord.root) {
                         shape?.let { chordDiagramGeometryOf(it, shapeTuning, chord.chord.root) } ?: emptyChordDiagramGeometryOf(shapeTuning.instrument)
                     },
@@ -87,7 +89,7 @@ internal fun ChordLibraryCell(
 }
 
 /** How narrow a column of the Chords tab gets, and how wide the scale sheet's cells are: a diagram and the card around it. */
-internal fun chordCellMinWidth(instrument: ChordInstrument?) = (instrument ?: ChordInstrument.GUITAR).diagramWidth + 24.dp
+internal fun chordCellMinWidth(instrument: ChordInstrument?, scale: Float = 1f) = (instrument ?: ChordInstrument.GUITAR).diagramWidth * scale + (if (scale < 1f) 12.dp else 24.dp) * scale
 
 private val ChordInstrument.diagramWidth: Dp get() = if (isFretted) 84.dp else 168.dp
 

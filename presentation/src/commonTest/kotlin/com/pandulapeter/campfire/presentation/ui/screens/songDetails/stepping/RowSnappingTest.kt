@@ -319,6 +319,25 @@ class RowSnappingTest {
     }
 
     @Test
+    fun `a page begins with the start of a stanza rather than a line where one is within reach`() {
+        // The same section, whose second stanza starts at its second line: the page stops short of the fourth line to begin there.
+        val section = SongRows(
+            stepOffsets = listOf(0, 3000),
+            stepSections = listOf(0, 1),
+            lineTops = listOf(24, 424, 874, 1324),
+            stanzaTops = listOf(24, 424),
+        )
+        val window = ReadingWindow(top = 24, overlap = 100)
+        assertEquals(400, next(scroll = 0, rows = section, window = window))
+        // No stanza starts within the next page, so it is cut at a line as before.
+        assertEquals(850, next(scroll = 400, rows = section, window = window))
+        // Back, the page begins with the stanza too, the furthest one within a page rather than the nearest line.
+        val withInnerStanza = section.copy(lineTops = listOf(24, 424, 574, 874, 1324), stanzaTops = listOf(24, 574))
+        assertEquals(550, previousStepTarget(scroll = 1100, rows = withInnerStanza, viewportHeight = 1000, window = window, maxValue = 3300))
+        assertEquals(400, previousStepTarget(scroll = 1100, rows = withInnerStanza.copy(stanzaTops = emptyList()), viewportHeight = 1000, window = window, maxValue = 3300))
+    }
+
+    @Test
     fun `a page is never less than two thirds of what can be read`() {
         assertEquals(667, ReadingWindow(overlap = 2000).pageHeight(viewportHeight = 1000))
         assertEquals(353 - 353 / 3, ReadingWindow(overlap = 204).pageHeight(viewportHeight = 353))

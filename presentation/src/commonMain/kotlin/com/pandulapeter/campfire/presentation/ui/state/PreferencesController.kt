@@ -190,6 +190,8 @@ internal class PreferencesController(
 
     fun setPinnedChordsPosition(value: UserPreferences.PinnedChordsPosition) = changeUserPreferences { copy(pinnedChordsPosition = value) }
 
+    fun setSongFont(value: UserPreferences.SongFont) = changeUserPreferences { copy(songFont = value) }
+
     fun setAutoScrollSpeed(value: Int) = changeUserPreferences {
         copy(autoScrollSpeed = value.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED))
     }

@@ -9,6 +9,7 @@
  */
 package com.pandulapeter.campfire.presentation.ui.songView
 
+import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.ui.songView.model.ScaleSuggestions
 import com.pandulapeter.campfire.presentation.ui.songView.firstSection.SongMetadataSection
 import com.pandulapeter.campfire.presentation.ui.songView.firstSection.SongPlayingControls
@@ -66,6 +67,7 @@ import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.ui.components.scaled
 import com.pandulapeter.campfire.presentation.ui.instrument.tunings
 import com.pandulapeter.campfire.presentation.ui.songLayout.rememberDefaultSectionLabels
+import com.pandulapeter.campfire.presentation.ui.theme.LocalMonospaceFontFamily
 import com.pandulapeter.campfire.tuner.api.model.InstrumentTuning
 
 /**
@@ -254,11 +256,15 @@ internal fun SongLyrics(
     // that first) rather than a deep one on every composition.
     val localTextStyle = LocalTextStyle.current
     val typography = MaterialTheme.typography
-    val lyricsStyle = remember(localTextStyle, typography, fontScale) {
+    // The chords sit over the characters of the line they are written before, so in a face whose characters are all the same
+    // width a chord stays over its word whatever the line holds, which the reader may prefer to the app's own face.
+    val monospaceFontFamily = LocalMonospaceFontFamily.current
+    val songFont = LocalSongFont.current
+    val lyricsStyle = remember(localTextStyle, typography, fontScale, songFont, monospaceFontFamily) {
         localTextStyle.merge(typography.bodyLarge).scaled(fontScale).copy(
             color = Color.Unspecified,
             textDirection = TextDirection.Content,
-        )
+        ).let { if (songFont == UserPreferences.SongFont.MONOSPACE) it.copy(fontFamily = monospaceFontFamily) else it }
     }
     val headerStyle = remember(typography, fontScale) { typography.titleSmall.scaled(fontScale) }
     val chordStyle = remember(lyricsStyle) { lyricsStyle.copy(fontWeight = FontWeight.Bold) }

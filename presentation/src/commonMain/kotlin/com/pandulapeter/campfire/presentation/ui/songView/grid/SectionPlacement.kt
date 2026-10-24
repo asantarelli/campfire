@@ -342,6 +342,7 @@ internal fun songRowsOf(
         lineTops = singleColumnUnits.map { arrangement.tops[it] },
         lineBottoms = singleColumnUnits.map { arrangement.tops[it] + unitHeights[it] },
         lineSections = singleColumnUnits.map { units.unitSections[it] },
+        stanzaTops = singleColumnUnits.filter { unit -> units.isStanzaBreakBefore[unit] || unit == units.sectionStarts[units.unitSections[unit]] }.map { arrangement.tops[it] },
         timingSections = units.timingSections,
     )
 }

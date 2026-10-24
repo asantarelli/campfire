@@ -31,6 +31,10 @@ import kotlinx.coroutines.flow.first
  * those pieces ends and [lineSections] the section each belongs to, which together name a line in terms another layout
  * of the song still has (see `stepping.LineAnchor`).
  *
+ * [stanzaTops] are the ones of those that start a stanza - a section, or a stretch of one after an empty line or in front of a
+ * comment - which a step that pages through a section taller than the screen brings the next page to where one is within
+ * its reach, so that a stanza is not cut in two between one page and the next unless it is taller than a page itself.
+ *
  * [timingSections] are the sections that change the tempo or the time signature the song is played in from there on,
  * ascending, each of which starts a stop of its own wherever the song is stepped by rows (see `stepping.timingIndexAt`). A change
  * written before the song's first line is reported at section 0 and starts no stop, since it is in force from the first.
@@ -44,6 +48,7 @@ internal data class SongRows(
     val lineTops: List<Int> = emptyList(),
     val lineBottoms: List<Int> = emptyList(),
     val lineSections: List<Int> = emptyList(),
+    val stanzaTops: List<Int> = emptyList(),
     val timingSections: List<Int> = emptyList(),
 ) {
     /**
@@ -57,6 +62,7 @@ internal data class SongRows(
         stepOffsets = stepOffsets.map { if (it <= 0) 0 else it + topPadding },
         lineTops = lineTops.map { it + topPadding },
         lineBottoms = lineBottoms.map { it + topPadding },
+        stanzaTops = stanzaTops.map { it + topPadding },
     )
 
     /**

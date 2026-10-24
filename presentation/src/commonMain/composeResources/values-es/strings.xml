@@ -317,7 +317,8 @@
     <string name="settings_library_cover_art_cache_clear">Vaciar la caché de portadas</string>
     <string name="settings_library_cover_art_cache_clear_confirmation">Se eliminarán las imágenes de portada guardadas en este dispositivo. Cada una se vuelve a descargar la próxima vez que se muestre.</string>
     <string name="settings_library_cover_art_cache_clear_action">Vaciar</string>
-    <string name="settings_library_delete">Eliminar la biblioteca</string>
+    <string name="settings_library_delete">Vaciar la biblioteca</string>
+    <string name="settings_library_empty">Vaciar la biblioteca</string>
     <string name="settings_library_delete_confirmation">Se eliminarán todas las canciones y repertorios de este dispositivo. Esto no se puede deshacer.</string>
     <string name="settings_library_delete_confirmation_sync">La sincronización con Dropbox empieza en cuanto se eliminan, y también los elimina de tu carpeta de Dropbox y de todos los dispositivos sincronizados con ella.</string>
     <string name="settings_library_delete_prompt">Escribe %1$s para confirmar</string>
@@ -377,6 +378,10 @@
     <string name="settings_pinned_chords_in_song">En la canción</string>
     <string name="settings_pinned_chords_top">Arriba</string>
     <string name="settings_pinned_chords_right">A la derecha</string>
+    <string name="settings_song_font">Tipografía</string>
+    <string name="settings_song_font_description">La tipografía de la letra y los acordes. La monoespaciada mantiene cada acorde justo sobre su palabra.</string>
+    <string name="settings_song_font_default">Predeterminada</string>
+    <string name="settings_song_font_monospace">Monoespaciada</string>
     <string name="settings_music_search">Escuchar la canción</string>
     <string name="settings_music_search_description">El botón de escuchar busca el artista y el título de la canción en este servicio, en tu navegador.</string>
     <string name="music_search_youtube">YouTube</string>
@@ -895,6 +900,7 @@
     <string name="song_details_scroll_down">Desplazar hacia abajo</string>
     <string name="song_details_auto_scroll_start">Desplazar la canción automáticamente</string>
     <string name="song_details_auto_scroll_stop">Detener el desplazamiento</string>
+    <string name="song_details_external_player">Reproducir o pausar el reproductor de música</string>
     <string name="song_details_auto_scroll_slower">Desplazar más lento</string>
     <string name="song_details_auto_scroll_faster">Desplazar más rápido</string>
     <string name="song_details_auto_scroll_speed">Velocidad de desplazamiento %1$d</string>

@@ -104,6 +104,9 @@ internal class RowSnapFlingBehavior(
         val start = scrollState.value.toFloat()
         val decayTarget = start + decay.calculateTargetValue(0f, initialVelocity)
         val currentRows = rows
+        // A song that is one continuous column is read by scrolling it: the finger takes it as far as it goes, with no
+        // page to be held to and no row to rest on; the step buttons are what moves it a page at a time.
+        if (!currentRows.isSteppedByRow) return with(defaultFling) { performFling(initialVelocity) }
         val cappedTarget = oneStepCappedTarget(
             start = start,
             target = decayTarget,

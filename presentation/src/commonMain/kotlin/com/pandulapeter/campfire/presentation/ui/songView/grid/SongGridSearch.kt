@@ -146,11 +146,6 @@ internal class SongGridSearch(
         .takeIf { it > maxColumnWidthPx && totalWidth > maxColumnWidthPx }
         ?.let { minOf(it, totalWidth) }
 
-    // A section is narrow where every line of it fits half the column without wrapping, so that setting it beside
-    // another costs it nothing. A change of tempo or time is never one, since it heads its page rather than sharing a row.
-    private fun isNarrowSection(section: Int, halfColumnWidth: Int) = !units.isTiming(section) &&
-        unitsOf(section).all { maxWidthOf(it) <= halfColumnWidth }
-
     // A wide row is a single column in which every section is as wide as it needs: the ones whose lines do not wrap as
     // wide as those lines, and the rest as wide as a single column, so that what wraps is not read in lines longer
     // than a column's because a staff of tablature shares the row.
@@ -332,26 +327,10 @@ internal class SongGridSearch(
             return withNarrowColumns(readable, fittingCounts.reversed().map { magazine(it).scored() }).laidOut()
         }
 
-        // A width with room for one column is stepped through a page at a time, the pages filled the way the rows of
-        // several columns are below, so that a step turns a screen of the song rather than a section of it.
-        if (spec.canCutSections && availableHeightPx > 0 && readableColumnCount == 1 && sectionCount <= MAX_CUT_SECTION_COUNT) {
-            val halfColumnWidth = columnWidthFor(totalWidth, 2)
-            val paged = flowIntoPages(
-                sectionStarts = segment.sectionStarts,
-                heightAt = { unit, columns -> unitHeightAt(unit, columnWidthFor(totalWidth, columns)) },
-                // A song the reader asked to be set in one column has no two sections side by side either.
-                isNarrow = { section -> spec.forcedColumnCount != 1 && isNarrowSection(section + sectionOffset, halfColumnWidth) },
-                isCuttableBefore = { unit -> segment.isCuttableBefore[unit] },
-                piecePadding = piecePadding,
-                sectionGap = sectionGapPx,
-                maxRowHeight = maxRowHeightPx,
-                lineHeight = lineHeightPx,
-                lineCount = { unit -> segment.lineCount[unit] },
-                isStanzaBreakBefore = { unit -> segment.isStanzaBreakBefore[unit] },
-            )
-            return withNarrowColumns(paged.scored())
-        }
-
+        // A width with room for one column is one continuous column, never pages: a page ends where the screen does, and what
+        // it leaves empty under it, and the divider, only stand between the reader and the next verse, while a block that
+        // cannot be cut, a staff of tablature, needs no page to be kept whole - a step begins at the start of a stanza or a
+        // block (see nextStepTarget).
         val searched = if (availableHeightPx > 0 && spec.forcedColumnCount > 0 && maxColumnCount > 1) {
             // The reader chose the number of columns, so there is none to find: the sections go into that many.
             gridFor(maxColumnCount).let { grid ->

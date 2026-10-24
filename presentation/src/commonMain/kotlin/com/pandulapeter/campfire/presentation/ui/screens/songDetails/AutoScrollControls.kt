@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
+import com.pandulapeter.campfire.presentation.resources.ic_media_play_pause
 import com.pandulapeter.campfire.presentation.resources.ic_pause
 import com.pandulapeter.campfire.presentation.resources.ic_play
 import com.pandulapeter.campfire.presentation.resources.ic_subtract
@@ -53,7 +54,9 @@ import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll
 import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll_speed
 import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll_start
 import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll_stop
+import com.pandulapeter.campfire.presentation.resources.song_details_external_player
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
+import com.pandulapeter.campfire.presentation.ui.platform.rememberExternalPlayerControl
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -84,9 +87,10 @@ internal fun BoxScope.AutoScrollControls(
         onFinished = { isRunning = false },
     )
     val hasSomethingToScroll = (scrollState?.maxValue ?: 0) > 0
+    val externalPlayer = rememberExternalPlayerControl()
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.BottomEnd).padding(end = end, bottom = bottom),
-        visible = hasSomethingToScroll || isRunning,
+        visible = hasSomethingToScroll || isRunning || externalPlayer != null,
         enter = scaleIn() + fadeIn(),
         exit = scaleOut() + fadeOut(),
     ) {
@@ -122,13 +126,23 @@ internal fun BoxScope.AutoScrollControls(
                     )
                 }
             }
-            AutoScrollButton(
-                icon = painterResource(if (isRunning) Res.drawable.ic_pause else Res.drawable.ic_play),
-                contentDescription = stringResource(
-                    if (isRunning) Res.string.song_details_auto_scroll_stop else Res.string.song_details_auto_scroll_start,
-                ),
-                onClick = { isRunning = !isRunning },
-            )
+            if (hasSomethingToScroll || isRunning) {
+                AutoScrollButton(
+                    icon = painterResource(if (isRunning) Res.drawable.ic_pause else Res.drawable.ic_play),
+                    contentDescription = stringResource(
+                        if (isRunning) Res.string.song_details_auto_scroll_stop else Res.string.song_details_auto_scroll_start,
+                    ),
+                    onClick = { isRunning = !isRunning },
+                )
+            }
+            // The first of the column's buttons, apart from the song's own scroll: the player the musician plays along with.
+            externalPlayer?.let { player ->
+                AutoScrollButton(
+                    icon = painterResource(Res.drawable.ic_media_play_pause),
+                    contentDescription = stringResource(Res.string.song_details_external_player),
+                    onClick = player::playPause,
+                )
+            }
         }
     }
 }

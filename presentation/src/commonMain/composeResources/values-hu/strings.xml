@@ -318,6 +318,7 @@
     <string name="settings_library_cover_art_cache_clear_confirmation">Az eszközön tárolt borítóképek törlődnek. Mindegyiket újra letölti az alkalmazás, amikor legközelebb megjelenik.</string>
     <string name="settings_library_cover_art_cache_clear_action">Törlés</string>
     <string name="settings_library_delete">Könyvtár törlése</string>
+    <string name="settings_library_empty">A könyvtár kiürítése</string>
     <string name="settings_library_delete_confirmation">Az eszközön lévő összes dal és lista törlődik. Ez nem vonható vissza.</string>
     <string name="settings_library_delete_confirmation_sync">A Dropbox-szinkronizálás a törlés után azonnal elindul, és a Dropbox-mappádból, valamint minden vele szinkronizált eszközről is törli őket.</string>
     <string name="settings_library_delete_prompt">A megerősítéshez írd be: %1$s</string>
@@ -377,6 +378,10 @@
     <string name="settings_pinned_chords_in_song">A dalban</string>
     <string name="settings_pinned_chords_top">Felül</string>
     <string name="settings_pinned_chords_right">Jobbra</string>
+    <string name="settings_song_font">Betűtípus</string>
+    <string name="settings_song_font_description">A szöveg és az akkordok betűtípusa. A fix szélességű tartja minden akkordot pontosan a szava fölött.</string>
+    <string name="settings_song_font_default">Alapértelmezett</string>
+    <string name="settings_song_font_monospace">Fix szélességű</string>
     <string name="settings_music_search">A dal meghallgatása</string>
     <string name="settings_music_search_description">A dal meghallgatás gombja ezen a szolgáltatáson keresi az előadót és a címet, a böngészőben.</string>
     <string name="music_search_youtube">YouTube</string>
@@ -894,6 +899,7 @@
     <string name="song_details_scroll_down">Görgetés lefelé</string>
     <string name="song_details_auto_scroll_start">A dal automatikus görgetésének indítása</string>
     <string name="song_details_auto_scroll_stop">A görgetés leállítása</string>
+    <string name="song_details_external_player">A zenelejátszó indítása vagy szüneteltetése</string>
     <string name="song_details_auto_scroll_slower">Lassabb görgetés</string>
     <string name="song_details_auto_scroll_faster">Gyorsabb görgetés</string>
     <string name="song_details_auto_scroll_speed">Görgetési sebesség: %1$d</string>

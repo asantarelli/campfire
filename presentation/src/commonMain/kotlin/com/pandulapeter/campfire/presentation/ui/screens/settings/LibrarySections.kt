@@ -36,6 +36,7 @@ import com.pandulapeter.campfire.presentation.resources.settings_import
 import com.pandulapeter.campfire.presentation.resources.settings_library_cover_art_cache
 import com.pandulapeter.campfire.presentation.resources.settings_library_cover_art_cache_clear
 import com.pandulapeter.campfire.presentation.resources.settings_library_delete
+import com.pandulapeter.campfire.presentation.resources.settings_library_empty
 import com.pandulapeter.campfire.presentation.resources.settings_library_size
 import com.pandulapeter.campfire.presentation.resources.settings_library_size_bytes
 import com.pandulapeter.campfire.presentation.resources.settings_library_size_decimal_separator
@@ -112,6 +113,16 @@ private fun ImportExportSection(
         isEnabled = !isPerformanceModeEnabled,
         isEmphasized = false,
         onClick = { viewModel.exportController.exportLibrary(filePicker) },
+    )
+    // Next to the import, which is where somebody who wants a clean import looks for it. The dialog it opens is the same the
+    // library's row under "On this device" opens: it wants a word typed, since nothing brings the songs back.
+    val librarySummary by viewModel.libraryState.librarySummary.collectAsStateWithLifecycle()
+    ActionListItem(
+        title = stringResource(Res.string.settings_library_empty),
+        icon = painterResource(Res.drawable.ic_delete),
+        isEnabled = librarySummary?.let { it.songCount + it.setlistCount > 0 } == true && !isImporting && !isPerformanceModeEnabled,
+        isEmphasized = false,
+        onClick = { viewModel.dialogHost.showDialog(DialogType.DeleteLibrary) },
     )
 }
 

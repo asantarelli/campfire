@@ -27,6 +27,10 @@ import com.pandulapeter.campfire.presentation.resources.settings_pinned_chords_t
 import com.pandulapeter.campfire.presentation.resources.settings_song_columns
 import com.pandulapeter.campfire.presentation.resources.settings_song_columns_automatic
 import com.pandulapeter.campfire.presentation.resources.settings_song_columns_description
+import com.pandulapeter.campfire.presentation.resources.settings_song_font
+import com.pandulapeter.campfire.presentation.resources.settings_song_font_default
+import com.pandulapeter.campfire.presentation.resources.settings_song_font_description
+import com.pandulapeter.campfire.presentation.resources.settings_song_font_monospace
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
 import com.pandulapeter.campfire.presentation.ui.components.controls.SegmentedChoice
 import com.pandulapeter.campfire.presentation.ui.settingsPage.SettingsSection
@@ -51,6 +55,19 @@ internal fun SongReadingSection(
                 (1..UserPreferences.MAX_SONG_COLUMNS).map { it to it.toString() },
             selected = userPreferences?.songColumns ?: UserPreferences.AUTOMATIC_SONG_COLUMNS,
             onSelected = viewModel.preferencesController::setSongColumns,
+        )
+    }
+    SettingsSubsection(
+        title = stringResource(Res.string.settings_song_font),
+        description = stringResource(Res.string.settings_song_font_description),
+    ) {
+        SegmentedChoice(
+            options = listOf(
+                UserPreferences.SongFont.DEFAULT to stringResource(Res.string.settings_song_font_default),
+                UserPreferences.SongFont.MONOSPACE to stringResource(Res.string.settings_song_font_monospace),
+            ),
+            selected = userPreferences?.songFont ?: UserPreferences.SongFont.DEFAULT,
+            onSelected = viewModel.preferencesController::setSongFont,
         )
     }
     SettingsSubsection(
