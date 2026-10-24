@@ -384,6 +384,10 @@
     <string name="settings_song_font_monospace">Monoespaciada</string>
     <string name="settings_music_search">Escuchar la canción</string>
     <string name="settings_music_search_description">El botón de escuchar busca el artista y el título de la canción en este servicio, en tu navegador.</string>
+    <string name="settings_external_player">Reproductor de música</string>
+    <string name="settings_external_player_description">El botón que lleva el reproductor de música al inicio le pide la posición, donde se puede. Android solo deja que una app lo haga una vez permitida en el acceso a notificaciones; la app no lee ninguna notificación.</string>
+    <string name="settings_external_player_allow">Permitir en el acceso a notificaciones</string>
+    <string name="settings_external_player_allowed">Permitido: cambiar en el acceso a notificaciones</string>
     <string name="music_search_youtube">YouTube</string>
     <string name="music_search_youtube_music">YouTube Music</string>
     <string name="music_search_spotify">Spotify</string>

@@ -86,6 +86,7 @@ internal fun SongReadingSection(
             onSelected = viewModel.preferencesController::setPinnedChordsPosition,
         )
     }
+    ExternalPlayerSettings()
     SettingsSubsection(
         title = stringResource(Res.string.settings_music_search),
         description = stringResource(Res.string.settings_music_search_description),

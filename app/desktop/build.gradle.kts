@@ -199,14 +199,15 @@ compose.desktop {
                 menu = true
                 menuGroup = "SDCancionero"
                 shortcut = true
-                // Installs into the user's own profile, so the installer never asks for an administrator.
-                perUserInstall = true
+                // Installs for every user, under Program Files, which asks for an administrator.
+                perUserInstall = false
                 // What makes a newer installer replace the installed version rather than land next to it. Windows
                 // Installer only looks for a product with the same upgrade code in the context it is installing into
                 // itself, so this and perUserInstall above both have to stay what they are for as long as the app
                 // exists: changing either leaves every existing installation where it is, with a second one in Apps.
-                // 4.2.2 is that installation - per machine, under the code jpackage derives when it is given none -
-                // and 4.2.3 was the change.
+                // A build that is installed over another has to carry a higher version, or the installer answers that
+                // the app is already installed. The installations made while this was per user (4.2.3 to 5.0.0) are
+                // not found by a per machine one, and are uninstalled once by hand.
                 upgradeUuid = "243e51a3-b5a0-49a7-9a61-2c276db59db9"
             }
             linux {

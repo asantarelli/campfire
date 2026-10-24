@@ -438,6 +438,21 @@
             android:foregroundServiceType="mediaPlayback"
             android:stopWithTask="false" />
 
+        <!--
+          What lets the button that takes the user's music player back to the start ask it for the position, once the user
+          allows it in the system's notification access: Android hands the media sessions of other apps only to a notification
+          listener. It reads no notification, see PlayerSessionsService.
+        -->
+        <service
+            android:name="com.pandulapeter.campfire.presentation.ui.platform.PlayerSessionsService"
+            android:exported="true"
+            android:label="@string/campfire"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
         <!-- Lets a shared song or setlist leave the app's private storage as a content URI, see AndroidFilePicker.shareFile in :presentation. -->
         <provider
             android:name="androidx.core.content.FileProvider"

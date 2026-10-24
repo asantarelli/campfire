@@ -384,6 +384,10 @@
     <string name="settings_song_font_monospace">Monospaced</string>
     <string name="settings_music_search">Listen to the song</string>
     <string name="settings_music_search_description">The song's listen button searches for its artist and title on this service, in your browser.</string>
+    <string name="settings_external_player">Music player</string>
+    <string name="settings_external_player_description">The button that takes the music player back to the start asks it for the position, where it can. Android only lets an app do that after it is allowed in the notification access; the app reads no notification.</string>
+    <string name="settings_external_player_allow">Allow in the notification access</string>
+    <string name="settings_external_player_allowed">Allowed: change in the notification access</string>
     <string name="music_search_youtube">YouTube</string>
     <string name="music_search_youtube_music">YouTube Music</string>
     <string name="music_search_spotify">Spotify</string>

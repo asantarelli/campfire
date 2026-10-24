@@ -135,8 +135,10 @@ leaves `Connecting`. The rest is `data/source/remote/implementation/CLAUDE.md`'s
 
 ### Windows
 
-- `.msi`: per user, fixed `upgradeUuid`. **Never change either**: both put a second Campfire
-  next to existing installs.
+- `.msi`: per machine (Program Files, asks for an administrator), fixed `upgradeUuid`. **Never change either**: both put
+  a second Campfire next to existing installs. A rebuild with the version already installed is refused as "already
+  installed", so every build that is handed out raises `campfire.versionName`. Per user installs of 4.2.3 to 5.0.0 are not
+  found by it: they are uninstalled once, by hand.
 - File associations: only `.cho`, `.chopro`, `.chordpro` (an MSI can only claim an extension outright); the Store
   package claims the same. Never zip or `.txt`. Keep in step with `LibraryFiles.SONG_EXTENSIONS`.
 - **MSIX** (`packageReleaseMsix`): identity from `campfire.windows.*` (Partner Center's, verbatim), version

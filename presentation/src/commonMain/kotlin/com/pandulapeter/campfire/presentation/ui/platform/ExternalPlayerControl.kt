@@ -18,18 +18,32 @@ import androidx.compose.runtime.Composable
  */
 internal interface ExternalPlayerControl {
 
+    /** What the system has to allow for [restart] to put the player at the very start, or null where it needs nothing. */
+    val restartAccess: RestartAccess?
+        get() = null
+
     fun playPause()
 
     /**
-     * Takes the player back to the start of what it is playing: the previous-track key, which a player that is past the
-     * first seconds of a track answers by starting it over, and one that is not by going on to the track before it.
+     * Takes the player back to the start of what it is playing and plays it from there. Where the system lets the app
+     * ask the player for a position that is what it does; where it does not, it presses the previous-track key, which a
+     * player past the first seconds of a track answers by starting it over, and many answer by doing nothing.
      */
     fun restart()
 }
 
+/** The system's permission for [ExternalPlayerControl.restart] to ask the player for a position. */
+internal interface RestartAccess {
+
+    val isGranted: Boolean
+
+    /** Opens the screen of the system's settings where it is given. */
+    fun open()
+}
+
 /**
  * The control of the device's media player, or null where the app cannot reach one: only Android and Windows let an app
- * press the media keys, whoever owns the player that is active, and that is the only thing they are used for.
+ * reach the player that is active, whoever owns it, and that is the only thing they are used for.
  */
 @Composable
 internal expect fun rememberExternalPlayerControl(): ExternalPlayerControl?

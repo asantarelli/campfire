@@ -384,6 +384,10 @@
     <string name="settings_song_font_monospace">Fix szélességű</string>
     <string name="settings_music_search">A dal meghallgatása</string>
     <string name="settings_music_search_description">A dal meghallgatás gombja ezen a szolgáltatáson keresi az előadót és a címet, a böngészőben.</string>
+    <string name="settings_external_player">Zenelejátszó</string>
+    <string name="settings_external_player_description">A gomb, amely a zenelejátszót az elejére viszi, ahol lehet, a lejátszási pozíciót kéri tőle. Az Android csak akkor engedi ezt egy alkalmazásnak, ha az értesítési hozzáférésben engedélyezték; az alkalmazás nem olvas el egyetlen értesítést sem.</string>
+    <string name="settings_external_player_allow">Engedélyezés az értesítési hozzáférésben</string>
+    <string name="settings_external_player_allowed">Engedélyezve: módosítás az értesítési hozzáférésben</string>
     <string name="music_search_youtube">YouTube</string>
     <string name="music_search_youtube_music">YouTube Music</string>
     <string name="music_search_spotify">Spotify</string>
