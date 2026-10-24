@@ -900,6 +900,7 @@
     <string name="song_details_auto_scroll_start">A dal automatikus görgetésének indítása</string>
     <string name="song_details_auto_scroll_stop">A görgetés leállítása</string>
     <string name="song_details_external_player">A zenelejátszó indítása vagy szüneteltetése</string>
+    <string name="song_details_external_player_restart">A zenelejátszó újraindítása az elejéről</string>
     <string name="song_details_auto_scroll_slower">Lassabb görgetés</string>
     <string name="song_details_auto_scroll_faster">Gyorsabb görgetés</string>
     <string name="song_details_auto_scroll_speed">Görgetési sebesség: %1$d</string>

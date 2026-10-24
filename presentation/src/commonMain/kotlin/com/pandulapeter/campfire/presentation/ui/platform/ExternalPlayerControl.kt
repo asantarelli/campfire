@@ -16,13 +16,20 @@ import androidx.compose.runtime.Composable
  * a recording on the phone) next to the song being read, not the app's own: the song is read with a hand on the
  * instrument, and the button that stops the recording is the one nearest to it.
  */
-internal fun interface ExternalPlayerControl {
+internal interface ExternalPlayerControl {
+
     fun playPause()
+
+    /**
+     * Takes the player back to the start of what it is playing: the previous-track key, which a player that is past the
+     * first seconds of a track answers by starting it over, and one that is not by going on to the track before it.
+     */
+    fun restart()
 }
 
 /**
- * The control of the device's media player, or null where the app cannot reach one: only Android lets an app press the
- * play key of the media session that is active, whoever owns it, and that is the only thing it is used for.
+ * The control of the device's media player, or null where the app cannot reach one: only Android and Windows let an app
+ * press the media keys, whoever owns the player that is active, and that is the only thing they are used for.
  */
 @Composable
 internal expect fun rememberExternalPlayerControl(): ExternalPlayerControl?

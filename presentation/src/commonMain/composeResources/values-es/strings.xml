@@ -901,6 +901,7 @@
     <string name="song_details_auto_scroll_start">Desplazar la canción automáticamente</string>
     <string name="song_details_auto_scroll_stop">Detener el desplazamiento</string>
     <string name="song_details_external_player">Reproducir o pausar el reproductor de música</string>
+    <string name="song_details_external_player_restart">Volver al inicio en el reproductor de música</string>
     <string name="song_details_auto_scroll_slower">Desplazar más lento</string>
     <string name="song_details_auto_scroll_faster">Desplazar más rápido</string>
     <string name="song_details_auto_scroll_speed">Velocidad de desplazamiento %1$d</string>

@@ -45,6 +45,7 @@ import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.localization.stringResource
 import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.ic_media_play_pause
+import com.pandulapeter.campfire.presentation.resources.ic_media_restart
 import com.pandulapeter.campfire.presentation.resources.ic_pause
 import com.pandulapeter.campfire.presentation.resources.ic_play
 import com.pandulapeter.campfire.presentation.resources.ic_subtract
@@ -55,6 +56,7 @@ import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll
 import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll_start
 import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll_stop
 import com.pandulapeter.campfire.presentation.resources.song_details_external_player
+import com.pandulapeter.campfire.presentation.resources.song_details_external_player_restart
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
 import com.pandulapeter.campfire.presentation.ui.platform.rememberExternalPlayerControl
 import org.jetbrains.compose.resources.painterResource
@@ -137,6 +139,11 @@ internal fun BoxScope.AutoScrollControls(
             }
             // The first of the column's buttons, apart from the song's own scroll: the player the musician plays along with.
             externalPlayer?.let { player ->
+                AutoScrollButton(
+                    icon = painterResource(Res.drawable.ic_media_restart),
+                    contentDescription = stringResource(Res.string.song_details_external_player_restart),
+                    onClick = player::restart,
+                )
                 AutoScrollButton(
                     icon = painterResource(Res.drawable.ic_media_play_pause),
                     contentDescription = stringResource(Res.string.song_details_external_player),

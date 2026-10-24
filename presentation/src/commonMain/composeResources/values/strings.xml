@@ -901,6 +901,7 @@
     <string name="song_details_auto_scroll_start">Start scrolling the song by itself</string>
     <string name="song_details_auto_scroll_stop">Stop scrolling</string>
     <string name="song_details_external_player">Play or pause the music player</string>
+    <string name="song_details_external_player_restart">Restart the music player from the beginning</string>
     <string name="song_details_auto_scroll_slower">Scroll slower</string>
     <string name="song_details_auto_scroll_faster">Scroll faster</string>
     <string name="song_details_auto_scroll_speed">Scroll speed %1$d</string>
