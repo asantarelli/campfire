@@ -751,7 +751,10 @@ impl App {
                     }
                 }
             });
-            if ui.button("⏯").on_hover_text("Reproducir o pausar el reproductor de música").clicked() {
+            if ui.button("|< Inicio").on_hover_text("Volver al inicio en el reproductor de música").clicked() {
+                crate::media::restart();
+            }
+            if ui.button("Play / Pausa").on_hover_text("Reproducir o pausar el reproductor de música").clicked() {
                 crate::media::play_pause();
             }
             if ui.checkbox(&mut self.settings.pin_chord_diagrams, "Diagramas").on_hover_text("Los acordes de la canción, dibujados al costado").changed() {
