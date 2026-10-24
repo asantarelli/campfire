@@ -269,7 +269,7 @@ data class UserPreferences(
         const val AUTOMATIC_SONG_COLUMNS = 0
         const val MAX_SONG_COLUMNS = 4
         const val MIN_AUTO_SCROLL_SPEED = 1
-        const val MAX_AUTO_SCROLL_SPEED = 10
+        const val MAX_AUTO_SCROLL_SPEED = 20
         const val DEFAULT_AUTO_SCROLL_SPEED = 4
 
         /** The text size a song opens at, and the one a stored size that is not a size falls back on. */

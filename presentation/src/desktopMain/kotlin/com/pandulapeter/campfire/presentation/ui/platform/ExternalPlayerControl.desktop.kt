@@ -26,7 +26,10 @@ private object WindowsPlayerControl : ExternalPlayerControl {
 
     override fun playPause() = run(PLAY_PAUSE_SCRIPT)
 
-    override fun restart() = run(RESTART_SCRIPT)
+    override fun restart(): Boolean {
+        run(RESTART_SCRIPT)
+        return true
+    }
 
     /**
      * Through a PowerShell, since the JVM can neither press a media key nor ask the system for the player, and the app

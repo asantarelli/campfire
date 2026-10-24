@@ -179,6 +179,7 @@
     <string name="new_song_placeholder_title">Canción nueva</string>
     <string name="new_song_placeholder_artist">Artista desconocido</string>
     <string name="paste_clipboard_empty">No hay texto en el portapapeles para pegar.</string>
+    <string name="player_cannot_restart">Este reproductor de música no deja que otras apps lo lleven al inicio de la pista.</string>
     <string name="paste_only_links">Un enlace no es una canción, y SDCancionero no abre páginas. Copia los acordes y la letra en sí.</string>
     <string name="paste_too_large">El texto supera los 8 MB que admite una importación.</string>
     <string name="shared_link_not_imported">SDCancionero no abre páginas web. Selecciona el texto de la hoja de acordes y compártelo en su lugar.</string>

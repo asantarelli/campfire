@@ -51,6 +51,7 @@ import com.pandulapeter.campfire.presentation.resources.import_result
 import com.pandulapeter.campfire.presentation.resources.paste_clipboard_empty
 import com.pandulapeter.campfire.presentation.resources.paste_only_links
 import com.pandulapeter.campfire.presentation.resources.paste_too_large
+import com.pandulapeter.campfire.presentation.resources.player_cannot_restart
 import com.pandulapeter.campfire.presentation.resources.shared_link_not_imported
 import com.pandulapeter.campfire.presentation.resources.song_editor_draft_lost
 import com.pandulapeter.campfire.presentation.resources.song_editor_draft_restored
@@ -144,6 +145,7 @@ internal fun Messages(
             }
         )
         Message.SilentMetronomeStopped -> stringResource(Res.string.metronome_stopped_silent)
+        Message.PlayerCannotRestart -> stringResource(Res.string.player_cannot_restart)
         Message.ClipboardEmpty -> stringResource(Res.string.paste_clipboard_empty)
         is Message.ClipboardRefused -> stringResource(current.text)
         Message.PastedOnlyLinks -> stringResource(Res.string.paste_only_links)

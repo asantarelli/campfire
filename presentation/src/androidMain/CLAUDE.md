@@ -31,7 +31,9 @@ The Android shell, called by `:app:android`.
   read under `requestDragAndDropPermissions`, asked while the drop is answered and released after the read; text items
   are a pasted song. A drag's description can't tell a text file from a text, so a `text/plain`-only drag starts only
   where `isNewSongPasteAvailable`.
-- **The music player buttons** (`platform/ExternalPlayerControl.android.kt`): play/pause is the media key. Back to the start
-  asks the active session for its position (`seekTo(0)`, then play), which Android gives only to a notification listener
-  the user has allowed (Settings → Preferences → Music player opens the system's screen for it). `PlayerSessionsService`
-  overrides no callback, so no notification is ever read; without the permission the previous-track key is pressed.
+- **The music player buttons** (`platform/ExternalPlayerControl.android.kt`): with the notification access the user has
+  allowed (Settings → Preferences → Music player opens the system's screen for it; `PlayerSessionsService` overrides no
+  callback, so no notification is ever read) the buttons talk to the active session itself: the media key straight to it
+  for play/pause, and for the start of a track a position (`seekTo(0)`) or, where it offers that, the previous track.
+  A player that offers neither - Spotify's free account does not, nor does its own app - gets the message
+  `Message.PlayerCannotRestart`. Without the access they are the system's media keys.

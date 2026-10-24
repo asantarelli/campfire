@@ -58,6 +58,7 @@ import com.pandulapeter.campfire.presentation.resources.song_details_auto_scroll
 import com.pandulapeter.campfire.presentation.resources.song_details_external_player
 import com.pandulapeter.campfire.presentation.resources.song_details_external_player_restart
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
+import com.pandulapeter.campfire.presentation.ui.messages.Message
 import com.pandulapeter.campfire.presentation.ui.platform.rememberExternalPlayerControl
 import org.jetbrains.compose.resources.painterResource
 
@@ -142,7 +143,7 @@ internal fun BoxScope.AutoScrollControls(
                 AutoScrollButton(
                     icon = painterResource(Res.drawable.ic_media_restart),
                     contentDescription = stringResource(Res.string.song_details_external_player_restart),
-                    onClick = player::restart,
+                    onClick = { if (!player.restart()) viewModel.messageSink.sendMessage(Message.PlayerCannotRestart) },
                 )
                 AutoScrollButton(
                     icon = painterResource(Res.drawable.ic_media_play_pause),

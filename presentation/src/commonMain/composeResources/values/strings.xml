@@ -179,6 +179,7 @@
     <string name="new_song_placeholder_title">New song</string>
     <string name="new_song_placeholder_artist">Unknown artist</string>
     <string name="paste_clipboard_empty">There is no text on the clipboard to paste.</string>
+    <string name="player_cannot_restart">This music player does not let other apps take it back to the start of the track.</string>
     <string name="paste_only_links">A link is not a song, and SDCancionero does not open pages. Copy the chords and the lyrics themselves.</string>
     <string name="paste_too_large">The text is longer than the 8 MB one import can take.</string>
     <string name="shared_link_not_imported">SDCancionero does not open web pages. Select the chord sheet\'s text and share that instead.</string>

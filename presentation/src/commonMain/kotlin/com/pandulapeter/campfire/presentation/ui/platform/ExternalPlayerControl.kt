@@ -25,11 +25,13 @@ internal interface ExternalPlayerControl {
     fun playPause()
 
     /**
-     * Takes the player back to the start of what it is playing and plays it from there. Where the system lets the app
-     * ask the player for a position that is what it does; where it does not, it presses the previous-track key, which a
-     * player past the first seconds of a track answers by starting it over, and many answer by doing nothing.
+     * Takes the player back to the start of what it is playing and plays it from there, and says whether it could be asked
+     * to: a player may offer neither a position nor a previous track to another app - Spotify's free account does not - and
+     * then there is nothing to ask. Where the system lets the app ask the player for a position that is what it does; where
+     * it does not, it presses the previous-track key, which a player past the first seconds of a track answers by starting it
+     * over, and many answer by doing nothing.
      */
-    fun restart()
+    fun restart(): Boolean
 }
 
 /** The system's permission for [ExternalPlayerControl.restart] to ask the player for a position. */

@@ -179,6 +179,7 @@
     <string name="new_song_placeholder_title">Új dal</string>
     <string name="new_song_placeholder_artist">Ismeretlen előadó</string>
     <string name="paste_clipboard_empty">A vágólapon nincs beilleszthető szöveg.</string>
+    <string name="player_cannot_restart">Ez a zenelejátszó nem engedi, hogy más alkalmazások visszavigyék a szám elejére.</string>
     <string name="paste_only_links">Egy link nem dal, és a SDCancionero nem nyit meg weboldalakat. Magukat az akkordokat és a dalszöveget másold ki.</string>
     <string name="paste_too_large">A szöveg hosszabb annál a 8 MB-nál, amennyit egy importálás feldolgoz.</string>
     <string name="shared_link_not_imported">A SDCancionero nem nyit meg weboldalakat. Jelöld ki az akkordokat és a dalszöveget, és azt oszd meg.</string>

@@ -59,6 +59,9 @@ sealed interface Message {
      */
     data class NewSongFromText(val isConverted: Boolean, val hasChords: Boolean) : Message
 
+    /** The music player the song's restart button reaches offers no way to go back to the start of its track to another app. */
+    data object PlayerCannotRestart : Message
+
     /** Paste from clipboard, or its shortcut, found no text on the clipboard. */
     data object ClipboardEmpty : Message
 
