@@ -112,6 +112,8 @@ pub struct App {
     chord_window: Option<String>,
     /// The song the player asked to delete, until they confirm.
     song_to_delete: Option<String>,
+    /// Whether the player asked to empty the library, until they confirm.
+    is_emptying_library: bool,
     status: Option<(String, Instant)>,
     is_dark_applied: Option<bool>,
     fonts_applied: Option<(String, String)>,
@@ -142,6 +144,7 @@ impl App {
             from_setlist: None,
             chord_window: None,
             song_to_delete: None,
+            is_emptying_library: false,
             status: None,
             is_dark_applied: None,
             fonts_applied: None,
@@ -451,6 +454,9 @@ impl App {
                 if ui.button("Exportar zip").clicked() {
                     self.export_zip();
                 }
+                if ui.button("Vaciar").on_hover_text("Borra todas las canciones y los repertorios").clicked() {
+                    self.is_emptying_library = true;
+                }
                 if ui.button("Importar").clicked() {
                     self.import_zip();
                 }
@@ -643,6 +649,33 @@ impl App {
         }
     }
 
+    /// Deletes every song and every repertoire, so that an import starts from an empty library.
+    fn empty_library(&mut self) {
+        let songs: Vec<String> = self.songs.iter().map(|entry| entry.file_name.clone()).collect();
+        let setlists: Vec<String> = self.setlists.iter().map(|(name, _)| name.clone()).collect();
+        let mut failures = 0;
+        for name in &songs {
+            if self.library.remove_song(name).is_err() {
+                failures += 1;
+            }
+        }
+        for name in &setlists {
+            if self.library.delete_setlist(name).is_err() {
+                failures += 1;
+            }
+        }
+        self.open = None;
+        self.current_setlist = None;
+        self.from_setlist = None;
+        self.reload_songs();
+        self.reload_setlists();
+        if failures == 0 {
+            self.say("Biblioteca vaciada.");
+        } else {
+            self.say(format!("La biblioteca quedó con {failures} archivos que no se pudieron borrar."));
+        }
+    }
+
     /// Deletes a song, and takes it out of every repertoire that named it.
     fn delete_song(&mut self, file_name: &str) {
         match self.library.remove_song(file_name) {
@@ -718,6 +751,9 @@ impl App {
                     }
                 }
             });
+            if ui.button("⏯").on_hover_text("Reproducir o pausar el reproductor de música").clicked() {
+                crate::media::play_pause();
+            }
             if ui.checkbox(&mut self.settings.pin_chord_diagrams, "Diagramas").on_hover_text("Los acordes de la canción, dibujados al costado").changed() {
                 changed_settings = true;
             }
@@ -915,6 +951,9 @@ impl App {
             if ui.button("Exportar zip").clicked() {
                 self.export_zip();
             }
+            if ui.button("Vaciar biblioteca").on_hover_text("Borra todas las canciones y los repertorios, para importar desde cero").clicked() {
+                self.is_emptying_library = true;
+            }
             if ui.button("Restablecer ajustes").on_hover_text("Vuelve todo lo de esta pantalla a como venía").clicked() {
                 self.settings = Settings::default();
                 changed = true;
@@ -963,7 +1002,7 @@ impl eframe::App for App {
                 egui::Panel::right("pinned_chords").resizable(false).exact_size(236.0).show(ui, |ui| {
                     ui.heading("Acordes");
                     egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
-                        egui::Grid::new("pinned_chords_grid").num_columns(2).spacing([6.0, 6.0]).show(ui, |ui| {
+                        egui::Grid::new("pinned_chords_grid").num_columns(2).spacing([3.0, 3.0]).show(ui, |ui| {
                             for (index, name) in chords.iter().enumerate() {
                                 tools::pinned_chord(ui, name, &settings, &colors);
                                 if index % 2 == 1 {
@@ -981,6 +1020,22 @@ impl eframe::App for App {
                     egui::Panel::right("reference").resizable(true).default_size(360.0).size_range(260.0..=520.0).show(ui, |ui| editor.show_reference(ui));
                 }
             }
+        }
+        if self.is_emptying_library {
+            egui::Window::new("Vaciar biblioteca").collapsible(false).resizable(false).anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]).show(ui.ctx(), |ui| {
+                ui.label(format!("¿Borrar las {} canciones y los {} repertorios?", self.songs.len(), self.setlists.len()));
+                ui.label(RichText::new("Se borran los archivos de la biblioteca. No se puede deshacer; si querés conservarlos, exportá un zip antes.").small().weak());
+                ui.add_space(6.0);
+                ui.horizontal(|ui| {
+                    if ui.button(RichText::new("Vaciar").color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
+                        self.is_emptying_library = false;
+                        self.empty_library();
+                    }
+                    if ui.button("Cancelar").clicked() {
+                        self.is_emptying_library = false;
+                    }
+                });
+            });
         }
         if let Some(file_name) = self.song_to_delete.clone() {
             let title = self.songs.iter().find(|entry| entry.file_name == file_name).map(SongEntry::display_title).unwrap_or_else(|| file_name.clone());

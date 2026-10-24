@@ -18,6 +18,7 @@ mod diagram;
 mod editor;
 mod layout;
 mod listen;
+mod media;
 mod settings;
 mod theme;
 mod tools;
