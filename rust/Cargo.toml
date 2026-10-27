@@ -15,7 +15,7 @@ resolver = "2"
 members = ["chordpro", "instruments", "library", "sdcancionero"]
 
 [workspace.package]
-version = "0.1.0"
+version = "5.0.2"
 edition = "2021"
 license = "MPL-2.0"
 authors = ["SDigitales"]

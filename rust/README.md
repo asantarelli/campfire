@@ -8,7 +8,7 @@ así que se puede pasar de una a otra con un zip.
 
 ## Qué hace
 
-- **Canciones:** lista con búsqueda, visor con acordes sobre la letra, columnas, tamaño y tipografía a elección (también
+- **Canciones:** lista con búsqueda y orden (por título, por artista o agrupada por artista), botones con iconos, visor con acordes sobre la letra, columnas, tamaño y tipografía a elección (también
   monoespaciadas), transposición, autoscroll y diagramas de acordes (al tocar un acorde, o fijos al costado).
 - **Acordes sobre su palabra:** cada acorde queda exactamente sobre el texto que lo seguía en el archivo; si dos acordes chocan,
   se separa la letra, nunca el acorde.

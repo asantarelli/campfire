@@ -25,4 +25,4 @@ serde_json = { version = "1", features = ["preserve_order"] }
 rfd = "0.15"
 eframe = { version = "0.37.0", default-features = false, features = ["glow", "default_fonts", "clipboard", "links"] }
 cpal = "0.18.2"
-instruments = { version = "0.1.0", path = "../instruments" }
+instruments = { path = "../instruments" }

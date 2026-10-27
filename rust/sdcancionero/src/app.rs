@@ -18,8 +18,10 @@ use eframe::egui::{self, RichText, ScrollArea, Vec2};
 use library::{Collision, Library, SongEntry};
 
 use crate::editor::{Editor, EditorAction};
+use crate::icons;
 use crate::listen::{self, Service};
-use crate::settings::{self, Instrument, Settings, NOTATIONS};
+use crate::settings::{self, Instrument, Settings, SongOrder, NOTATIONS};
+use crate::song_list::{self, ListRow};
 use crate::tools::{self, SongMetronome, SongTiming, ToolTab, Tools};
 
 mod setlists;
@@ -176,7 +178,7 @@ impl App {
     fn reload_songs(&mut self) {
         match self.library.scan_songs() {
             Ok(mut songs) => {
-                songs.sort_by_key(|entry| entry.display_title().to_lowercase());
+                song_list::sort(&mut songs, self.settings.song_order);
                 self.songs = songs;
             }
             Err(error) => self.say(format!("No se pudo leer la biblioteca: {error}")),
@@ -445,35 +447,46 @@ impl App {
         ui.horizontal(|ui| {
             ui.heading("SDCancionero");
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.button("Ajustes").clicked() {
+                if ui.button(icons::label(icons::SETTINGS, "Ajustes")).clicked() {
                     self.screen = Screen::Settings;
                 }
-                if ui.button("Herramientas").on_hover_text("Metrónomo, afinador y acordes").clicked() {
+                if ui.button(icons::label(icons::TOOLS, "Herramientas")).on_hover_text("Metrónomo, afinador y acordes").clicked() {
                     self.open_tools(ToolTab::Metronome);
                 }
-                if ui.button("Exportar zip").clicked() {
+                if ui.button(icons::label(icons::EXPORT, "Exportar zip")).clicked() {
                     self.export_zip();
                 }
-                if ui.button("Vaciar").on_hover_text("Borra todas las canciones y los repertorios").clicked() {
+                if ui.button(icons::label(icons::TRASH, "Vaciar")).on_hover_text("Borra todas las canciones y los repertorios").clicked() {
                     self.is_emptying_library = true;
                 }
-                if ui.button("Importar").clicked() {
+                if ui.button(icons::label(icons::IMPORT, "Importar")).clicked() {
                     self.import_zip();
                 }
-                if ui.button("+ Nueva").clicked() {
+                if ui.button(icons::label(icons::NEW, "Nueva")).clicked() {
                     self.new_song();
                 }
             });
         });
         ui.horizontal(|ui| {
-            ui.selectable_value(&mut self.songs_tab, SongsTab::Songs, RichText::new("Canciones").size(16.0));
-            ui.selectable_value(&mut self.songs_tab, SongsTab::Setlists, RichText::new("Repertorios").size(16.0));
+            ui.selectable_value(&mut self.songs_tab, SongsTab::Songs, RichText::new(icons::label(icons::SONGS, "Canciones")).size(16.0));
+            ui.selectable_value(&mut self.songs_tab, SongsTab::Setlists, RichText::new(icons::label(icons::SETLISTS, "Repertorios")).size(16.0));
         });
         ui.separator();
         if self.songs_tab == SongsTab::Setlists {
             self.setlists_tab(ui);
             return;
         }
+        ui.horizontal(|ui| {
+            ui.label("Orden:");
+            let mut changed = false;
+            for (order, name) in [(SongOrder::Title, "Por título"), (SongOrder::Artist, "Por artista"), (SongOrder::ArtistGroups, "Agrupar por artista")] {
+                changed |= ui.selectable_value(&mut self.settings.song_order, order, name).changed();
+            }
+            if changed {
+                song_list::sort(&mut self.songs, self.settings.song_order);
+                self.save_settings();
+            }
+        });
         ui.add(egui::TextEdit::singleline(&mut self.search).hint_text("Buscar por título o artista").desired_width(f32::INFINITY));
         ui.add_space(6.0);
         let query = self.search.trim().to_lowercase();
@@ -493,8 +506,17 @@ impl App {
         let mut chosen: Option<String> = None;
         let mut action: Option<SongAction> = None;
         let colors = SongColors::of(self.settings.is_dark);
-        ScrollArea::vertical().auto_shrink([false, false]).show_rows(ui, 46.0, matching.len(), |ui, range| {
-            for &index in &matching[range] {
+        let rows = song_list::rows(&self.songs, &matching, self.settings.song_order);
+        ScrollArea::vertical().auto_shrink([false, false]).show_rows(ui, 46.0, rows.len(), |ui, range| {
+            for row in &rows[range] {
+                let index = match row {
+                    ListRow::Header(artist) => {
+                        let (heading, _) = ui.allocate_exact_size(Vec2::new(ui.available_width(), 42.0), egui::Sense::hover());
+                        ui.painter().text(heading.left_bottom() + Vec2::new(10.0, -6.0), egui::Align2::LEFT_BOTTOM, artist, egui::FontId::new(15.0, theme::bold()), colors.muted);
+                        continue;
+                    }
+                    ListRow::Song(index) => *index,
+                };
                 let entry = &self.songs[index];
                 ui.horizontal(|ui| {
                     let response = ui.allocate_response(Vec2::new((ui.available_width() - 44.0).max(60.0), 42.0), egui::Sense::click());
@@ -523,28 +545,28 @@ impl App {
                         ui.painter().circle_filled(dots.center() + Vec2::new(0.0, step * 7.0), 2.2, colors.text);
                     }
                     egui::Popup::menu(&button).show(|ui| {
-                        if ui.button("Editar").clicked() {
+                        if ui.button(icons::label(icons::EDIT, "Editar")).clicked() {
                             action = Some(SongAction::Edit(entry.file_name.clone()));
                             ui.close();
                         }
-                        if ui.button("Duplicar").clicked() {
+                        if ui.button(icons::label(icons::DUPLICATE, "Duplicar")).clicked() {
                             action = Some(SongAction::Duplicate(entry.file_name.clone()));
                             ui.close();
                         }
-                        if ui.button("Exportar").clicked() {
+                        if ui.button(icons::label(icons::EXPORT, "Exportar")).clicked() {
                             action = Some(SongAction::Export(entry.file_name.clone()));
                             ui.close();
                         }
-                        if ui.button(RichText::new("Eliminar").color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
+                        if ui.button(RichText::new(icons::label(icons::TRASH, "Eliminar")).color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
                             action = Some(SongAction::Delete(entry.file_name.clone()));
                             ui.close();
                         }
                         ui.separator();
-                        if ui.button("Abrir").clicked() {
+                        if ui.button(icons::label(icons::OPEN, "Abrir")).clicked() {
                             action = Some(SongAction::Open(entry.file_name.clone()));
                             ui.close();
                         }
-                        ui.menu_button("Agregar a un repertorio", |ui| {
+                        ui.menu_button(icons::label(icons::NEW, "Agregar a un repertorio"), |ui| {
                             if self.setlists.is_empty() {
                                 ui.label("No hay repertorios todavía.");
                             }
@@ -721,10 +743,10 @@ impl App {
             if ui.button("← Canciones").clicked() {
                 leave = true;
             }
-            if ui.button("Editar").clicked() {
+            if ui.button(icons::label(icons::EDIT, "Editar")).clicked() {
                 edit = true;
             }
-            if ui.button("Herramientas").clicked() {
+            if ui.button(icons::label(icons::TOOLS, "Herramientas")).clicked() {
                 open_tools = true;
             }
             if let (Some((_, index)), Some(state)) = (&self.from_setlist, &self.current_setlist) {
@@ -742,7 +764,7 @@ impl App {
                 metronome.show(ui, &metronome_colors);
             }
             ui.separator();
-            ui.menu_button("Escuchar ▾", |ui| {
+            ui.menu_button(icons::label(icons::LISTEN, "Escuchar ▾"), |ui| {
                 let query = listen::search_query(&title, open.shown.metadata.artist.as_deref());
                 for service in Service::ALL {
                     if ui.button(service.name()).on_hover_text("Busca la canción en el navegador").clicked() {
@@ -751,10 +773,10 @@ impl App {
                     }
                 }
             });
-            if ui.button("|< Inicio").on_hover_text("Volver al inicio en el reproductor de música").clicked() {
+            if ui.button(icons::label(icons::RESTART, "Inicio")).on_hover_text("Volver al inicio en el reproductor de música").clicked() {
                 crate::media::restart();
             }
-            if ui.button("Play / Pausa").on_hover_text("Reproducir o pausar el reproductor de música").clicked() {
+            if ui.button(icons::label(icons::PLAY_PAUSE, "Play / Pausa")).on_hover_text("Reproducir o pausar el reproductor de música").clicked() {
                 crate::media::play_pause();
             }
             if ui.checkbox(&mut self.settings.pin_chord_diagrams, "Diagramas").on_hover_text("Los acordes de la canción, dibujados al costado").changed() {
@@ -782,7 +804,7 @@ impl App {
                 changed_settings = true;
             }
             ui.separator();
-            let scroll_label = if open.is_auto_scrolling { "Detener" } else { "Autoscroll" };
+            let scroll_label = if open.is_auto_scrolling { icons::label(icons::STOP, "Detener") } else { icons::label(icons::PLAY, "Autoscroll") };
             if ui.button(scroll_label).on_hover_text("Espacio").clicked() {
                 toggle_scroll = true;
             }
@@ -948,13 +970,13 @@ impl App {
             }
         });
         ui.horizontal(|ui| {
-            if ui.button("Importar…").clicked() {
+            if ui.button(icons::label(icons::IMPORT, "Importar…")).clicked() {
                 self.import_zip();
             }
-            if ui.button("Exportar zip").clicked() {
+            if ui.button(icons::label(icons::EXPORT, "Exportar zip")).clicked() {
                 self.export_zip();
             }
-            if ui.button("Vaciar biblioteca").on_hover_text("Borra todas las canciones y los repertorios, para importar desde cero").clicked() {
+            if ui.button(icons::label(icons::TRASH, "Vaciar biblioteca")).on_hover_text("Borra todas las canciones y los repertorios, para importar desde cero").clicked() {
                 self.is_emptying_library = true;
             }
             if ui.button("Restablecer ajustes").on_hover_text("Vuelve todo lo de esta pantalla a como venía").clicked() {
@@ -1047,7 +1069,7 @@ impl eframe::App for App {
                 ui.label(RichText::new("Se borra el archivo y se quita de los repertorios que la nombran. No se puede deshacer.").small().weak());
                 ui.add_space(6.0);
                 ui.horizontal(|ui| {
-                    if ui.button(RichText::new("Eliminar").color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
+                    if ui.button(RichText::new(icons::label(icons::TRASH, "Eliminar")).color(egui::Color32::from_rgb(0xE5, 0x57, 0x57))).clicked() {
                         self.song_to_delete = None;
                         self.delete_song(&file_name);
                     }

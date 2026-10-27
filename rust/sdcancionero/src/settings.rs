@@ -24,6 +24,33 @@ pub enum Instrument {
     Ukulele,
 }
 
+/// How the list of songs is ordered, which the player picks above it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SongOrder {
+    Title,
+    Artist,
+    /// By artist, with a heading in front of the songs of each.
+    ArtistGroups,
+}
+
+impl SongOrder {
+    fn key(self) -> &'static str {
+        match self {
+            SongOrder::Title => "title",
+            SongOrder::Artist => "artist",
+            SongOrder::ArtistGroups => "artistGroups",
+        }
+    }
+
+    fn from_key(key: Option<&str>) -> SongOrder {
+        match key {
+            Some("artist") => SongOrder::Artist,
+            Some("artistGroups") => SongOrder::ArtistGroups,
+            _ => SongOrder::Title,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Settings {
     /// How many columns a song is spread over, as many as fit.
@@ -44,6 +71,7 @@ pub struct Settings {
     /// The face the editor is written in, by name.
     pub editor_font: String,
     pub editor_text_size: f32,
+    pub song_order: SongOrder,
 }
 
 impl Default for Settings {
@@ -62,6 +90,7 @@ impl Default for Settings {
             view_font: crate::theme::BUNDLED_VIEW_FONT.to_string(),
             editor_font: crate::theme::BUNDLED_EDITOR_FONT.to_string(),
             editor_text_size: 16.0,
+            song_order: SongOrder::Title,
         }
     }
 }
@@ -124,6 +153,7 @@ impl Settings {
             view_font: object.get("viewFont").and_then(Value::as_str).map(str::to_string).unwrap_or(defaults.view_font),
             editor_font: object.get("editorFont").and_then(Value::as_str).map(str::to_string).unwrap_or(defaults.editor_font),
             editor_text_size: number("editorTextSize", defaults.editor_text_size).clamp(MIN_TEXT_SIZE, MAX_TEXT_SIZE),
+            song_order: SongOrder::from_key(object.get("songOrder").and_then(Value::as_str)),
         })
     }
 
@@ -143,6 +173,7 @@ impl Settings {
         object.insert("viewFont".into(), Value::from(self.view_font.clone()));
         object.insert("editorFont".into(), Value::from(self.editor_font.clone()));
         object.insert("editorTextSize".into(), Value::from(self.editor_text_size as f64));
+        object.insert("songOrder".into(), Value::from(self.song_order.key()));
         object.insert("instrument".into(), Value::from(if self.instrument == Instrument::Ukulele { "ukulele" } else { "guitar" }));
         serde_json::to_string_pretty(&Value::Object(object)).expect("a JSON value always serializes")
     }
@@ -168,6 +199,7 @@ mod tests {
             view_font: "Georgia".into(),
             editor_font: "Consolas".into(),
             editor_text_size: 20.0,
+            song_order: SongOrder::ArtistGroups,
         };
         assert_eq!(Settings::decode(&settings.encode()), Some(settings));
     }

@@ -10,6 +10,7 @@
 //! orange. The player may pick another face for the songs and for the editor from the ones the computer has.
 
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 use eframe::egui::{self, Color32, FontData, FontDefinitions, FontFamily};
@@ -46,6 +47,16 @@ const SYSTEM_VIEW_FONTS: [(&str, &str); 8] = [
 
 /// Faces of Windows with letters of one width, which is what a chord sheet needs to stay aligned.
 const SYSTEM_EDITOR_FONTS: [(&str, &str); 4] = [("Consolas", "consola.ttf"), ("Courier New", "cour.ttf"), ("Lucida Console", "lucon.ttf"), ("Cascadia Mono", "CascadiaMono.ttf")];
+
+/// Whether the icon font of Windows 10 and later is installed, which the pictures of the buttons are set in.
+static HAS_ICONS: AtomicBool = AtomicBool::new(false);
+
+pub fn has_icons() -> bool {
+    HAS_ICONS.load(Ordering::Relaxed)
+}
+
+/// The font whose private use characters are the pictures of the interface (Segoe MDL2 Assets, which every Windows since the 10th has).
+const ICON_FONT_FILE: &str = "segmdl2.ttf";
 
 fn fonts_directory() -> PathBuf {
     let windows = std::env::var_os("WINDIR").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(r"C:\Windows"));
@@ -101,6 +112,13 @@ pub fn install_fonts(context: &egui::Context, view_font: &str, editor_font: &str
         editor.insert(0, "editor_font".into());
     }
     fonts.families.insert(editor_family(), editor);
+    // After every other face, since the pictures are characters none of them has: a button's label asks for them by their code.
+    let icons = std::fs::read(fonts_directory().join(ICON_FONT_FILE)).ok();
+    HAS_ICONS.store(icons.is_some(), Ordering::Relaxed);
+    if let Some(bytes) = icons {
+        fonts.font_data.insert("icons".into(), Arc::new(FontData::from_owned(bytes)));
+        fonts.families.entry(FontFamily::Proportional).or_default().push("icons".into());
+    }
     context.set_fonts(fonts);
 }
 
