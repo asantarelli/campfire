@@ -176,8 +176,8 @@
     <string name="songs_paste_converted">Convertida a partir de acordes escritos sobre la letra. Revisa el título y el artista, y guarda.</string>
     <string name="songs_paste_chordpro">Se conservó como el ChordPro en que está escrita. Revisa el título y el artista, y guarda.</string>
     <string name="songs_paste_no_chords">No se encontraron acordes, así que es una canción solo con letra. Revisa el título y el artista, y guarda.</string>
-    <string name="new_song_placeholder_title">Canción nueva</string>
-    <string name="new_song_placeholder_artist">Artista desconocido</string>
+    <string name="new_song_placeholder_title">Título</string>
+    <string name="new_song_placeholder_artist">Autor</string>
     <string name="paste_clipboard_empty">No hay texto en el portapapeles para pegar.</string>
     <string name="player_cannot_restart">Este reproductor de música no deja que otras apps lo lleven al inicio de la pista.</string>
     <string name="paste_only_links">Un enlace no es una canción, y SDCancionero no abre páginas. Copia los acordes y la letra en sí.</string>

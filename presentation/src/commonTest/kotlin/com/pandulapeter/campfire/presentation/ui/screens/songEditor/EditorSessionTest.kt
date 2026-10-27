@@ -247,7 +247,7 @@ class EditorSessionTest {
         val editor = backStack.last() as CampfireDestination.SongEditor
         assertTrue(editor.isNewSong)
         assertEquals(listOf(CampfireDestination.Songs, editor), backStack.toList())
-        assertEquals("{title: New song}\n{artist: Unknown artist}\n[G]Hello", fixture.session.editorDraft.value?.text)
+        assertEquals("{title: Title}\n{artist: Author}\n[G]Hello", fixture.session.editorDraft.value?.text)
         assertTrue(fixture.session.hasUnsavedEditorText())
         assertEquals(fixture.session.editorDraft.value, storedDraft)
         assertTrue(files.isEmpty())

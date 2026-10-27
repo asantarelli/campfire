@@ -176,8 +176,8 @@
     <string name="songs_paste_converted">A dalszöveg fölé írt akkordokat a SDCancionero a szövegbe illesztette. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
     <string name="songs_paste_chordpro">A szöveg már ChordPro formátumú, így változatlan maradt. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
     <string name="songs_paste_no_chords">Nem található benne akkord, így ez csak a dalszöveg. Ellenőrizd a címet és az előadót, majd mentsd el.</string>
-    <string name="new_song_placeholder_title">Új dal</string>
-    <string name="new_song_placeholder_artist">Ismeretlen előadó</string>
+    <string name="new_song_placeholder_title">Cím</string>
+    <string name="new_song_placeholder_artist">Szerző</string>
     <string name="paste_clipboard_empty">A vágólapon nincs beilleszthető szöveg.</string>
     <string name="player_cannot_restart">Ez a zenelejátszó nem engedi, hogy más alkalmazások visszavigyék a szám elejére.</string>
     <string name="paste_only_links">Egy link nem dal, és a SDCancionero nem nyit meg weboldalakat. Magukat az akkordokat és a dalszöveget másold ki.</string>
