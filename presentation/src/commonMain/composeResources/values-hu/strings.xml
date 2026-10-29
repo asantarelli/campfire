@@ -815,6 +815,7 @@
     <string name="song_editor_insert_language">Nyelv</string>
     <string name="song_editor_insert_link">Hivatkozás</string>
     <string name="song_editor_insert_chord_shape">Akkordfogás</string>
+    <string name="song_editor_chord_shape_placeholder_name">Név</string>
     <string name="song_editor_insert_strum">Pengetés</string>
     <string name="song_editor_insert_symbols">Szimbólumok</string>
     <string name="song_editor_strum_down">↓  Lefelé pengetés</string>

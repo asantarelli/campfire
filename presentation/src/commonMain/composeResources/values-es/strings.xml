@@ -816,6 +816,7 @@
     <string name="song_editor_insert_language">Idioma</string>
     <string name="song_editor_insert_link">Enlace</string>
     <string name="song_editor_insert_chord_shape">Forma del acorde</string>
+    <string name="song_editor_chord_shape_placeholder_name">Nombre</string>
     <string name="song_editor_insert_strum">Rasgueo</string>
     <string name="song_editor_insert_symbols">Símbolos</string>
     <string name="song_editor_strum_down">↓  Rasgueo hacia abajo</string>

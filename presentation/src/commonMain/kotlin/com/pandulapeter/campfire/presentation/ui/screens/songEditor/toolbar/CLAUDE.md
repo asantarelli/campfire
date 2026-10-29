@@ -43,8 +43,9 @@ The editor's Shortcuts toolbar and its control row.
   every one with shapes, no Any, the twelve-string a guitar). It writes a `{define}` for the chord at the caret into the
   header, **always the standard-tuning shape** (ChordPro gives a definition no tuning): the player's choice for that
   instrument, else the app's first, frets selected; or it moves the caret to an existing line's frets. With the caret in
-  no chord it writes a placeholder C, name selected (a line to edit teaches the syntax), or selects a C already defined
-  for that instrument. The preview's Chords section shows every definition, each on its own instrument, whatever the
+  no chord it writes a blank template (`{define: Name base-fret 1 frets 0 0 0 0 0 0 fingers 0 0 0 0 0 0}`, the strings of
+  that instrument, name selected) for a shape of the song's own, or selects the one already defined under that name (the
+  keyboard, with no frets, gets a C). The preview's Chords section shows every definition, each on its own instrument, whatever the
   switches.
 
 ### Folding

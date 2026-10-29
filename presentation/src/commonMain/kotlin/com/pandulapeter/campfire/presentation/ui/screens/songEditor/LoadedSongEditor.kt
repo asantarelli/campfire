@@ -9,6 +9,7 @@
  */
 package com.pandulapeter.campfire.presentation.ui.screens.songEditor
 
+import com.pandulapeter.campfire.presentation.resources.song_editor_chord_shape_placeholder_name
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.EditorChordShapes
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.EditorControlRow
 import com.pandulapeter.campfire.presentation.ui.screens.songEditor.toolbar.EditorToolbar
@@ -306,17 +307,20 @@ internal fun LoadedSongEditor(
                         onToolbarToggled = { isToolbarExpanded = !isToolbarExpanded },
                     )
                 }
+                val chordShapePlaceholderName = stringResource(Res.string.song_editor_chord_shape_placeholder_name)
+                val chordShapes = remember(userPreferences, chordShapePlaceholderName) {
+                    EditorChordShapes(
+                        notation = notation.toChordNotation(),
+                        storedShapes = userPreferences?.chordVoicings.orEmpty(),
+                        placeholderName = chordShapePlaceholderName,
+                    )
+                }
                 // Nothing below can act on a preview, so the insertions leave with the field they write into.
                 AnimatedVisibility(visible = isToolbarExpanded && panes != EditorPanes.PREVIEW) {
                     EditorToolbar(
                         textFieldState = textFieldState,
                         contentPadding = contentPadding,
-                        chordShapes = remember(userPreferences) {
-                            EditorChordShapes(
-                                notation = notation.toChordNotation(),
-                                storedShapes = userPreferences?.chordVoicings.orEmpty(),
-                            )
-                        },
+                        chordShapes = chordShapes,
                         tabStaff = remember(userPreferences) {
                             val instrument = userPreferences?.instrument ?: UserPreferences.Instrument.GUITAR
                             { tabInstrument -> emptyTabStaffFor(tabInstrument, instrument, notation.toChordNotation()) }

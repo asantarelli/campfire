@@ -24,7 +24,7 @@ class ChordShapeInsertionTest {
         notation: ChordNotation = ChordNotation.STANDARD,
         storedShapes: Map<String, String> = emptyMap(),
     ): Pair<String, String> {
-        val insertion = chordShapeInsertion(text, caret, notation, instrument, storedShapes)
+        val insertion = chordShapeInsertion(text, caret, notation, instrument, storedShapes, PLACEHOLDER_NAME)
         val result = text.substring(0, insertion.offset) + insertion.text + text.substring(insertion.offset)
         return result to result.substring(insertion.selectionStart, insertion.selectionEnd)
     }
@@ -54,25 +54,27 @@ class ChordShapeInsertionTest {
         val (text, selected) = apply(song, song.indexOf("Am"), instrument = ChordInstrument.MANDOLIN)
         assertEquals("2 2 3 0", selected)
         assertEquals(true, "{define-mandolin: Am base-fret 1 frets 2 2 3 0 fingers 1 2 3 0}" in text)
-        val insertion = chordShapeInsertion(text, text.lastIndexOf("Am"), ChordNotation.STANDARD, ChordInstrument.MANDOLIN, emptyMap())
+        val insertion = chordShapeInsertion(text, text.lastIndexOf("Am"), ChordNotation.STANDARD, ChordInstrument.MANDOLIN, emptyMap(), PLACEHOLDER_NAME)
         assertEquals("", insertion.text)
         assertEquals("2 2 3 0", text.substring(insertion.selectionStart, insertion.selectionEnd))
     }
 
     @Test
-    fun `with the caret in no chord a whole placeholder is written, its name selected to be typed over`() {
+    fun `with the caret in no chord a blank template is written, its name selected to be typed over`() {
         val caret = song.indexOf("Hello") + 2
         val (text, selected) = apply(song, caret)
-        assertEquals(true, "{define: C base-fret 1 frets x 3 2 0 1 0" in text)
-        assertEquals("C", selected)
+        assertEquals(true, "{define: $PLACEHOLDER_NAME base-fret 1 frets 0 0 0 0 0 0 fingers 0 0 0 0 0 0}" in text)
+        assertEquals(PLACEHOLDER_NAME, selected)
+        assertEquals(true, "{define: $PLACEHOLDER_NAME base-fret 1 frets 0 0 0 0 fingers 0 0 0 0}" in apply(song, caret, instrument = ChordInstrument.UKULELE).first)
+        assertEquals(true, "{define-mandolin: $PLACEHOLDER_NAME base-fret 1 frets 0 0 0 0 fingers 0 0 0 0}" in apply(song, caret, instrument = ChordInstrument.MANDOLIN).first)
         assertEquals(true, "{define: C keys 0 4 7}" in apply(song, caret, instrument = ChordInstrument.KEYBOARD).first)
-        assertEquals("Do", apply(song, caret, notation = ChordNotation.LATIN).second)
+        assertEquals(PLACEHOLDER_NAME, apply(song, caret, notation = ChordNotation.LATIN).second)
     }
 
     @Test
     fun `a chord already defined gets no second line, the caret goes to its frets`() {
         val defined = "{title: X}\n{define: Am frets x 0 2 2 1 0}\n\n[Am]there"
-        val insertion = chordShapeInsertion(defined, defined.lastIndexOf("Am"), ChordNotation.STANDARD, ChordInstrument.GUITAR, emptyMap())
+        val insertion = chordShapeInsertion(defined, defined.lastIndexOf("Am"), ChordNotation.STANDARD, ChordInstrument.GUITAR, emptyMap(), PLACEHOLDER_NAME)
         assertEquals("", insertion.text)
         assertEquals("x 0 2 2 1 0", defined.substring(insertion.selectionStart, insertion.selectionEnd))
         // Defined for another instrument only, it gets a line of its own.
@@ -80,16 +82,16 @@ class ChordShapeInsertionTest {
     }
 
     @Test
-    fun `a placeholder the text already defines gets no second line, the caret goes to its frets`() {
-        val defined = "{title: X}\n{define: C base-fret 3 frets x 1 3 3 3 1}\n\nHello"
+    fun `a template the text already defines gets no second line, the caret goes to its frets`() {
+        val defined = "{title: X}\n{define: $PLACEHOLDER_NAME base-fret 1 frets 0 2 2 0 0 0}\n\nHello"
         val caret = defined.indexOf("Hello") + 2
-        val insertion = chordShapeInsertion(defined, caret, ChordNotation.STANDARD, ChordInstrument.GUITAR, emptyMap())
+        val insertion = chordShapeInsertion(defined, caret, ChordNotation.STANDARD, ChordInstrument.GUITAR, emptyMap(), PLACEHOLDER_NAME)
         assertEquals("", insertion.text)
-        assertEquals("x 1 3 3 3 1", defined.substring(insertion.selectionStart, insertion.selectionEnd))
-        // Defined for another instrument only, the placeholder is still written.
+        assertEquals("0 2 2 0 0 0", defined.substring(insertion.selectionStart, insertion.selectionEnd))
+        // Defined for another instrument only, the template is still written.
         val (text, selected) = apply(defined, caret, instrument = ChordInstrument.UKULELE)
-        assertEquals("C", selected)
-        assertEquals(true, "{define: C base-fret 1 frets 0 0 0 3" in text)
+        assertEquals(PLACEHOLDER_NAME, selected)
+        assertEquals(true, "{define: $PLACEHOLDER_NAME base-fret 1 frets 0 0 0 0 fingers 0 0 0 0}" in text)
     }
 
     @Test
@@ -100,5 +102,9 @@ class ChordShapeInsertionTest {
         assertEquals(true, "{define: H7 base-fret 1 frets x 2 1 2 0 2" in text)
         assertEquals("10 14 17".split(" ").size, apply(german, german.indexOf("[B]") + 1, instrument = ChordInstrument.KEYBOARD, notation = ChordNotation.GERMAN).second.split(" ").size)
         assertEquals(true, "{define: B keys 0 4 7}" in apply(german, german.indexOf("[B]") + 1, instrument = ChordInstrument.KEYBOARD, notation = ChordNotation.GERMAN).first)
+    }
+
+    private companion object {
+        const val PLACEHOLDER_NAME = "Name"
     }
 }

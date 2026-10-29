@@ -816,6 +816,7 @@
     <string name="song_editor_insert_language">Language</string>
     <string name="song_editor_insert_link">Link</string>
     <string name="song_editor_insert_chord_shape">Chord shape</string>
+    <string name="song_editor_chord_shape_placeholder_name">Name</string>
     <string name="song_editor_insert_strum">Strum</string>
     <string name="song_editor_insert_symbols">Symbols</string>
     <string name="song_editor_strum_down">↓  Down strum</string>

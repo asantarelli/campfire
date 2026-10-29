@@ -54,11 +54,13 @@ private fun TextFieldState.insertIntoHeader(insertion: EditorInsertion, metadata
 /**
  * What the Chord shape button needs besides the text and the instrument picked from its menu: the notation the field is
  * written in, and the player's own choices of shape (`UserPreferences.chordVoicings`), whose entry under the picked
- * instrument's id is the standard tuning's that the line is filled in from (see [chordShapeInsertion]).
+ * instrument's id is the standard tuning's that the line is filled in from, and the name the blank template is given
+ * (see [chordShapeInsertion]).
  */
 internal class EditorChordShapes(
     val notation: ChordNotation,
     val storedShapes: Map<String, Map<String, String>>,
+    val placeholderName: String,
 )
 
 internal fun TextFieldState.insertChordShape(chordShapes: EditorChordShapes, instrument: ChordInstrument) = edit {
@@ -68,6 +70,7 @@ internal fun TextFieldState.insertChordShape(chordShapes: EditorChordShapes, ins
         notation = chordShapes.notation,
         instrument = instrument,
         storedShapes = chordShapes.storedShapes[instrument.id].orEmpty(),
+        placeholderName = chordShapes.placeholderName,
     )
     if (insertion.text.isNotEmpty()) insert(insertion.offset, insertion.text)
     selection = TextRange(insertion.selectionStart, insertion.selectionEnd)
