@@ -137,4 +137,17 @@ class SongChordsTest {
         assertEquals(listOf("C", "Am"), chords.map { it.name })
         assertEquals(listOf(null, null), chords.map { it.letterName })
     }
+
+    @Test
+    fun `a shape the song defines under a name of its own is listed after the chords it plays, with no root marked`() {
+        val song = "{define: Dv1 base-fret 1 frets x 5 4 2 3 x fingers 0 1 2 4 3 0}\n{define: Nombre base-fret 1 frets 0 0 0 0 0 0}\n{define: Am base-fret 1 frets x 0 2 2 1 0}\n[Dv1]la [G]la"
+        val chords = names(song)
+        assertEquals(listOf("G", "Dv1", "Nombre"), chords.map { it.name })
+        assertEquals(listOf(false, true, true), chords.map { it.isCustom })
+        assertEquals(listOf(-1, -1), chords.filter { it.isCustom }.map { it.diagramRoot })
+        assertNotNull(chords.last().definition)
+        // Written for another instrument, or in a tuning that does not draw definitions, it is not listed.
+        assertEquals(listOf("G"), names(song, tuning = ChordTuning.standard(ChordInstrument.UKULELE)).map { it.name })
+        assertEquals(listOf("Dv1", "Nombre"), names("{define: Dv1 frets 0 0 0 0 0 0}\n{define: Nombre frets 0 0 0 0 0 0}").map { it.name })
+    }
 }

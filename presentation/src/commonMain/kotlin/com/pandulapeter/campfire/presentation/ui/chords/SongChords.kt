@@ -38,6 +38,9 @@ import com.pandulapeter.campfire.chordpro.model.ChordVoicing
  *   ([ChordTuning.drawsDefinitions]): a standard tuning shape, which the chord's sheet says is there and offers to show.
  * @property isShapePending The default shape has not been looked for yet, see [songChordsOf]'s `searchesShapes`; drawn
  *   as the empty frame until it has.
+ * @property isCustom A name of the song's own (`Dv1`) that it gives a shape with `{define}` and that is no chord the app
+ *   can name notes for: [chord] is only a stand-in, so what needs the notes of the chord (its sheet, its root marked on the
+ *   diagram, the shape the player stores for it) leaves it out.
  */
 @Immutable
 internal data class SongChord(
@@ -49,7 +52,18 @@ internal data class SongChord(
     val definition: ChordDefinition? = null,
     val undrawnDefinition: ChordDefinition? = null,
     val isShapePending: Boolean = false,
-)
+    val isCustom: Boolean = false,
+) {
+
+    /** The pitch class the diagram marks as the root, none for a name of the song's own. */
+    val diagramRoot: Int get() = if (isCustom) NO_ROOT else chord.root
+}
+
+/** What no pitch class is, for a diagram that marks no root. */
+private const val NO_ROOT = -1
+
+/** What stands in for the notes of a [SongChord.isCustom]: nothing reads them. */
+private val CUSTOM_CHORD = Chord(root = 0, intervals = listOf(0))
 
 /**
  * The chords of [song], which is already transposed but still in the standard notation, each once by the name the page
@@ -68,6 +82,10 @@ internal data class SongChord(
  * hand can hold it, in the octave the move chose for exactly that, and otherwise the chord is drawn as if the song gave
  * it no shape. A definition is a shape in standard tuning, so in a tuning whose shapes are not the standard ones it is
  * not drawn either, and is only kept as [SongChord.undrawnDefinition].
+ *
+ * A definition of a name no chord answers to (`Dv1`, a shape of the song's own) is listed after the chords the song
+ * plays, played or not, on the instrument it is written for, where the tuning draws definitions at all: the song's own
+ * shapes are what it is read with, whatever it names them.
  *
  * Without [searchesShapes] a chord whose default shape only the search finds is left [SongChord.isShapePending], for
  * [withSearchedShapes] to fill in away from the main thread: what builds a page in a frame cannot wait for a search.
@@ -89,6 +107,13 @@ internal fun songChordsOf(
         .mapNotNull { name -> ChordProChords.parse(name)?.let { chord -> Triple(name, chord, definitionOf(name, chord)) } }
         .distinctBy { (_, chord, definition) -> chord to definition?.let { it.voicing to it.movedBy } }
     if (entries.size > MAX_SONG_CHORDS) return emptyList()
+    val custom = if (tuning.drawsDefinitions) {
+        definitions.filter { ChordProChords.parse(it.name) == null }.associateBy { it.name }.values.map { definition ->
+            SongChord(name = definition.name, chord = CUSTOM_CHORD, spelling = definition.name, definition = definition, isCustom = true)
+        }
+    } else {
+        emptyList()
+    }
     return entries.map { (name, chord, written) ->
         val definition = written?.takeIf { tuning.drawsDefinitions }
         val isShapePending = definition == null && !searchesShapes && ChordVoicings.needsSearch(chord, tuning)
@@ -102,7 +127,7 @@ internal fun songChordsOf(
             undrawnDefinition = written?.takeIf { definition == null },
             isShapePending = isShapePending,
         )
-    }
+    } + custom
 }
 
 /** [this] with the shapes [songChordsOf] left to be looked for filled in: the search, so never on the main thread. */

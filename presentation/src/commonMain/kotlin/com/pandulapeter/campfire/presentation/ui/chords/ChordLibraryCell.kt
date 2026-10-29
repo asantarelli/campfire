@@ -48,7 +48,7 @@ internal fun ChordLibraryCell(
     scale: Float = 1f,
 ) {
     val description = chordCellDescription(
-        ChordCell(name = chord.name, letterName = chord.letterName, tuning = tuning, root = chord.chord.root, selection = selection),
+        ChordCell(name = chord.name, letterName = chord.letterName, tuning = tuning, root = chord.diagramRoot, selection = selection),
     )
     Surface(
         // The description is set here, without clearing, and the content cleared below: a clearing node here would also clear
@@ -78,8 +78,8 @@ internal fun ChordLibraryCell(
             ) { (shape, shapeTuning) ->
                 ChordDiagram(
                     modifier = Modifier.size(width = shapeTuning.instrument.diagramWidth * scale, height = shapeTuning.instrument.diagramHeight * scale),
-                    geometry = remember(shape, shapeTuning, chord.chord.root) {
-                        shape?.let { chordDiagramGeometryOf(it, shapeTuning, chord.chord.root) } ?: emptyChordDiagramGeometryOf(shapeTuning.instrument)
+                    geometry = remember(shape, shapeTuning, chord.diagramRoot) {
+                        shape?.let { chordDiagramGeometryOf(it, shapeTuning, chord.diagramRoot) } ?: emptyChordDiagramGeometryOf(shapeTuning.instrument)
                     },
                     description = description,
                 )

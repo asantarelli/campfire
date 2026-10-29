@@ -86,7 +86,7 @@ internal fun printChordsOf(
     PrintChord(
         name = chord.name,
         letterName = chord.letterName,
-        geometry = selectShape(chord, tuning, storedShapes).shape?.let { chordDiagramGeometryOf(it, tuning, chord.chord.root) }
+        geometry = selectShape(chord, tuning, storedShapes).shape?.let { chordDiagramGeometryOf(it, tuning, chord.diagramRoot) }
             ?: emptyChordDiagramGeometryOf(tuning.instrument),
     )
 }

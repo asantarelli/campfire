@@ -94,3 +94,7 @@ is gone.
   **One hop only**: a chord sheet opened from a scale sheet offers no scales (`ChordReference.showsScales`), and a scale
   sheet opened from a chord sheet no chords (`DialogType.Scale.showsChords`), so the two never chain.
 - Chord sheets offer scales only while Scale suggestions is on (`FeatureSwitches.areScaleSuggestionsEnabled`).
+- **A song's own shapes** (`{define: Dv1 …}` under a name no chord answers to) are `SongChord`s with `isCustom`, listed by
+  `songChordsOf` after the chords the song plays, on the instrument they are written for: in the Chords section, pinned,
+  and printed. They have no notes behind them: no sheet opens (`ChordShapeSheet` leaves them out), no root is marked
+  (`diagramRoot`), and no shape of the player's is stored for them.

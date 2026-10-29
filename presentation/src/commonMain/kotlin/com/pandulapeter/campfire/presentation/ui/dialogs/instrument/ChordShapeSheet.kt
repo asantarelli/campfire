@@ -99,7 +99,7 @@ internal fun ChordShapeSheet(
     val chords by produceState<List<SongChord>?>(null, text, transposition, spelling, tuning) {
         value = text?.let { withContext(Dispatchers.Default) { songChordsOf(viewModel.songRenderer.transposedSong(it, transposition, spelling), notation, tuning) } }
     }
-    val chord = chords?.firstOrNull { it.name == dialog.chordName }
+    val chord = chords?.firstOrNull { it.name == dialog.chordName && !it.isCustom }
     // The page names the chord as the song is played there, so a transposition or an edit synced in while the sheet is up
     // may leave nothing by that name: the diagram that was tapped is gone, and with it the sheet.
     if (chords != null && chord == null) return LaunchedEffect(Unit) { viewModel.dialogHost.dismissSheet(dialog) }

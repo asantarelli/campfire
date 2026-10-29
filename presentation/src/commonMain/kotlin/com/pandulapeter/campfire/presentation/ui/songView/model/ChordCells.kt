@@ -62,7 +62,7 @@ internal fun chordCellsOf(chords: List<SongChord>, tuning: ChordTuning, storedSh
         name = chord.name,
         letterName = chord.letterName,
         tuning = tuning,
-        root = chord.chord.root,
+        root = chord.diagramRoot,
         selection = selectShape(chord, tuning, storedShapes),
     )
 }
