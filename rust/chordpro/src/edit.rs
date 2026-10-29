@@ -71,13 +71,29 @@ pub fn insert_directive(text: &str, start: usize, end: usize, name: &str, has_va
 /// `{start_of_name}`, the selected lines and `{end_of_name}`, on lines of their own: the lines the selection touches are
 /// moved into the section. With nothing selected the caret is on the empty line between the two, where the section is typed.
 pub fn insert_section(text: &str, start: usize, end: usize, name: &str) -> Edited {
+    insert_environment(text, start, end, &format!("{{start_of_{name}}}"), &format!("{{end_of_{name}}}"), "", 0)
+}
+
+/// A tablature: `{start_of_tab}` (or `{start_of_tab-guitar}` for the tab of one instrument) around the selected lines, or around
+/// an empty `staff` of one bar with the caret at the start of its first line, where nothing is selected.
+pub fn insert_tab(text: &str, start: usize, end: usize, selector: Option<&str>, staff: &[String]) -> Edited {
+    let opening = match selector {
+        Some(selector) => format!("{{start_of_tab-{selector}}}"),
+        None => "{start_of_tab}".to_string(),
+    };
+    let first_line = staff.first().map(String::as_str).unwrap_or("");
+    let caret_in_body = first_line.chars().position(|c| c == '|').map_or(0, |index| index + 1);
+    insert_environment(text, start, end, &opening, "{end_of_tab}", &staff.join("\n"), caret_in_body)
+}
+
+/// `opening`, the selected lines and `closing` on lines of their own; with nothing selected, `empty_body` in between and the caret
+/// `caret_in_body` characters into it.
+fn insert_environment(text: &str, start: usize, end: usize, opening: &str, closing: &str, empty_body: &str, caret_in_body: usize) -> Edited {
     let chars = chars(text);
     let (start, end) = ordered(start, end, chars.len());
-    let opening = format!("{{start_of_{name}}}");
-    let closing = format!("{{end_of_{name}}}");
     let caret_offset = opening.chars().count() + 1;
     if start == end {
-        return place_on_own_line(&chars, start, &format!("{opening}\n\n{closing}"), caret_offset, 0);
+        return place_on_own_line(&chars, start, &format!("{opening}\n{empty_body}\n{closing}"), caret_offset + caret_in_body, 0);
     }
     let first = chars[..start].iter().rposition(|&c| c == '\n').map_or(0, |index| index + 1);
     // A selection that ends right after a line break does not touch the line after it.
@@ -129,6 +145,35 @@ pub fn body_start_index(lines: &[String]) -> usize {
 /// second; one that may be repeated (`tag`) is added after the last of its kind.
 pub fn insert_metadata(text: &str, name: &str, is_repeatable: bool) -> Edited {
     insert_header_line(text, name, is_repeatable, &format!("{{{name}: }}"), name.chars().count() + 3, &|directive| directive.name == name)
+}
+
+/// A blank `{define}` for a shape of `strings` strings, with every string open and no finger on any, written into the header
+/// with its `name` selected: a chord of the song's own is written by typing the name over and changing the numbers. A shape the
+/// file already defines under that name takes the caret to the end of its line instead of writing a second.
+pub fn insert_define(text: &str, name: &str, strings: usize) -> Edited {
+    let zeros = vec!["0"; strings].join(" ");
+    let line = format!("{{define: {name} base-fret 1 frets {zeros} fingers {zeros}}}");
+    let finds = |directive: &directives::Directive| {
+        directive.name.split('-').next() == Some("define") && directive.value.as_deref().is_some_and(|value| value.split_whitespace().next() == Some(name))
+    };
+    let edited = insert_header_line(text, "define", false, &line, "{define: ".chars().count(), &finds);
+    if edited.text == text {
+        return edited;
+    }
+    Edited { selection_end: edited.selection_start + name.chars().count(), ..edited }
+}
+
+/// A directive that is said in the header and then again as a change from a line on (`tempo`, `time`): the header's where the
+/// file has none yet, else a line of its own at the caret.
+pub fn insert_changeable(text: &str, start: usize, end: usize, name: &str) -> Edited {
+    let lines = directives::split_lines(text);
+    let body_start = body_start_index(&lines);
+    let is_in_header = lines[..body_start].iter().any(|line| directives::match_directive(line.trim()).is_some_and(|directive| directive.name == name));
+    if is_in_header {
+        insert_directive(text, start, end, name, true)
+    } else {
+        insert_metadata(text, name, false)
+    }
 }
 
 /// The same for `{meta: key value}`.
@@ -275,5 +320,37 @@ mod tests {
     fn the_line_endings_of_the_file_are_kept() {
         let edited = insert_metadata("{title: A}\r\n[Am]x\r\n", "key", false);
         assert_eq!(edited.text, "{title: A}\r\n{key: }\r\n[Am]x\r\n");
+    }
+
+    #[test]
+    fn a_tab_is_written_around_an_empty_staff_or_around_the_selection() {
+        let staff: Vec<String> = ["e|----|", "B|----|"].iter().map(|line| line.to_string()).collect();
+        let empty = insert_tab("", 0, 0, Some("guitar"), &staff);
+        assert_eq!(empty.text, "{start_of_tab-guitar}\ne|----|\nB|----|\n{end_of_tab}");
+        // The caret is right after the bar line that opens the first line of the staff.
+        assert_eq!(empty.selection_start, "{start_of_tab-guitar}\ne|".chars().count());
+        assert_eq!(insert_tab("", 0, 0, None, &staff).text.lines().next(), Some("{start_of_tab}"));
+        let wrapped = insert_tab("e|--1--|\nB|--2--|", 0, 17, None, &staff);
+        assert_eq!(wrapped.text, "{start_of_tab}\ne|--1--|\nB|--2--|\n{end_of_tab}");
+    }
+
+    #[test]
+    fn a_blank_definition_goes_into_the_header_with_its_name_selected() {
+        let edited = insert_define("{title: A}\n[Am]body\n", "Nombre", 6);
+        assert_eq!(edited.text, "{title: A}\n{define: Nombre base-fret 1 frets 0 0 0 0 0 0 fingers 0 0 0 0 0 0}\n[Am]body\n");
+        let chars: Vec<char> = edited.text.chars().collect();
+        assert_eq!(chars[edited.selection_start..edited.selection_end].iter().collect::<String>(), "Nombre");
+        assert!(insert_define("{title: A}\n", "Nombre", 4).text.contains("frets 0 0 0 0 fingers 0 0 0 0}"));
+        // Written once: the second time the caret goes to the one there is.
+        let again = insert_define(&edited.text, "Nombre", 6);
+        assert_eq!(again.text, edited.text);
+    }
+
+    #[test]
+    fn a_tempo_goes_into_the_header_once_and_after_that_at_the_caret() {
+        let first = insert_changeable("{title: A}\n\n[Am]one\ntwo\n", 17, 17, "tempo");
+        assert_eq!(first.text, "{title: A}\n{tempo: }\n\n[Am]one\ntwo\n");
+        let second = insert_changeable("{title: A}\n{tempo: 100}\n\n[Am]one\ntwo\n", 30, 30, "tempo");
+        assert!(second.text.contains("[Am]one\n{tempo: }\ntwo"), "{}", second.text);
     }
 }

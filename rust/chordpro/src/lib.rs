@@ -13,6 +13,7 @@
 pub mod chord;
 pub mod chord_names;
 pub mod convert;
+pub mod definitions;
 pub mod directives;
 pub mod edit;
 pub mod model;
@@ -30,5 +31,5 @@ mod normalize;
 mod rewriter;
 mod section_builder;
 
-pub use rewriter::chords_in;
+pub use rewriter::{chords_in, diagram_chords_in};
 pub mod text_rewriter;

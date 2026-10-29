@@ -1021,7 +1021,8 @@ impl eframe::App for App {
         if self.screen == Screen::Song && self.settings.pin_chord_diagrams {
             if let Some(open) = &self.open {
                 let colors = SongColors::of(self.settings.is_dark);
-                let chords = chordpro::chords_in(&open.shown);
+                let chords = chordpro::diagram_chords_in(&open.shown);
+                let definitions = open.shown.metadata.definitions.clone();
                 let settings = self.settings.clone();
                 // A column of diagrams, two to a row, that never takes more room than they need.
                 egui::Panel::right("pinned_chords").resizable(false).exact_size(236.0).show(ui, |ui| {
@@ -1029,7 +1030,7 @@ impl eframe::App for App {
                     egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
                         egui::Grid::new("pinned_chords_grid").num_columns(2).spacing([3.0, 3.0]).show(ui, |ui| {
                             for (index, name) in chords.iter().enumerate() {
-                                tools::pinned_chord(ui, name, &settings, &colors);
+                                tools::pinned_chord(ui, name, &settings, &colors, &definitions);
                                 if index % 2 == 1 {
                                     ui.end_row();
                                 }
@@ -1081,9 +1082,10 @@ impl eframe::App for App {
         }
         if let Some(name) = self.chord_window.clone() {
             let colors = SongColors::of(self.settings.is_dark);
+            let definitions = self.open.as_ref().map(|open| open.shown.metadata.definitions.clone()).unwrap_or_default();
             let mut is_open = true;
             egui::Window::new("Acorde").open(&mut is_open).resizable(true).default_width(420.0).show(ui.ctx(), |ui| {
-                tools::chord_sheet(ui, &name, &self.settings, &colors, 6, 1.0);
+                tools::chord_sheet(ui, &name, &self.settings, &colors, 6, 1.0, &definitions);
             });
             if !is_open {
                 self.chord_window = None;

@@ -65,6 +65,8 @@ pub struct Metadata {
     pub links: Vec<Link>,
     /// `{meta: name value}` and unknown `x_*` directives, in order.
     pub custom: BTreeMap<String, Vec<String>>,
+    /// The shapes the song defines for its chords, one per chord and number of strings: the last definition wins.
+    pub definitions: Vec<ChordDefinition>,
 }
 
 impl Metadata {
@@ -77,6 +79,18 @@ impl Metadata {
             None => name.to_string(),
         }
     }
+}
+
+/// A shape the song gives a chord with `{define}`, for the diagram of a chord no table of the app has a name for.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChordDefinition {
+    pub name: String,
+    /// The fret the diagram starts at, 1 for the nut.
+    pub base_fret: u8,
+    /// One per string, from the lowest: the fret counted from the nut (0 is open), `None` for a muted string.
+    pub frets: Vec<Option<u8>>,
+    /// The finger on each string, 0 for none, where the definition says.
+    pub fingers: Option<Vec<u8>>,
 }
 
 /// A page about a song, carried as `{meta: link https://… Optional name}`.

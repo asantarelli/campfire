@@ -32,7 +32,20 @@ pub enum Insertion {
     Meta { key: &'static str, repeatable: bool },
     /// Characters a keyboard has no key for, written at the caret.
     Symbol(&'static str),
+    /// A tablature, around the selected lines or around an empty staff, for one instrument or for any.
+    Tab { selector: Option<&'static str>, staff: &'static [&'static str] },
+    /// A blank `{define}` of a shape of this many strings, in the header.
+    Define { strings: usize },
+    /// A directive said in the header and then again as a change from a line on (`tempo`, `time`).
+    Changeable { name: &'static str },
 }
+
+/// The name a blank shape is given, which is typed over.
+const SHAPE_NAME: &str = "Nombre";
+
+/// The empty staff of one bar a new tablature starts as, its strings named from the highest.
+pub const GUITAR_STAFF: [&str; 6] = ["e|----------------|", "B|----------------|", "G|----------------|", "D|----------------|", "A|----------------|", "E|----------------|"];
+pub const UKULELE_STAFF: [&str; 4] = ["A|----------------|", "E|----------------|", "C|----------------|", "G|----------------|"];
 
 impl Insertion {
     fn apply(self, text: &str, start: usize, end: usize) -> Edited {
@@ -43,6 +56,9 @@ impl Insertion {
             Insertion::Metadata { name, repeatable } => edit::insert_metadata(text, name, repeatable),
             Insertion::Meta { key, repeatable } => edit::insert_meta(text, key, repeatable),
             Insertion::Symbol(symbol) => edit::insert_at_caret(text, start, end, symbol),
+            Insertion::Tab { selector, staff } => edit::insert_tab(text, start, end, selector, &staff.iter().map(|line| line.to_string()).collect::<Vec<_>>()),
+            Insertion::Define { strings } => edit::insert_define(text, SHAPE_NAME, strings),
+            Insertion::Changeable { name } => edit::insert_changeable(text, start, end, name),
         }
     }
 }
@@ -69,6 +85,12 @@ fn metadata(title: &'static str, name: &'static str, example: &'static str, desc
     entry(title, syntax, description, Insertion::Metadata { name, repeatable })
 }
 
+/// A header directive that can be said again further down as a change, which the first time goes into the header.
+fn changeable(title: &'static str, name: &'static str, example: &'static str, description: &'static str) -> ReferenceEntry {
+    let syntax: &'static str = Box::leak(format!("{{{name}: {example}}}").into_boxed_str());
+    entry(title, syntax, description, Insertion::Changeable { name })
+}
+
 fn meta(title: &'static str, key: &'static str, example: &'static str, description: &'static str, repeatable: bool) -> ReferenceEntry {
     let syntax: &'static str = Box::leak(format!("{{meta: {key} {example}}}").into_boxed_str());
     entry(title, syntax, description, Insertion::Meta { key, repeatable })
@@ -82,6 +104,23 @@ fn directive(title: &'static str, name: &'static str, example: &'static str, des
 fn section(title: &'static str, name: &'static str, description: &'static str) -> ReferenceEntry {
     let syntax: &'static str = Box::leak(format!("{{start_of_{name}}} … {{end_of_{name}}}").into_boxed_str());
     entry(title, syntax, description, Insertion::Section { name })
+}
+
+fn tab(title: &'static str, selector: Option<&'static str>, staff: &'static [&'static str], description: &'static str) -> ReferenceEntry {
+    let syntax: &'static str = Box::leak(format!("{{start_of_tab{}}} … {{end_of_tab}}", selector.map(|selector| format!("-{selector}")).unwrap_or_default()).into_boxed_str());
+    entry(title, syntax, description, Insertion::Tab { selector, staff })
+}
+
+/// A blank shape of a chord of the song's own: the frets and the fingers, from the lowest string, all at 0 to be changed.
+fn shape(title: &'static str, strings: usize) -> ReferenceEntry {
+    let zeros = vec!["0"; strings].join(" ");
+    let syntax: &'static str = Box::leak(format!("{{define: {SHAPE_NAME} base-fret 1 frets {zeros} fingers {zeros}}}").into_boxed_str());
+    entry(
+        title,
+        syntax,
+        "Dibuja el diagrama de un acorde con la forma que le das: los trastes de cada cuerda desde la más grave (x para una cuerda muda, 0 al aire, 1 para el primer traste desde base-fret) y los dedos (1 índice, 4 meñique, 0 ninguno).",
+        Insertion::Define { strings },
+    )
 }
 
 const SECTION_DESCRIPTION: &str = "Abre y cierra un bloque de este tipo. Todo lo que queda entre las dos líneas pertenece a la sección.";
@@ -102,8 +141,8 @@ pub fn reference_groups() -> Vec<ReferenceGroup> {
                 metadata("Año", "year", "1872", "El año en que salió.", false),
                 metadata("Tono", "key", "G", "El tono en el que están escritos los acordes.", false),
                 metadata("Capo", "capo", "2", "El traste donde va el capo.", false),
-                metadata("Tempo", "tempo", "100", "Pulsos por minuto, que sigue el metrónomo.", false),
-                metadata("Compás", "time", "3/4", "El compás, como 3/4 o 6/8.", false),
+                changeable("Tempo", "tempo", "100", "Pulsos por minuto, que sigue el metrónomo. La primera vez va en el encabezado; las siguientes, donde está el cursor, como un cambio desde esa línea."),
+                changeable("Compás", "time", "3/4", "El compás, como 3/4 o 6/8. La primera vez va en el encabezado; las siguientes, donde está el cursor, como un cambio desde esa línea."),
                 metadata("Duración", "duration", "3:45", "Cuánto dura la canción, en minutos y segundos.", false),
                 metadata("Etiqueta", "tag", "Fácil", "Una etiqueta para filtrar la biblioteca. Escribe una por línea.", true),
                 meta("Idioma", "language", "es", "El idioma de la letra, con un código de dos letras (en, es, hu).", true),
@@ -134,12 +173,22 @@ pub fn reference_groups() -> Vec<ReferenceGroup> {
                     "Repite el último estribillo sin volver a escribirlo.",
                     Insertion::Directive { name: "chorus", has_value: false },
                 ),
-                section(
-                    "Tablatura",
-                    "tab",
-                    "Tablatura: sus líneas se muestran tal como están escritas, con letra monoespaciada, para que las columnas queden alineadas.",
-                ),
                 section("Cuadrícula", "grid", "Una cuadrícula de acordes, con los compases separados por barras verticales."),
+            ],
+        },
+        ReferenceGroup {
+            title: "Tablatura",
+            entries: vec![
+                tab("Tablatura (cualquier instrumento)", None, &GUITAR_STAFF, "Un pentagrama vacío de una barra, con las cuerdas nombradas. Si hay líneas seleccionadas, las rodea."),
+                tab("Tablatura de guitarra", Some("guitar"), &GUITAR_STAFF, "Solo la ve quien toca guitarra; con varias tablatura una detrás de otra, cada uno ve la suya."),
+                tab("Tablatura de ukelele", Some("ukulele"), &UKULELE_STAFF, "Solo la ve quien toca ukelele."),
+            ],
+        },
+        ReferenceGroup {
+            title: "Formas de acordes",
+            entries: vec![
+                shape("Forma de acorde (guitarra)", 6),
+                shape("Forma de acorde (ukelele)", 4),
             ],
         },
         ReferenceGroup {
@@ -298,6 +347,8 @@ impl Editor {
         let mut action = EditorAction::None;
         let ctx = ui.ctx().clone();
         let sections = self.entries_of(&["Secciones"]);
+        let tabs = self.entries_of(&["Tablatura"]);
+        let shapes = self.entries_of(&["Formas de acordes"]);
         let comments = self.entries_of(&["Comentarios", "Cambios a lo largo de la canción"]);
         let data = self.entries_of(&["Datos de la canción"]);
         let mut pending: Option<Insertion> = None;
@@ -325,6 +376,8 @@ impl Editor {
                 self.insert(&ctx, Insertion::Wrap { prefix: "[*", suffix: "]" });
             }
             insertion_menu(ui, "Sección ▾", &sections, &mut pending);
+            insertion_menu(ui, "Tablatura ▾", &tabs, &mut pending);
+            insertion_menu(ui, "Acorde propio ▾", &shapes, &mut pending);
             insertion_menu(ui, "Comentario ▾", &comments, &mut pending);
             insertion_menu(ui, "Datos ▾", &data, &mut pending);
             let strums: Vec<(&'static str, Insertion)> = STRUMS.iter().map(|(label, symbol)| (*label, Insertion::Symbol(symbol))).collect();

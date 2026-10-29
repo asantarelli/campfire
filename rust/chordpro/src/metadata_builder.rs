@@ -11,7 +11,7 @@
 use std::collections::{BTreeMap, HashSet};
 
 use crate::directives::Directive;
-use crate::model::{Link, Metadata};
+use crate::model::{ChordDefinition, Link, Metadata};
 use crate::values;
 
 /// The value of a field a song can change mid-song — its key, tempo or time signature — of which a later line is a change
@@ -127,6 +127,7 @@ pub(crate) struct MetadataBuilder {
     languages: Vec<String>,
     links: Vec<Link>,
     custom: BTreeMap<String, Vec<String>>,
+    definitions: Vec<ChordDefinition>,
 }
 
 impl MetadataBuilder {
@@ -150,7 +151,14 @@ impl MetadataBuilder {
             languages: Vec::new(),
             links: Vec::new(),
             custom: BTreeMap::new(),
+            definitions: Vec::new(),
         }
+    }
+
+    /// A shape of the song's own for a chord. Another for the same chord on as many strings is replaced, since the last one counts.
+    pub(crate) fn add_definition(&mut self, definition: ChordDefinition) {
+        self.definitions.retain(|known| !(known.name == definition.name && known.frets.len() == definition.frets.len()));
+        self.definitions.push(definition);
     }
 
     /// `is_in_body`: whether `directive` stands in the body of the song rather than in its header.
@@ -258,6 +266,7 @@ impl MetadataBuilder {
             languages: self.languages.clone(),
             links: self.links.clone(),
             custom: self.custom.clone(),
+            definitions: self.definitions.clone(),
         }
     }
 }

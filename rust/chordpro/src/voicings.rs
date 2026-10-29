@@ -39,6 +39,8 @@ pub type Fret = Option<u8>;
 pub struct Voicing {
     /// One entry per string, from the lowest.
     pub frets: Vec<Fret>,
+    /// The finger on each string, 0 for none, where the shape comes with them (a song's own definition does).
+    pub fingers: Option<Vec<u8>>,
 }
 
 impl Voicing {
@@ -112,7 +114,7 @@ pub fn voicings(chord: &Chord, tuning: &Tuning, limit: usize) -> Vec<Voicing> {
     for window in 0..=(MAX_FRET - SPAN) {
         let mut frets: Vec<Fret> = vec![None; strings];
         search(0, window, tuning, &allowed, &mut frets, &mut |frets| {
-            let voicing = Voicing { frets: frets.to_vec() };
+            let voicing = Voicing { frets: frets.to_vec(), fingers: None };
             if let Some(score) = score(&voicing, tuning, &required, bass, is_bass_asked, window) {
                 found.push((score, voicing));
             }
@@ -260,13 +262,13 @@ mod tests {
 
     #[test]
     fn a_shape_is_described_by_its_frets() {
-        let c = Voicing { frets: vec![None, Some(3), Some(2), Some(0), Some(1), Some(0)] };
+        let c = Voicing { frets: vec![None, Some(3), Some(2), Some(0), Some(1), Some(0)], fingers: None };
         assert_eq!(c.text(), "x32010");
         assert_eq!(c.base_fret(), 1);
         assert_eq!(c.fingers(), 3);
-        let f = Voicing { frets: vec![Some(1), Some(3), Some(3), Some(2), Some(1), Some(1)] };
+        let f = Voicing { frets: vec![Some(1), Some(3), Some(3), Some(2), Some(1), Some(1)], fingers: None };
         assert_eq!(f.fingers(), 4);
-        let high = Voicing { frets: vec![Some(8), Some(10), Some(10), Some(9), Some(8), Some(8)] };
+        let high = Voicing { frets: vec![Some(8), Some(10), Some(10), Some(9), Some(8), Some(8)], fingers: None };
         assert_eq!(high.base_fret(), 8);
         assert_eq!(high.text(), "8.10.10.9.8.8");
     }

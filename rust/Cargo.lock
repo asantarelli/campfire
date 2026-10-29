@@ -452,7 +452,7 @@ dependencies = [
 
 [[package]]
 name = "chordpro"
-version = "5.0.2"
+version = "5.0.3"
 
 [[package]]
 name = "clipboard-win"
@@ -1373,7 +1373,7 @@ dependencies = [
 
 [[package]]
 name = "instruments"
-version = "5.0.2"
+version = "5.0.3"
 
 [[package]]
 name = "itertools"
@@ -1505,7 +1505,7 @@ dependencies = [
 
 [[package]]
 name = "library"
-version = "5.0.2"
+version = "5.0.3"
 dependencies = [
  "chordpro",
  "serde",
@@ -2456,7 +2456,7 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "sdcancionero"
-version = "5.0.2"
+version = "5.0.3"
 dependencies = [
  "chordpro",
  "cpal",

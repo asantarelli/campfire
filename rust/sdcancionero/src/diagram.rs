@@ -62,6 +62,8 @@ pub fn draw(ui: &Ui, rect: Rect, name: &str, voicing: &Voicing, colors: &SongCol
             painter.line_segment([a, b], Stroke::new(fret_gap * 0.55, colors.text));
         }
     }
+    // A number inside the dot reads against it: dark on a light dot, light on a dark one.
+    let finger_color = if colors.text.r() > 0x80 { Color32::from_gray(0x18) } else { Color32::from_gray(0xF2) };
     for (string, fret) in voicing.frets.iter().enumerate() {
         let x = left + string as f32 * string_gap;
         match fret {
@@ -74,7 +76,11 @@ pub fn draw(ui: &Ui, rect: Rect, name: &str, voicing: &Voicing, colors: &SongCol
             Some(fret) => {
                 let row = (*fret as i32 - base as i32).clamp(0, FRETS_SHOWN as i32 - 1) as f32;
                 let y = top + (row + 0.5) * fret_gap;
-                painter.circle_filled(Pos2::new(x, y), (fret_gap * 0.34).min(string_gap * 0.42), colors.text);
+                let radius = (fret_gap * 0.34).min(string_gap * 0.42);
+                painter.circle_filled(Pos2::new(x, y), radius, colors.text);
+                if let Some(finger) = voicing.fingers.as_ref().and_then(|fingers| fingers.get(string)).filter(|&&finger| finger > 0) {
+                    painter.text(Pos2::new(x, y), Align2::CENTER_CENTER, finger.to_string(), FontId::proportional(radius * 1.35), finger_color);
+                }
             }
         }
     }

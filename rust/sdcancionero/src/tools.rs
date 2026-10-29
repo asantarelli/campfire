@@ -14,9 +14,11 @@
 use std::time::{Duration, Instant};
 
 use chordpro::chord;
+use chordpro::definitions;
+use chordpro::model::ChordDefinition;
 use chordpro::notation::{self, ChordNotation};
 use chordpro::scales;
-use chordpro::voicings::{self, Tuning};
+use chordpro::voicings::{self, Tuning, Voicing};
 use eframe::egui::{self, Align2, Color32, FontId, Pos2, RichText, Sense, Stroke, Ui, Vec2};
 use instruments::metronome::{Accent, DEFAULT_TEMPO, TEMPO_RANGE};
 use instruments::tuner::{self, InstrumentTuning, Note, Pitch};
@@ -524,7 +526,7 @@ impl Tools {
                     for chord in &chords {
                         ui.vertical(|ui| {
                             ui.label(RichText::new(&chord.degree).color(colors.muted));
-                            pinned_chord(ui, &chord.name, settings, colors);
+                            pinned_chord(ui, &chord.name, settings, colors, &[]);
                         });
                     }
                 });
@@ -558,7 +560,7 @@ impl Tools {
         });
         ui.separator();
         let name = if self.query.trim().is_empty() { format!("{}{}", ROOTS[self.root], SUFFIXES[self.suffix]) } else { self.query.trim().to_string() };
-        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| chord_sheet(ui, &name, settings, colors, 8, 1.15));
+        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| chord_sheet(ui, &name, settings, colors, 8, 1.15, &[]));
     }
 }
 
@@ -625,7 +627,14 @@ fn cents_meter(ui: &mut Ui, cents: f32, colors: &SongColors) {
 }
 
 /// The notes of the chord called `name` and its shapes on the player's instrument, at most `limit` of them.
-pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, limit: usize, scale: f32) {
+pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, limit: usize, scale: f32, definitions: &[ChordDefinition]) {
+    if let Some(voicing) = defined_voicing(name, settings, definitions) {
+        ui.label(RichText::new(name).size(26.0).strong());
+        ui.label(RichText::new("La forma que define la canción.").color(colors.muted));
+        ui.add_space(6.0);
+        diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, name, &voicing, colors, scale));
+        return;
+    }
     let Some(chord) = chord::parse(name, ChordNotation::Standard) else {
         ui.label(RichText::new(format!("«{name}» no es un acorde.")).color(colors.muted));
         return;
@@ -651,15 +660,29 @@ pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongCo
     });
 }
 
-/// A chord of the strip pinned beside a song: its name and its most comfortable shape.
-pub fn pinned_chord(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors) {
-    let Some(chord) = chord::parse(name, ChordNotation::Standard) else {
-        return;
+/// The shape the song itself defines for the chord `name` on the player's instrument (as many strings as it has), the last of them.
+pub fn defined_voicing(name: &str, settings: &Settings, definitions: &[ChordDefinition]) -> Option<Voicing> {
+    let strings = settings.instrument.tuning().strings.len();
+    definitions.iter().rev().find(|definition| definition.name == name && definition.frets.len() == strings).map(definitions::voicing_of)
+}
+
+/// A chord of the strip pinned beside a song: its name and its shape, the song's own where it defines one and else the most
+/// comfortable.
+pub fn pinned_chord(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, definitions: &[ChordDefinition]) {
+    let (voicing, shown) = match defined_voicing(name, settings, definitions) {
+        // A name no table knows is written as the song writes it.
+        Some(voicing) => (voicing, if chord::parse(name, ChordNotation::Standard).is_some() { shown_chord(name, settings) } else { name.to_string() }),
+        None => {
+            let Some(chord) = chord::parse(name, ChordNotation::Standard) else {
+                return;
+            };
+            let Some(voicing) = voicings::voicings(&chord, &settings.instrument.tuning(), 1).into_iter().next() else {
+                return;
+            };
+            (voicing, shown_chord(name, settings))
+        }
     };
-    let Some(voicing) = voicings::voicings(&chord, &settings.instrument.tuning(), 1).into_iter().next() else {
-        return;
-    };
-    diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown_chord(name, settings), &voicing, colors, 0.85));
+    diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown, &voicing, colors, 0.85));
 }
 
 /// The name of a chord as the player reads it: in their notation, with the signs they chose.

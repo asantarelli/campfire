@@ -139,6 +139,24 @@ pub fn chords_in(song: &Song) -> Vec<String> {
     names
 }
 
+/// The chords a song draws diagrams of: the ones it plays, and those it defines a shape for even where no table of the app has
+/// a name for them (`Dv1`), each once, then the defined ones it never plays.
+pub fn diagram_chords_in(song: &Song) -> Vec<String> {
+    let defined: std::collections::HashSet<&str> = song.metadata.definitions.iter().map(|definition| definition.name.as_str()).collect();
+    let mut names = written_chord_names(song);
+    if song.metadata.key.is_some() {
+        names.remove(0);
+    }
+    let mut seen = std::collections::HashSet::new();
+    names.retain(|name| (chord_names::is_chord_name(name) || defined.contains(name.as_str())) && seen.insert(name.clone()));
+    for definition in &song.metadata.definitions {
+        if seen.insert(definition.name.clone()) {
+            names.push(definition.name.clone());
+        }
+    }
+    names
+}
+
 /// The chord names a song writes, in the order it writes them: its key, then the chords over its lyrics and the cells of its
 /// grids. What the notation of a file is judged by, and the spelling of a transposition.
 pub(crate) fn written_chord_names(song: &Song) -> Vec<String> {

@@ -113,9 +113,16 @@ pub(crate) fn starts_body(directive: &Directive) -> bool {
 
 fn handle_directive(directive: &Directive, metadata: &mut MetadataBuilder, section: &mut SectionBuilder, transposition: &mut Transposition) {
     let name = directive.name.as_str();
-    // A definition's shape is drawn from the app's own tables here, so the directive is read past.
+    // A definition's shape is kept for the diagram of a chord the app's own tables have no name for; `{chord}` only says which
+    // chord to draw, which the app already does.
     let base = name.split('-').next().unwrap_or(name);
-    if base == "define" || base == "chord" {
+    if base == "define" {
+        if let Some(definition) = directive.value.as_deref().and_then(crate::definitions::parse) {
+            metadata.add_definition(definition);
+        }
+        return;
+    }
+    if base == "chord" {
         return;
     }
     if directives::has_selector_suffix(name) {
