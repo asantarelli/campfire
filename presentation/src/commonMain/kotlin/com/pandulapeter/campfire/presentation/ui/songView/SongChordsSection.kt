@@ -354,6 +354,7 @@ private fun DrawScope.drawChordCell(
                 backgroundColor = paint.backgroundColor,
                 textMeasurer = paint.diagramTextMeasurer,
                 fontFamily = paint.diagramFontFamily,
+                style = paint.diagramStyle,
             )
         }
         if (fadingOut == null || fadeProgress >= 1f) {

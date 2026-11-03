@@ -34,6 +34,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -203,7 +204,10 @@ internal fun SongListItem(
             coverArtUrl = coverArtUrl,
             actions = actions,
             headlineContent = {
-                ListItemHeadline(text = songCardTitle(song.title, index))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SongKindBadge(isScore = song.isScore)
+                    ListItemHeadline(modifier = Modifier.weight(1f, fill = false), text = songCardTitle(song.title, index))
+                }
             },
             // The artist and the values each get a line of their own beside the cover: the artist is cut short by nothing but
             // the card's width, and the values, which are short, never take letters off it. Songs written in the app need

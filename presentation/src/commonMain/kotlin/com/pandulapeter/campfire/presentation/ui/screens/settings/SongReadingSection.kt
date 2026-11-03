@@ -16,6 +16,14 @@ import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.music_search_spotify
 import com.pandulapeter.campfire.presentation.resources.music_search_youtube
 import com.pandulapeter.campfire.presentation.resources.music_search_youtube_music
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_colors
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_colors_description
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels_degrees
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels_description
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels_fingers
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels_none
+import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels_notes
 import com.pandulapeter.campfire.presentation.resources.settings_group_song_view
 import com.pandulapeter.campfire.presentation.resources.settings_music_search
 import com.pandulapeter.campfire.presentation.resources.settings_music_search_description
@@ -32,6 +40,7 @@ import com.pandulapeter.campfire.presentation.resources.settings_song_font_defau
 import com.pandulapeter.campfire.presentation.resources.settings_song_font_description
 import com.pandulapeter.campfire.presentation.resources.settings_song_font_monospace
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
+import com.pandulapeter.campfire.presentation.ui.components.SwitchListItem
 import com.pandulapeter.campfire.presentation.ui.components.controls.SegmentedChoice
 import com.pandulapeter.campfire.presentation.ui.settingsPage.SettingsSection
 import com.pandulapeter.campfire.presentation.ui.settingsPage.SettingsSubsection
@@ -84,6 +93,30 @@ internal fun SongReadingSection(
             selected = userPreferences?.pinnedChordsPosition ?: UserPreferences.PinnedChordsPosition.RIGHT,
             isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
             onSelected = viewModel.preferencesController::setPinnedChordsPosition,
+        )
+    }
+    SettingsSubsection(
+        title = stringResource(Res.string.settings_chord_dot_labels),
+        description = stringResource(Res.string.settings_chord_dot_labels_description),
+        isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
+    ) {
+        SegmentedChoice(
+            options = listOf(
+                UserPreferences.ChordDotLabels.NONE to stringResource(Res.string.settings_chord_dot_labels_none),
+                UserPreferences.ChordDotLabels.FINGERS to stringResource(Res.string.settings_chord_dot_labels_fingers),
+                UserPreferences.ChordDotLabels.NOTES to stringResource(Res.string.settings_chord_dot_labels_notes),
+                UserPreferences.ChordDotLabels.DEGREES to stringResource(Res.string.settings_chord_dot_labels_degrees),
+            ),
+            selected = userPreferences?.chordDotLabels ?: UserPreferences.ChordDotLabels.NONE,
+            isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
+            onSelected = viewModel.preferencesController::setChordDotLabels,
+        )
+        SwitchListItem(
+            title = stringResource(Res.string.settings_chord_dot_colors),
+            description = stringResource(Res.string.settings_chord_dot_colors_description),
+            isChecked = userPreferences?.areChordDotsColoredByFunction == true,
+            isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
+            onCheckedChange = viewModel.preferencesController::setChordDotsColoredByFunction,
         )
     }
     ExternalPlayerSettings()

@@ -17,6 +17,7 @@ kotlin {
         commonMain.dependencies {
             api(project(":domain:api"))
             implementation(project(":data:repository:api"))
+            implementation(project(":guitarpro"))
             implementation(libs.kotlin.coroutines)
         }
         commonTest.dependencies {

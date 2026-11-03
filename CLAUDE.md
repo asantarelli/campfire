@@ -56,6 +56,7 @@ app:android / desktop / ios / web     entry points, platform chrome, "open with"
   tools/promo-video                   the promo video: Remotion and a Python soundtrack over Promo.kt's footage
   tools/fonts                         draws ♭ ♮ ♯ into the bundled Inter, which has none
   chordpro                            dependency-free ChordPro parser, serializer, transposer, chords, tabs
+  guitarpro                           dependency-free Guitar Pro 3-5 reader and the layout of a score on a page
 ```
 
 Data flow: `FileStorage` → `LocalSource` (files in, models out) → `Repository` (emits `DataState<T>`, reads once, caches,
@@ -175,6 +176,7 @@ One line each; the detail is in the file named (`ui/` = `presentation/src/common
 - The app is set in its bundled Inter and JetBrains Mono on every platform, never the system's fonts: `ui/theme`.
 - Settings links only to the website, GitHub, the author's site, donations, and its own store's rating page:
   `ui/screens/settings`.
+- A Guitar Pro score is imported as a song that holds the file, marked G beside the C of the chord sheets, and opens as a staff and a tablature: `ui/dialogs/score`, `guitarpro`.
 - Printing and export: `ui/screens/export`, `ui/print`.
 - Documents are converted locally to ChordPro, never uploaded or kept: `data/formats`, `chordpro/convert`.
 - Other apps' songs and backups are translated locally (SongbookPro, OpenSong and OpenSongApp, OnSong, JSON exports);

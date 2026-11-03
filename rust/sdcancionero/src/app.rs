@@ -19,8 +19,10 @@ use library::{Collision, Library, SongEntry};
 
 use crate::editor::{Editor, EditorAction};
 use crate::icons;
+use crate::score_view::{self, ScoreAction, ScoreView};
 use crate::listen::{self, Service};
-use crate::settings::{self, Instrument, Settings, SongOrder, NOTATIONS};
+use crate::audio::AudioOutput;
+use crate::settings::{self, DotLabels, Instrument, Settings, SongOrder, NOTATIONS};
 use crate::song_list::{self, ListRow};
 use crate::tools::{self, SongMetronome, SongTiming, ToolTab, Tools};
 
@@ -40,6 +42,11 @@ const DEMO_SONGS: [(&str, &str); 2] = [
 
 /// How long a message in the status line stays up.
 const STATUS_DURATION: Duration = Duration::from_secs(6);
+/// The file types the import takes, which are the ones a drop takes too.
+const IMPORT_EXTENSIONS: [&str; 8] = ["zip", "cho", "chopro", "crd", "txt", "gp3", "gp4", "gp5"];
+
+/// How long the note of a pressed string sounds.
+const NOTE_DURATION: Duration = Duration::from_millis(900);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Screen {
@@ -49,6 +56,8 @@ enum Screen {
     Tools,
     Setlist,
     Settings,
+    /// A Guitar Pro score, which is only read.
+    Score,
 }
 
 /// What the menu of a song in the list asks for.
@@ -114,6 +123,12 @@ pub struct App {
     chord_window: Option<String>,
     /// The song the player asked to delete, until they confirm.
     song_to_delete: Option<String>,
+    /// The sound of the string the player pressed on a diagram, and when it stops. Kept only while it sounds.
+    note_player: Option<(AudioOutput, Instant)>,
+    /// The Guitar Pro score on the screen.
+    score: Option<ScoreView>,
+    /// The title and the artist of a score being changed: the song's file, and the two texts as they are typed.
+    score_details: Option<(String, String, String)>,
     /// Whether the player asked to empty the library, until they confirm.
     is_emptying_library: bool,
     status: Option<(String, Instant)>,
@@ -146,6 +161,9 @@ impl App {
             from_setlist: None,
             chord_window: None,
             song_to_delete: None,
+            note_player: None,
+            score: None,
+            score_details: None,
             is_emptying_library: false,
             status: None,
             is_dark_applied: None,
@@ -191,7 +209,35 @@ impl App {
         }
     }
 
+    fn is_score(&self, file_name: &str) -> bool {
+        self.songs.iter().any(|entry| entry.file_name == file_name && entry.is_score)
+    }
+
+    /// Shows the score the song holds, as a staff and a tablature.
+    fn open_score_song(&mut self, file_name: &str) {
+        let text = match self.library.read_song(file_name) {
+            Ok(Some(text)) => text,
+            Ok(None) => return self.say("La canción ya no existe."),
+            Err(error) => return self.say(format!("No se pudo abrir la canción: {error}")),
+        };
+        let metadata = chordpro::parser::parse(&text, chordpro::notation::ChordNotation::Standard).metadata;
+        let Some(bytes) = guitarpro::song::bytes_of(&metadata.custom) else {
+            return self.say("No se puede leer esta partitura.");
+        };
+        match score_view::open(&bytes) {
+            Ok(score) => {
+                let title = self.songs.iter().find(|entry| entry.file_name == file_name).map(SongEntry::display_title).unwrap_or_default();
+                self.score = Some(ScoreView::new(score, title, metadata.artist.unwrap_or_default()));
+                self.screen = Screen::Score;
+            }
+            Err(message) => self.say(message),
+        }
+    }
+
     fn open_song(&mut self, file_name: &str) {
+        if self.is_score(file_name) {
+            return self.open_score_song(file_name);
+        }
         match self.library.read_song(file_name) {
             Ok(Some(text)) => {
                 self.open = Some(OpenSong::new(file_name.to_string(), &text, self.settings.prefer_flats));
@@ -204,7 +250,26 @@ impl App {
         }
     }
 
+    /// Writes the title and the artist a score is called into its song, leaving the score as it is.
+    fn save_score_details(&mut self, file_name: &str, title: &str, artist: &str) {
+        match self.library.read_song(file_name) {
+            Ok(Some(text)) => match self.library.write_song(file_name, &guitarpro::song::with_title_and_artist(&text, title, artist)) {
+                Ok(()) => self.reload_songs(),
+                Err(error) => self.say(format!("No se pudo guardar: {error}")),
+            },
+            Ok(None) => self.say("La canción ya no existe."),
+            Err(error) => self.say(format!("No se pudo abrir la canción: {error}")),
+        }
+    }
+
     fn edit_song(&mut self, file_name: &str) {
+        // A score has no text to type into: what is changed is its title and its artist.
+        if self.is_score(file_name) {
+            if let Some(entry) = self.songs.iter().find(|entry| entry.file_name == file_name) {
+                self.score_details = Some((file_name.to_string(), entry.metadata.title.clone().unwrap_or_default(), entry.metadata.artist.clone().unwrap_or_default()));
+            }
+            return;
+        }
         match self.library.read_song(file_name) {
             Ok(Some(text)) => {
                 self.editor = Some(Editor::new(Some(file_name.to_string()), text));
@@ -374,10 +439,15 @@ impl App {
     }
 
     fn import_zip(&mut self) {
-        let Some(path) = rfd::FileDialog::new().set_title("Importar canciones").add_filter("Zip o canciones", &["zip", "cho", "chopro", "crd", "txt"]).pick_file() else {
+        let Some(path) = rfd::FileDialog::new().set_title("Importar canciones").add_filter("Zip, canciones o partituras", &IMPORT_EXTENSIONS).pick_file() else {
             return;
         };
-        let Ok(bytes) = std::fs::read(&path) else {
+        self.import_path(&path);
+    }
+
+    /// Imports the file at `path`: a zip of songs, a song, or a Guitar Pro score, which becomes a song and is opened.
+    fn import_path(&mut self, path: &std::path::Path) {
+        let Ok(bytes) = std::fs::read(path) else {
             self.say("No se pudo leer el archivo.");
             return;
         };
@@ -393,6 +463,13 @@ impl App {
                 let added = report.added.len() + report.numbered.len();
                 self.say(format!("Importación lista: {added} nuevas, {} ya estaban, {} omitidas.", report.unchanged.len(), report.skipped.len()));
                 self.reload_songs();
+                // A score is what was asked for, so it is opened rather than left in the list.
+                if let [only] = report.added.iter().chain(&report.numbered).collect::<Vec<_>>()[..] {
+                    if self.is_score(only) {
+                        let only = only.clone();
+                        self.open_score_song(&only);
+                    }
+                }
             }
             Err(error) => self.say(format!("No se pudo importar: {error}")),
         }
@@ -524,14 +601,19 @@ impl App {
                     if response.hovered() {
                         painter.rect_filled(response.rect, 6.0, ui.visuals().widgets.hovered.bg_fill);
                     }
-                    painter.text(response.rect.left_top() + Vec2::new(10.0, 4.0), egui::Align2::LEFT_TOP, entry.display_title(), egui::FontId::new(16.0, theme::bold()), colors.text);
+                    // The letter that says what the file is: a G for a Guitar Pro score, a C for a ChordPro song.
+                    let badge = egui::Rect::from_min_size(response.rect.left_top() + Vec2::new(10.0, 6.0), Vec2::splat(22.0));
+                    let (letter, fill) = if entry.is_score { ("G", colors.chord.gamma_multiply(0.25)) } else { ("C", colors.heading.gamma_multiply(0.25)) };
+                    painter.rect_filled(badge, 6.0, fill);
+                    painter.text(badge.center(), egui::Align2::CENTER_CENTER, letter, egui::FontId::new(13.0, theme::bold()), colors.text);
+                    painter.text(response.rect.left_top() + Vec2::new(40.0, 4.0), egui::Align2::LEFT_TOP, entry.display_title(), egui::FontId::new(16.0, theme::bold()), colors.text);
                     let detail = entry.metadata.artist.clone().unwrap_or_default();
                     let detail = match (&entry.metadata.key, detail.is_empty()) {
                         (Some(key), false) => format!("{detail} · {key}"),
                         (Some(key), true) => key.clone(),
                         (None, _) => detail,
                     };
-                    painter.text(response.rect.left_top() + Vec2::new(10.0, 24.0), egui::Align2::LEFT_TOP, detail, egui::FontId::proportional(12.5), colors.muted);
+                    painter.text(response.rect.left_top() + Vec2::new(40.0, 24.0), egui::Align2::LEFT_TOP, detail, egui::FontId::proportional(12.5), colors.muted);
                     if response.clicked() {
                         chosen = Some(entry.file_name.clone());
                     }
@@ -668,6 +750,23 @@ impl App {
                 self.say(format!("Canción duplicada como {new_name}"));
             }
             Err(error) => self.say(format!("No se pudo duplicar: {error}")),
+        }
+    }
+
+    /// Plays the note of a string the player pressed on a diagram for a moment, on the sound card only for as long as it sounds.
+    fn play_note(&mut self, frequency: f32) {
+        if self.note_player.is_none() {
+            match AudioOutput::new() {
+                Ok(output) => self.note_player = Some((output, Instant::now())),
+                Err(error) => {
+                    self.say(format!("No se pudo reproducir la nota: {error}"));
+                    return;
+                }
+            }
+        }
+        if let Some((output, until)) = &mut self.note_player {
+            output.play_tone(frequency);
+            *until = Instant::now() + NOTE_DURATION;
         }
     }
 
@@ -934,6 +1033,19 @@ impl App {
             ui.label("Diagramas de acordes");
             changed |= ui.checkbox(&mut self.settings.pin_chord_diagrams, "Fijarlos junto a la canción").changed();
             ui.end_row();
+            ui.label("Puntos de los diagramas");
+            ui.horizontal(|ui| {
+                for (labels, name) in [(DotLabels::None, "Nada"), (DotLabels::Fingers, "Dedos"), (DotLabels::Notes, "Notas"), (DotLabels::Degrees, "Grados")] {
+                    changed |= ui.radio_value(&mut self.settings.dot_labels, labels, name).changed();
+                }
+            });
+            ui.end_row();
+            ui.label("Color de los puntos");
+            changed |= ui
+                .checkbox(&mut self.settings.dots_colored_by_function, "Colorear por función")
+                .on_hover_text("La fundamental lleva el color del acorde, las terceras van en azul, las quintas en verde y las séptimas y la sexta en violeta")
+                .changed();
+            ui.end_row();
             ui.label("Tipografía de las canciones");
             egui::ComboBox::from_id_salt("view_font").selected_text(self.settings.view_font.clone()).show_ui(ui, |ui| {
                 for name in theme::view_fonts() {
@@ -1018,19 +1130,30 @@ impl eframe::App for App {
             });
             ui.ctx().request_repaint_after(STATUS_DURATION);
         }
+        if let Some((output, until)) = &self.note_player {
+            if Instant::now() >= *until {
+                output.stop_tone();
+                self.note_player = None;
+            } else {
+                ui.ctx().request_repaint_after(Duration::from_millis(60));
+            }
+        }
         if self.screen == Screen::Song && self.settings.pin_chord_diagrams {
             if let Some(open) = &self.open {
                 let colors = SongColors::of(self.settings.is_dark);
                 let chords = chordpro::diagram_chords_in(&open.shown);
                 let definitions = open.shown.metadata.definitions.clone();
                 let settings = self.settings.clone();
+                let mut tapped: Option<f32> = None;
                 // A column of diagrams, two to a row, that never takes more room than they need.
                 egui::Panel::right("pinned_chords").resizable(false).exact_size(236.0).show(ui, |ui| {
                     ui.heading("Acordes");
                     egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
                         egui::Grid::new("pinned_chords_grid").num_columns(2).spacing([3.0, 3.0]).show(ui, |ui| {
                             for (index, name) in chords.iter().enumerate() {
-                                tools::pinned_chord(ui, name, &settings, &colors, &definitions);
+                                if let Some(frequency) = tools::pinned_chord(ui, name, &settings, &colors, &definitions) {
+                                    tapped = Some(frequency);
+                                }
                                 if index % 2 == 1 {
                                     ui.end_row();
                                 }
@@ -1038,6 +1161,9 @@ impl eframe::App for App {
                         });
                     });
                 });
+                if let Some(frequency) = tapped {
+                    self.play_note(frequency);
+                }
             }
         }
         if self.screen == Screen::Editor {
@@ -1063,6 +1189,28 @@ impl eframe::App for App {
                 });
             });
         }
+        if let Some((file_name, mut title, mut artist)) = self.score_details.clone() {
+            let (mut is_saved, mut is_cancelled) = (false, false);
+            egui::Window::new("Título y artista").collapsible(false).resizable(false).anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]).show(ui.ctx(), |ui| {
+                ui.label("Título");
+                ui.add(egui::TextEdit::singleline(&mut title).desired_width(320.0));
+                ui.label("Artista");
+                ui.add(egui::TextEdit::singleline(&mut artist).desired_width(320.0));
+                ui.add_space(6.0);
+                ui.horizontal(|ui| {
+                    is_saved = ui.button("Guardar").clicked();
+                    is_cancelled = ui.button("Cancelar").clicked();
+                });
+            });
+            if is_saved {
+                self.score_details = None;
+                self.save_score_details(&file_name, &title, &artist);
+            } else if is_cancelled {
+                self.score_details = None;
+            } else {
+                self.score_details = Some((file_name, title, artist));
+            }
+        }
         if let Some(file_name) = self.song_to_delete.clone() {
             let title = self.songs.iter().find(|entry| entry.file_name == file_name).map(SongEntry::display_title).unwrap_or_else(|| file_name.clone());
             egui::Window::new("Eliminar canción").collapsible(false).resizable(false).anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]).show(ui.ctx(), |ui| {
@@ -1084,15 +1232,27 @@ impl eframe::App for App {
             let colors = SongColors::of(self.settings.is_dark);
             let definitions = self.open.as_ref().map(|open| open.shown.metadata.definitions.clone()).unwrap_or_default();
             let mut is_open = true;
+            let mut tapped: Option<f32> = None;
             egui::Window::new("Acorde").open(&mut is_open).resizable(true).default_width(420.0).show(ui.ctx(), |ui| {
-                tools::chord_sheet(ui, &name, &self.settings, &colors, 6, 1.0, &definitions);
+                tapped = tools::chord_sheet(ui, &name, &self.settings, &colors, 6, 1.0, &definitions);
             });
+            if let Some(frequency) = tapped {
+                self.play_note(frequency);
+            }
             if !is_open {
                 self.chord_window = None;
             }
         }
         if self.screen != Screen::Song {
             self.song_metronome = None;
+        }
+        let dropped: Vec<std::path::PathBuf> = ui.ctx().input(|input| {
+            input.raw.dropped_files.iter().map(|file| file.path().to_path_buf()).filter(|path| {
+                path.extension().and_then(|extension| extension.to_str()).is_some_and(|extension| IMPORT_EXTENSIONS.iter().any(|known| known.eq_ignore_ascii_case(extension)))
+            }).collect()
+        });
+        for path in dropped {
+            self.import_path(&path);
         }
         egui::CentralPanel::default().show(ui, |ui| match self.screen {
             Screen::Songs => self.songs_screen(ui),
@@ -1101,6 +1261,14 @@ impl eframe::App for App {
             Screen::Tools => self.tools_screen(ui),
             Screen::Setlist => self.setlist_screen(ui),
             Screen::Settings => self.settings_screen(ui),
+            Screen::Score => {
+                let colors = SongColors::of(self.settings.is_dark);
+                let action = self.score.as_mut().map(|score| score.show(ui, &colors)).unwrap_or(ScoreAction::Close);
+                if action == ScoreAction::Close {
+                    self.score = None;
+                    self.screen = Screen::Songs;
+                }
+            }
         });
     }
 }

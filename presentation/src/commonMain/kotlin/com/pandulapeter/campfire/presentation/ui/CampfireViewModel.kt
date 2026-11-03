@@ -65,6 +65,7 @@ import com.pandulapeter.campfire.domain.api.songs.GetEditorDraftUseCase
 import com.pandulapeter.campfire.domain.api.library.GetScreenDataUseCase
 import com.pandulapeter.campfire.domain.api.songs.GetSongContentInvalidationsUseCase
 import com.pandulapeter.campfire.domain.api.songs.GetSongContentUseCase
+import com.pandulapeter.campfire.presentation.ui.state.songs.ScoreOpener
 import com.pandulapeter.campfire.domain.api.sync.GetSyncProvidersUseCase
 import com.pandulapeter.campfire.domain.api.sync.GetSyncStateUseCase
 import com.pandulapeter.campfire.domain.api.preferences.GetUserPreferencesUseCase
@@ -288,6 +289,14 @@ class CampfireViewModel(
         }
     }
 
+    private val scoreOpener = ScoreOpener(
+        scope = viewModelScope,
+        dialogHost = dialogHost,
+        messageSink = messageSink,
+        getSongContent = getSongContent,
+        song = { fileName -> libraryState.songLookup.value.songsByFileName[fileName] },
+    )
+
     // Navigation
     internal val navigator: Navigator = Navigator(
         savedStateStore = savedStateStore,
@@ -308,6 +317,8 @@ class CampfireViewModel(
         isSongSelecting = { songSelection.isSongSelecting },
         endSongSelection = { songSelection.end() },
         onTransitionEnded = { songTextStore.pruneSongTexts() },
+        isScore = { fileName -> libraryState.songLookup.value.songsByFileName[fileName]?.isScore == true },
+        openScore = scoreOpener::open,
     ).apply {
         addOnBackStackChanged { _, stack ->
             if (stack.lastOrNull() != CampfireDestination.Setlists) setlistsController.reorderingSetlistFileName = null

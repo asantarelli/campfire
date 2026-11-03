@@ -22,11 +22,13 @@ import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.ic_delete
 import com.pandulapeter.campfire.presentation.resources.ic_duplicate
 import com.pandulapeter.campfire.presentation.resources.ic_edit
+import com.pandulapeter.campfire.presentation.resources.ic_info
 import com.pandulapeter.campfire.presentation.resources.songs_export_song
 import com.pandulapeter.campfire.presentation.resources.ic_export
 import com.pandulapeter.campfire.presentation.resources.ic_rename
 import com.pandulapeter.campfire.presentation.resources.songs_delete_song
 import com.pandulapeter.campfire.presentation.resources.songs_duplicate_song
+import com.pandulapeter.campfire.presentation.resources.song_details_song_info
 import com.pandulapeter.campfire.presentation.resources.songs_edit_song
 import com.pandulapeter.campfire.presentation.resources.songs_update_file_name
 import org.jetbrains.compose.resources.painterResource
@@ -131,8 +133,17 @@ internal fun SongActions(
 internal fun editSongAction(
     actions: SongActionHandler,
     song: Song,
-) = ActionsMenuItem(
-    title = stringResource(Res.string.songs_edit_song),
-    icon = painterResource(Res.drawable.ic_edit),
-    onClick = { actions.edit(song) },
-)
+) = if (song.isScore) {
+    // A score has no text to type into, so what it offers is what the song says about itself: its title and its artist.
+    ActionsMenuItem(
+        title = stringResource(Res.string.song_details_song_info),
+        icon = painterResource(Res.drawable.ic_info),
+        onClick = { actions.edit(song) },
+    )
+} else {
+    ActionsMenuItem(
+        title = stringResource(Res.string.songs_edit_song),
+        icon = painterResource(Res.drawable.ic_edit),
+        onClick = { actions.edit(song) },
+    )
+}

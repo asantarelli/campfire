@@ -20,6 +20,7 @@ pub mod model;
 pub mod notation;
 pub mod parser;
 pub mod scales;
+pub mod spelling;
 pub mod tokens;
 pub mod transposer;
 pub mod values;

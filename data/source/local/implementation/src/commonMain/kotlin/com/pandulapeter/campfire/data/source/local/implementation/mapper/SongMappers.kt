@@ -13,6 +13,7 @@ import com.pandulapeter.campfire.chordpro.ChordProDuration
 import com.pandulapeter.campfire.chordpro.ChordProTempo
 import com.pandulapeter.campfire.chordpro.model.ChordProSummary
 import com.pandulapeter.campfire.chordpro.model.displayTitle
+import com.pandulapeter.campfire.guitarpro.song.ScoreSongText
 import com.pandulapeter.campfire.data.model.song.Song
 import com.pandulapeter.campfire.data.model.song.normalizedTags
 import com.pandulapeter.campfire.data.model.library.normalizedToNfc
@@ -51,5 +52,6 @@ internal fun StoredFileInfo.toSong(summary: ChordProSummary): Song {
         tempo = ChordProTempo.parse(summary.metadata.tempo),
         time = summary.metadata.time?.takeIf { it.isNotBlank() },
         capo = summary.metadata.capo,
+        isScore = ScoreSongText.isScore(summary.metadata.custom),
     )
 }

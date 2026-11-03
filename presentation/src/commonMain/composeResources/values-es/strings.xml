@@ -248,6 +248,10 @@
     <string name="songs_labels_sorted_alphabetically">Ordenadas alfabéticamente</string>
     <string name="songs_filters_reset">Restablecer todos los filtros</string>
 
+    <!-- The letter in front of a song's title that says what its file is: G for a Guitar Pro score, C for a ChordPro song, read out as these. -->
+    <string name="songs_kind_guitar_pro">Partitura de Guitar Pro</string>
+    <string name="songs_kind_chordpro">Canción de ChordPro</string>
+
     <!-- Setlists screen -->
     <string name="setlists">Repertorios</string>
     <string name="setlists_no_data">Todavía no hay repertorios</string>
@@ -383,6 +387,14 @@
     <string name="settings_song_font_description">La tipografía de la letra y los acordes. La monoespaciada mantiene cada acorde justo sobre su palabra.</string>
     <string name="settings_song_font_default">Predeterminada</string>
     <string name="settings_song_font_monospace">Monoespaciada</string>
+    <string name="settings_chord_dot_labels">Puntos de los diagramas</string>
+    <string name="settings_chord_dot_labels_description">Qué dicen los puntos de un diagrama: nada, el dedo, la nota o su lugar en el acorde (R fundamental, 3 tercera, 5 quinta, ♭7 séptima).</string>
+    <string name="settings_chord_dot_labels_none">Nada</string>
+    <string name="settings_chord_dot_labels_fingers">Dedos</string>
+    <string name="settings_chord_dot_labels_notes">Notas</string>
+    <string name="settings_chord_dot_labels_degrees">Grados</string>
+    <string name="settings_chord_dot_colors">Colorear por función</string>
+    <string name="settings_chord_dot_colors_description">La fundamental conserva el color de acento, las terceras son naranjas, las quintas verdes y las séptimas y la sexta violetas.</string>
     <string name="settings_music_search">Escuchar la canción</string>
     <string name="settings_music_search_description">El botón de escuchar busca el artista y el título de la canción en este servicio, en tu navegador.</string>
     <string name="settings_external_player">Reproductor de música</string>
@@ -773,6 +785,18 @@
     <string name="scale_aliases_augmented">Hexatónica</string>
     <string name="scale_aliases_diminished">Octatónica</string>
 
+    <!-- The sheet that reads a Guitar Pro file: the staff, the tablature and the rhythm under it. -->
+    <string name="score_staff">Partitura</string>
+    <string name="score_tablature">Tablatura</string>
+    <string name="score_rhythm">Ritmo</string>
+    <string name="score_size">Tamaño</string>
+    <!-- The name of a track the file does not name, e.g. "Track 2". -->
+    <string name="score_track_unnamed">Pista %1$d</string>
+    <string name="score_error_not_guitar_pro">Este no es un archivo de Guitar Pro.</string>
+    <string name="score_error_unsupported">Esta versión de Guitar Pro todavía no se puede leer. Solo se leen los archivos de Guitar Pro 3, 4 y 5.</string>
+    <string name="score_error_unexpected_end">El archivo se corta antes de terminar la partitura.</string>
+    <string name="score_unreadable">No se puede leer esta partitura.</string>
+    <string name="score_error_corrupt">El archivo está dañado y no se puede leer.</string>
     <!-- Song editor screen -->
     <string name="song_editor_edit">Editar</string>
     <string name="song_editor_preview">Vista previa</string>

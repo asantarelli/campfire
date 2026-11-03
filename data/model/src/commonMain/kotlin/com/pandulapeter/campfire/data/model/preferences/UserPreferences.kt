@@ -234,6 +234,10 @@ data class UserPreferences(
     val autoScrollSpeed: Int = DEFAULT_AUTO_SCROLL_SPEED,
     /** The face the lyrics and the chords of a song are set in while it is read. */
     val songFont: SongFont = SongFont.DEFAULT,
+    /** What the dots of a chord diagram say. */
+    val chordDotLabels: ChordDotLabels = ChordDotLabels.NONE,
+    /** Whether the dots of a chord diagram are colored by the function of their note in the chord. */
+    val areChordDotsColoredByFunction: Boolean = false,
 ) {
 
     /**
@@ -494,6 +498,14 @@ data class UserPreferences(
     enum class SongFont(val id: String) {
         DEFAULT("default"),
         MONOSPACE("monospace"),
+    }
+
+    /** What a chord diagram writes on its dots and over its open strings: nothing, the finger, the note or its place in the chord. */
+    enum class ChordDotLabels(val id: String) {
+        NONE("none"),
+        FINGERS("fingers"),
+        NOTES("notes"),
+        DEGREES("degrees"),
     }
 
     enum class Language(val id: String) {

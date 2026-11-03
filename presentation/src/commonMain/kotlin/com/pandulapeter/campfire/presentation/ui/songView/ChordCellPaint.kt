@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
+import com.pandulapeter.campfire.presentation.ui.chords.ChordDiagramStyle
+import com.pandulapeter.campfire.presentation.ui.chords.LocalChordDiagramStyle
 import com.pandulapeter.campfire.presentation.ui.theme.LocalSecondAccentColor
 
 /** What the cells of a song's chord rows are drawn with: the theme's colors and font, and a measurer for the diagrams. */
@@ -26,6 +28,7 @@ internal class ChordCellPaint(
     val backgroundColor: Color,
     val diagramTextMeasurer: TextMeasurer,
     val diagramFontFamily: FontFamily?,
+    val diagramStyle: ChordDiagramStyle,
 )
 
 @Composable
@@ -39,4 +42,5 @@ internal fun chordCellPaint() = ChordCellPaint(
     // number on every draw, so it gets one with a cache of its own, as the composed diagram had.
     diagramTextMeasurer = rememberTextMeasurer(),
     diagramFontFamily = MaterialTheme.typography.bodyMedium.fontFamily,
+    diagramStyle = LocalChordDiagramStyle.current,
 )

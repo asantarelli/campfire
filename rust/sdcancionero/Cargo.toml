@@ -20,6 +20,7 @@ winresource = "0.1"
 [dependencies]
 image = { version = "0.25", default-features = false, features = ["png"] }
 chordpro = { path = "../chordpro" }
+guitarpro = { path = "../guitarpro" }
 library = { path = "../library" }
 serde_json = { version = "1", features = ["preserve_order"] }
 rfd = "0.15"

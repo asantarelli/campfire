@@ -33,6 +33,8 @@ sealed interface DialogType {
         val songSetlistFileName: String? = null,
         val songs: List<Song> = emptyList(),
     ) : DialogType
+    /** The staff and the tablature of the Guitar Pro score a [song] holds, whose file is [bytes]: read, never written back. */
+    data class GuitarProScore(val song: Song, val bytes: ByteArray) : DialogType
     data object NewSetlist : DialogType
     data object NewSong : DialogType
 

@@ -30,6 +30,9 @@ internal sealed interface ChordDiagramGeometry {
      *   string. An open root is marked like a stopped one, since the root is what a hand finds the chord by.
      * @property dots The stopped strings no barre holds, each on its [Dot.row], 0 being the window's first fret.
      * @property barres The fingers laid across several strings.
+     * @property pitchClasses The note each string sounds, as a pitch class, null for a muted one: what the diagram writes
+     *   on its dots where it is asked to.
+     * @property root The chord's root as a pitch class, or a negative number for a shape that has none.
      */
     data class Fretted(
         val strings: Int,
@@ -38,6 +41,8 @@ internal sealed interface ChordDiagramGeometry {
         val markers: List<Marker?>,
         val dots: List<Dot>,
         val barres: List<Barre>,
+        val pitchClasses: List<Int?> = emptyList(),
+        val root: Int = -1,
     ) : ChordDiagramGeometry {
 
         enum class Marker { MUTED, OPEN, OPEN_ROOT }
@@ -114,6 +119,8 @@ internal fun chordDiagramGeometryOf(shape: ChordVoicing, tuning: ChordTuning, ro
                 )
             }.filter { it.row in 0 until fretCount },
             barres = barres,
+            pitchClasses = frets.mapIndexed { string, fret -> fret?.let { strings.getOrNull(string)?.plus(it)?.mod(12) } },
+            root = root,
         )
     }
 }

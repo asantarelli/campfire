@@ -103,6 +103,7 @@ include(
     ":data:sync:implementation",
     ":domain:api",
     ":domain:implementation",
+    ":guitarpro",
     ":metronome:api",
     ":metronome:implementation",
     ":presentation",

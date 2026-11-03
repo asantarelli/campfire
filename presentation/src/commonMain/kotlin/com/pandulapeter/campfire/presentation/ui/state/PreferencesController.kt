@@ -192,6 +192,10 @@ internal class PreferencesController(
 
     fun setSongFont(value: UserPreferences.SongFont) = changeUserPreferences { copy(songFont = value) }
 
+    fun setChordDotLabels(value: UserPreferences.ChordDotLabels) = changeUserPreferences { copy(chordDotLabels = value) }
+
+    fun setChordDotsColoredByFunction(value: Boolean) = changeUserPreferences { copy(areChordDotsColoredByFunction = value) }
+
     fun setAutoScrollSpeed(value: Int) = changeUserPreferences {
         copy(autoScrollSpeed = value.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED))
     }

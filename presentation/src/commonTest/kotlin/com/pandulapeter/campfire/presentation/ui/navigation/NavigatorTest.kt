@@ -41,6 +41,8 @@ class NavigatorTest {
     private var hasUnsavedText = false
     private var isReordering = false
     private var isSelecting = false
+    private val scoreFileNames = mutableSetOf<String>()
+    private val openedScores = mutableListOf<String>()
     private var topLevelDestinations = CampfireDestination.TopLevel.entries
     private var onboardingSteps = listOf(OnboardingStep.WELCOME, OnboardingStep.FEATURES, OnboardingStep.SYNC)
     private val savedStateHandle = SavedStateHandle()
@@ -67,6 +69,8 @@ class NavigatorTest {
         isSongSelecting = { isSelecting },
         endSongSelection = { isSelecting = false },
         onTransitionEnded = {},
+        isScore = { it in scoreFileNames },
+        openScore = { openedScores += it },
     )
 
     @Test
@@ -77,6 +81,17 @@ class NavigatorTest {
         navigator.addOnBackStackChanged { _, _ -> calls += "second" }
         navigator.selectTopLevelDestination(CampfireDestination.Settings)
         assertEquals(listOf("first ${CampfireDestination.Songs} 2", "second"), calls)
+    }
+
+    @Test
+    fun `a song that holds a score opens its score instead of a page, however it is reached`() = runTest {
+        val navigator = navigator(backgroundScope)
+        scoreFileNames += "score.cho"
+        navigator.openSong(song("score.cho"))
+        navigator.openSongInSetlist(setlist("set.setlist.json", "a.cho", "score.cho"), song("score.cho"))
+        navigator.openImportedSong("score.cho")
+        assertEquals(listOf("score.cho", "score.cho", "score.cho"), openedScores)
+        assertEquals(listOf<CampfireDestination>(CampfireDestination.Songs), navigator.backStack.toList())
     }
 
     @Test

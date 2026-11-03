@@ -51,6 +51,12 @@ object LibraryFiles {
     /** Document inputs converted locally to ChordPro, never registered as system Open with file types. */
     val DOCUMENT_EXTENSIONS = listOf(".pdf", ".docx")
 
+    /**
+     * Guitar Pro scores, which are shown rather than imported: they are never part of the library, so they are not
+     * [IMPORTABLE_EXTENSIONS], but a selection reads them whole (see [ImportBudget]) for the screen that shows them.
+     */
+    val SCORE_EXTENSIONS = listOf(".gp3", ".gp4", ".gp5")
+
     /** Read only far enough to report the obsolete binary Word format as an unreadable document. */
     const val LEGACY_DOCUMENT_EXTENSION = ".doc"
 
@@ -67,6 +73,9 @@ object LibraryFiles {
 
     /** Whether an import knows a file called [name] by its extension, and so never has to look at its bytes to decide. */
     fun isImportableFileName(name: String) = IMPORTABLE_EXTENSIONS.any { name.endsWith(it, ignoreCase = true) }
+
+    /** Whether a file called [name] is a Guitar Pro score by its extension. */
+    fun isScoreFileName(name: String) = SCORE_EXTENSIONS.any { name.endsWith(it, ignoreCase = true) }
 
     /** Whether a file called [name] is a document by its extension, the obsolete binary Word format included. */
     fun isDocumentFileName(name: String) = (DOCUMENT_EXTENSIONS + LEGACY_DOCUMENT_EXTENSION).any { name.endsWith(it, ignoreCase = true) }

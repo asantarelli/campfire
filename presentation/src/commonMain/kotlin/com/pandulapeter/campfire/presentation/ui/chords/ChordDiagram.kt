@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
+import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.ui.components.isDarkerMoreLegible
 import com.pandulapeter.campfire.presentation.ui.theme.LocalSecondAccentColor
 import kotlin.math.min
@@ -51,6 +52,7 @@ internal fun ChordDiagram(
     description: String,
     showsFingers: Boolean = false,
 ) {
+    val style = LocalChordDiagramStyle.current
     val lineColor = MaterialTheme.colorScheme.onSurface
     val mutedColor = MaterialTheme.colorScheme.onSurfaceVariant
     val rootColor = LocalSecondAccentColor.current
@@ -60,7 +62,7 @@ internal fun ChordDiagram(
     Spacer(
         modifier = modifier
             .semantics { contentDescription = description }
-            .drawBehind { drawChordDiagram(geometry, size, lineColor, mutedColor, rootColor, backgroundColor, textMeasurer, fontFamily, showsFingers) },
+            .drawBehind { drawChordDiagram(geometry, size, lineColor, mutedColor, rootColor, backgroundColor, textMeasurer, fontFamily, showsFingers, style = style) },
     )
 }
 
@@ -86,8 +88,12 @@ internal fun DrawScope.drawChordDiagram(
     fontFamily: FontFamily?,
     showsFingers: Boolean = false,
     minimumStroke: Float = 1f,
+    style: ChordDiagramStyle = ChordDiagramStyle(),
 ) = when (geometry) {
-    is ChordDiagramGeometry.Fretted -> drawFretted(geometry, area, lineColor, mutedColor, rootColor, backgroundColor, textMeasurer, fontFamily, showsFingers, minimumStroke)
+    is ChordDiagramGeometry.Fretted -> {
+        val labels = style.labels.takeIf { it != UserPreferences.ChordDotLabels.NONE } ?: if (showsFingers) UserPreferences.ChordDotLabels.FINGERS else UserPreferences.ChordDotLabels.NONE
+        drawFretted(geometry, area, lineColor, mutedColor, rootColor, backgroundColor, textMeasurer, fontFamily, labels, style.isColoredByFunction, minimumStroke)
+    }
     is ChordDiagramGeometry.Keyboard -> drawKeyboard(geometry, area, lineColor, rootColor, backgroundColor, minimumStroke)
 }
 
@@ -100,7 +106,8 @@ private fun DrawScope.drawFretted(
     backgroundColor: Color,
     textMeasurer: TextMeasurer,
     fontFamily: FontFamily?,
-    showsFingers: Boolean,
+    labels: UserPreferences.ChordDotLabels,
+    isColoredByFunction: Boolean,
     minimumStroke: Float,
 ) {
     // The left band is kept whether or not a base fret is named in it, so that every diagram of a row lines up.
@@ -132,8 +139,17 @@ private fun DrawScope.drawFretted(
                 drawLine(mutedColor, Offset(x(string) - markerSize, markerY - markerSize), Offset(x(string) + markerSize, markerY + markerSize), strokeWidth = thin)
                 drawLine(mutedColor, Offset(x(string) - markerSize, markerY + markerSize), Offset(x(string) + markerSize, markerY - markerSize), strokeWidth = thin)
             }
-            ChordDiagramGeometry.Fretted.Marker.OPEN -> drawCircle(lineColor, radius = markerSize, center = Offset(x(string), markerY), style = Stroke(thin))
-            ChordDiagramGeometry.Fretted.Marker.OPEN_ROOT -> drawCircle(rootColor, radius = markerSize, center = Offset(x(string), markerY), style = Stroke(thin * ROOT_RING_WIDTH))
+            ChordDiagramGeometry.Fretted.Marker.OPEN, ChordDiagramGeometry.Fretted.Marker.OPEN_ROOT -> {
+                val isRoot = marker == ChordDiagramGeometry.Fretted.Marker.OPEN_ROOT
+                val ringColor = if (isRoot) rootColor else lineColor
+                val text = if (labels == UserPreferences.ChordDotLabels.NOTES || labels == UserPreferences.ChordDotLabels.DEGREES) openLabelOf(geometry, string, labels) else null
+                if (text == null) {
+                    drawCircle(ringColor, radius = markerSize, center = Offset(x(string), markerY), style = Stroke(if (isRoot) thin * ROOT_RING_WIDTH else thin))
+                } else {
+                    val color = if (isRoot || !isColoredByFunction) ringColor else functionColorOf(geometry, string, ringColor)
+                    drawLabel(textMeasurer, fontFamily, text, Offset(x(string), markerY), minOf(top * 0.36f, stringGap * 0.5f), color, isBold = true)
+                }
+            }
             null -> Unit
         }
     }
@@ -146,13 +162,56 @@ private fun DrawScope.drawFretted(
         )
         // A root at the barre's end is a dot of its own, which carries the finger instead.
         val isUnderDot = geometry.dots.any { it.string == barre.fromString && it.row == barre.row }
-        if (showsFingers && barre.finger != null && !isUnderDot) drawFinger(textMeasurer, fontFamily, barre.finger, Offset(x(barre.fromString), y(barre.row)), radius, backgroundColor)
+        if (labels == UserPreferences.ChordDotLabels.FINGERS && barre.finger != null && !isUnderDot) {
+            drawFinger(textMeasurer, fontFamily, barre.finger, Offset(x(barre.fromString), y(barre.row)), radius, backgroundColor)
+        }
+        // Notes and degrees, and colors, go on every string the barre holds: what a barre says is its finger, but what the
+        // diagram asked for is what each string sounds.
+        if (labels == UserPreferences.ChordDotLabels.NOTES || labels == UserPreferences.ChordDotLabels.DEGREES || isColoredByFunction) {
+            (barre.fromString..barre.toString).filter { geometry.dots.none { dot -> dot.string == it && dot.row == barre.row } }.forEach { string ->
+                if (geometry.pitchClasses.getOrNull(string) == null) return@forEach
+                val center = Offset(x(string), y(barre.row))
+                if (isColoredByFunction) drawCircle(functionColorOf(geometry, string, lineColor), radius = radius, center = center)
+                labelOf(geometry, string, null, labels)?.let { drawLabel(textMeasurer, fontFamily, it, center, radius, backgroundColor, isBold = true) }
+            }
+        }
     }
     geometry.dots.forEach { dot ->
         val center = Offset(x(dot.string), y(dot.row))
-        drawCircle(if (dot.isRoot) rootColor else lineColor, radius = radius, center = center)
-        if (showsFingers && dot.finger != null) drawFinger(textMeasurer, fontFamily, dot.finger, center, radius, backgroundColor)
+        val color = if (dot.isRoot) rootColor else if (isColoredByFunction) functionColorOf(geometry, dot.string, lineColor) else lineColor
+        drawCircle(color, radius = radius, center = center)
+        labelOf(geometry, dot.string, dot.finger, labels)?.let {
+            if (labels == UserPreferences.ChordDotLabels.FINGERS) drawFinger(textMeasurer, fontFamily, dot.finger!!, center, radius, backgroundColor) else drawLabel(textMeasurer, fontFamily, it, center, radius, backgroundColor, isBold = true)
+        }
     }
+}
+
+/** What the dot of [string] says in [labels]: its finger, its note or its place in the chord, or nothing. */
+private fun labelOf(geometry: ChordDiagramGeometry.Fretted, string: Int, finger: Int?, labels: UserPreferences.ChordDotLabels): String? {
+    val pitchClass = geometry.pitchClasses.getOrNull(string) ?: return if (labels == UserPreferences.ChordDotLabels.FINGERS) finger?.toString() else null
+    return when (labels) {
+        UserPreferences.ChordDotLabels.NONE -> null
+        UserPreferences.ChordDotLabels.FINGERS -> finger?.toString()
+        UserPreferences.ChordDotLabels.NOTES -> noteLabelOf(pitchClass, geometry.root)
+        UserPreferences.ChordDotLabels.DEGREES -> degreeLabelOf(pitchClass, geometry.root)
+    }
+}
+
+/** What an open string says over the nut where the diagram names notes: the note of the open string, or its place in the chord. */
+private fun openLabelOf(geometry: ChordDiagramGeometry.Fretted, string: Int, labels: UserPreferences.ChordDotLabels) = labelOf(geometry, string, null, labels)
+
+/** The color of the note of [string] by its function in the chord, or [fallback] for the notes that have none. */
+private fun functionColorOf(geometry: ChordDiagramGeometry.Fretted, string: Int, fallback: Color): Color {
+    val pitchClass = geometry.pitchClasses.getOrNull(string) ?: return fallback
+    if (geometry.root !in 0..11) return fallback
+    return chordFunctionOf(pitchClass - geometry.root)?.color ?: fallback
+}
+
+/** [text] centered at [center], in a size that fits a dot of [radius]: one that is two characters wide is a little smaller. */
+private fun DrawScope.drawLabel(textMeasurer: TextMeasurer, fontFamily: FontFamily?, text: String, center: Offset, radius: Float, color: Color, isBold: Boolean) {
+    val scale = if (text.length > 1) NOTE_TEXT_LONG else NOTE_TEXT
+    val label = textMeasurer.measure(text, TextStyle(fontSize = (radius * scale / density / fontScale).sp, fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal, color = color, fontFamily = fontFamily), density = this)
+    drawText(label, topLeft = Offset(center.x - label.size.width / 2f, center.y - label.size.height / 2f))
 }
 
 private fun DrawScope.drawFinger(textMeasurer: TextMeasurer, fontFamily: FontFamily?, finger: Int, center: Offset, radius: Float, color: Color) {
@@ -240,6 +299,8 @@ private const val DOT_RADIUS = 0.46f
 private const val DOT_ROW_RADIUS = 0.36f
 private const val BASE_FRET_TEXT = 0.7f
 private const val FINGER_TEXT = 1.2f
+private const val NOTE_TEXT = 1.1f
+private const val NOTE_TEXT_LONG = 0.85f
 private const val BLACK_KEY_HEIGHT = 0.6f
 private const val BLACK_KEY_WIDTH = 0.6f
 private const val PRESSED_KEY_DEEPENING = 0.4f

@@ -78,6 +78,7 @@ import com.pandulapeter.campfire.presentation.ui.navigation.FeatureSwitches
 import com.pandulapeter.campfire.presentation.ui.scales.ScaleDiagram
 import com.pandulapeter.campfire.presentation.ui.scales.ScaleDiagramGeometry
 import com.pandulapeter.campfire.presentation.ui.scales.ScaleLabels
+import com.pandulapeter.campfire.presentation.ui.scales.ScaleLabelsToggle
 import com.pandulapeter.campfire.presentation.ui.scales.displayedDegree
 import com.pandulapeter.campfire.presentation.ui.scales.scaleAliases
 import com.pandulapeter.campfire.presentation.ui.scales.scaleDiagramDescription
@@ -223,40 +224,6 @@ private fun ScaleSheetDiagram(
             },
             description = description,
         )
-    }
-}
-
-/**
- * The header's toggle between a neck's degrees and its notes, one icon button rather than a segmented row, which took
- * most of a phone's header from the title. It shows the mode the neck is in now, as the app's other toggles show their
- * state, and tells a screen reader both: the tap's result as its description and the mode shown now as its state.
- */
-@Composable
-private fun ScaleLabelsToggle(
-    labels: ScaleLabels,
-    onLabelsSelected: (ScaleLabels) -> Unit,
-) {
-    val shownLabel = stringResource(if (labels == ScaleLabels.DEGREES) Res.string.scales_labels_degrees else Res.string.scales_labels_notes)
-    IconButton(
-        modifier = Modifier.semantics { stateDescription = shownLabel },
-        onClick = { onLabelsSelected(if (labels == ScaleLabels.DEGREES) ScaleLabels.NOTES else ScaleLabels.DEGREES) },
-    ) {
-        Crossfade(
-            targetState = labels,
-            label = "scaleLabelsToggle",
-        ) { shownLabels ->
-            if (shownLabels == ScaleLabels.DEGREES) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_scale_degrees),
-                    contentDescription = stringResource(Res.string.scales_labels_show_notes),
-                )
-            } else {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_scale_notes),
-                    contentDescription = stringResource(Res.string.scales_labels_show_degrees),
-                )
-            }
-        }
     }
 }
 

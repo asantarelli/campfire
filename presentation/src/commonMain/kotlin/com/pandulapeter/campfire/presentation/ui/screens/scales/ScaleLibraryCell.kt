@@ -33,7 +33,8 @@ import com.pandulapeter.campfire.presentation.ui.theme.LocalSecondAccentColor
 
 /**
  * One scale of the Scales tab: its [title], the scale in its key ("C Dorian", as the Chords tab names each chord in the
- * key), in the chords' accent color over a small diagram of it on the player's instrument, without labels, on a card
+ * key), in the chords' accent color over a small diagram of it on the player's instrument, its dots labelled with their
+ * notes or their degrees ([labels], none for a keyboard), on a card
  * that opens the scale sheet. A tuning or an instrument picked on the tab crossfades the diagram into the new one.
  */
 @Composable
@@ -41,6 +42,7 @@ internal fun ScaleLibraryCell(
     modifier: Modifier = Modifier,
     title: String,
     geometry: ScaleDiagramGeometry,
+    labels: List<String>?,
     description: String,
     onClick: () -> Unit,
 ) = Surface(
@@ -74,9 +76,9 @@ internal fun ScaleLibraryCell(
                 modifier = Modifier
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                     .fillMaxWidth()
-                    .height(if (shown is ScaleDiagramGeometry.Keyboard) KEYBOARD_HEIGHT else NECK_HEIGHT),
+                    .height(if (shown is ScaleDiagramGeometry.Keyboard) KEYBOARD_HEIGHT else if (labels == null) NECK_HEIGHT else LABELLED_NECK_HEIGHT),
                 geometry = shown,
-                labels = null,
+                labels = labels.takeUnless { shown is ScaleDiagramGeometry.Keyboard },
                 description = description,
             )
         }
@@ -87,4 +89,7 @@ internal fun ScaleLibraryCell(
 internal val SCALE_CELL_MIN_WIDTH = 160.dp
 
 private val NECK_HEIGHT = 52.dp
+
+/** Taller than a bare neck, since a dot has to be big enough to hold the name of its note. */
+private val LABELLED_NECK_HEIGHT = 96.dp
 private val KEYBOARD_HEIGHT = 64.dp

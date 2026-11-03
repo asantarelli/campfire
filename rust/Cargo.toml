@@ -12,10 +12,10 @@
 
 [workspace]
 resolver = "2"
-members = ["chordpro", "instruments", "library", "sdcancionero"]
+members = ["chordpro", "guitarpro", "instruments", "library", "sdcancionero"]
 
 [workspace.package]
-version = "5.0.4"
+version = "5.0.8"
 edition = "2021"
 license = "MPL-2.0"
 authors = ["SDigitales"]

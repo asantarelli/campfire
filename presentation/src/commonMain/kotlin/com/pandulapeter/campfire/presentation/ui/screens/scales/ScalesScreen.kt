@@ -12,6 +12,7 @@ package com.pandulapeter.campfire.presentation.ui.screens.scales
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -58,6 +59,11 @@ import com.pandulapeter.campfire.presentation.ui.components.QueryBackHandler
 import com.pandulapeter.campfire.presentation.ui.components.pinnedSearchField
 import com.pandulapeter.campfire.presentation.ui.components.pinnedSearchTopFade
 import com.pandulapeter.campfire.presentation.ui.components.rememberPinnedSearchFocus
+import com.pandulapeter.campfire.presentation.ui.scales.ScaleDiagramGeometry
+import com.pandulapeter.campfire.presentation.ui.scales.ScaleLabels
+import com.pandulapeter.campfire.presentation.ui.scales.ScaleLabelsToggle
+import com.pandulapeter.campfire.presentation.ui.scales.displayedDegree
+import com.pandulapeter.campfire.presentation.ui.scales.shownScaleNoteNames
 import com.pandulapeter.campfire.presentation.ui.scales.scaleName
 import com.pandulapeter.campfire.presentation.ui.scales.scaleTitle
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
@@ -109,6 +115,7 @@ internal fun ScalesScreen(
     val instrument = userPreferences?.instrument ?: UserPreferences.Instrument.GUITAR
     val instrumentTuning = userPreferences?.instrumentTuning
     val keyName = keys[state.keyIndex.coerceIn(keys.indices)]
+    val labels = state.labels
     val query = state.query
     val results = rememberScaleLibraryResults(state.familyIndex, query, keyName, notation)
     val rootName = results.rootName
@@ -169,12 +176,15 @@ internal fun ScalesScreen(
                 focusRequests = state.searchFocusRequests,
                 onQueryChanged = { state.query = it },
             ) {
-                LibraryKeyStepper(
-                    keys = keys,
-                    selectedIndex = state.keyIndex,
-                    notation = notation,
-                    onSelected = { state.keyIndex = it },
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    LibraryKeyStepper(
+                        keys = keys,
+                        selectedIndex = state.keyIndex,
+                        notation = notation,
+                        onSelected = { state.keyIndex = it },
+                    )
+                    ScaleLabelsToggle(labels = labels, onLabelsSelected = { state.labels = it })
+                }
             }
             item(key = HEADER_KEY, span = { GridItemSpan(maxLineSpan) }, contentType = HEADER_KEY) {
                 ScaleLibraryHeader(
@@ -203,6 +213,7 @@ internal fun ScalesScreen(
                     root = root,
                     rootName = rootName,
                     notation = notation,
+                    labels = labels,
                     instrument = instrument,
                     instrumentTuning = instrumentTuning,
                     onClick = { viewModel.dialogHost.showDialog(DialogType.Scale(scaleId = scale.id, rootName = rootName)) },
@@ -232,6 +243,7 @@ private fun ScaleLibraryItem(
     root: Int,
     rootName: String,
     notation: ChordNotation,
+    labels: ScaleLabels,
     instrument: UserPreferences.Instrument,
     instrumentTuning: InstrumentTuning?,
     onClick: () -> Unit,
@@ -241,10 +253,18 @@ private fun ScaleLibraryItem(
     val geometry = remember(scale, root, instrumentTuning, instrument) {
         scaleDiagramGeometryOf(scale, root, instrumentTuning?.strings, instrument)
     }
+    // What each dot says, which the sheet over the cell says too (see ScaleLabels): a keyboard carries none.
+    val noteNames = remember(scale, rootName, notation) { shownScaleNoteNames(scale, rootName, notation) }
+    val degrees = remember(scale) { scale.degrees.map(::displayedDegree) }
     Box(modifier = modifier) {
         ScaleLibraryCell(
             title = scaleTitle(scale, rootName, notation),
             geometry = geometry,
+            labels = when {
+                geometry is ScaleDiagramGeometry.Keyboard -> null
+                labels == ScaleLabels.DEGREES -> degrees
+                else -> noteNames
+            },
             description = scaleDiagramDescription(scale, rootName, notation),
             onClick = onClick,
         )

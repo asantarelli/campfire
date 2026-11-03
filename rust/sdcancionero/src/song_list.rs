@@ -63,7 +63,7 @@ mod tests {
 
     fn entry(file_name: &str, title: &str, artist: Option<&str>) -> SongEntry {
         let metadata = Metadata { title: Some(title.to_string()), artist: artist.map(str::to_string), ..Metadata::default() };
-        SongEntry { file_name: file_name.to_string(), metadata, has_chords: true }
+        SongEntry { file_name: file_name.to_string(), metadata, has_chords: true, is_score: false }
     }
 
     fn titles(songs: &[SongEntry]) -> Vec<String> {

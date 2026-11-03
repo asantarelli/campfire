@@ -15,13 +15,18 @@ import com.pandulapeter.campfire.data.model.song.Song
 import com.pandulapeter.campfire.presentation.ui.CampfireViewModel
 import com.pandulapeter.campfire.presentation.ui.components.actions.SongActionHandler
 import com.pandulapeter.campfire.presentation.ui.dialogs.DialogType
+import com.pandulapeter.campfire.presentation.ui.dialogs.SongEditTarget
 
 /** The [SongActionHandler] of a screen, which hands every song menu on it to [viewModel]. */
 @Composable
 internal fun rememberSongActionHandler(viewModel: CampfireViewModel): SongActionHandler = remember(viewModel) {
     object : SongActionHandler {
         override fun edit(song: Song) {
-            viewModel.editorSession.openEditor(song.fileName)
+            if (song.isScore) {
+                viewModel.dialogHost.showDialog(DialogType.SongInfo(song = song, target = SongEditTarget.File(song.fileName)))
+            } else {
+                viewModel.editorSession.openEditor(song.fileName)
+            }
         }
 
         override fun updateFileName(song: Song) {

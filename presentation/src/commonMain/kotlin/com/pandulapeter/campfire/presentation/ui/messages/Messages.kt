@@ -42,6 +42,7 @@ import com.pandulapeter.campfire.presentation.resources.metronome_stopped_interr
 import com.pandulapeter.campfire.presentation.resources.metronome_stopped_refused
 import com.pandulapeter.campfire.presentation.resources.metronome_stopped_silent
 import com.pandulapeter.campfire.presentation.resources.import_failed
+import com.pandulapeter.campfire.presentation.resources.score_unreadable
 import com.pandulapeter.campfire.presentation.resources.import_interrupted
 import com.pandulapeter.campfire.presentation.resources.import_converted
 import com.pandulapeter.campfire.presentation.resources.import_details
@@ -102,6 +103,7 @@ internal fun Messages(
         ).joinToString("\n")
 
         Message.ImportFailed -> stringResource(Res.string.import_failed)
+        Message.ScoreUnreadable -> stringResource(Res.string.score_unreadable)
         Message.ImportInterrupted -> stringResource(Res.string.import_interrupted)
         Message.ExportFailed -> stringResource(Res.string.export_failed)
         Message.PdfSaved -> stringResource(Res.string.export_pdf_saved)

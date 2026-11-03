@@ -25,6 +25,9 @@ sealed interface Message {
 
     data object ImportFailed : Message
 
+    /** A song that says it holds a Guitar Pro score does not hold one that can be read: its file is gone, or its lines were changed. */
+    data object ScoreUnreadable : Message
+
     /** A restored process found that the one before it ended behind an import that had not been written yet. */
     data object ImportInterrupted : Message
     data object ExportFailed : Message

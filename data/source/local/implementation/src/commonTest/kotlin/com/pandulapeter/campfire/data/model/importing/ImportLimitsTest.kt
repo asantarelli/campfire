@@ -39,6 +39,16 @@ internal class ImportLimitsTest {
     }
 
     @Test
+    fun `a guitar pro score is kept whole whatever its bytes are, in any case of its name`() {
+        val bytes = byteArrayOf(0x18, 'F'.code.toByte(), 0, 1, 2, 3)
+
+        val score = ImportBudget().read(name = "Exercises.GP5", size = bytes.size.toLong()) { bytes }
+
+        assertContentEquals(bytes, score!!.bytes)
+        assertFalse(score.isPlainTextByContent)
+    }
+
+    @Test
     fun `an unknown loose file that is text is kept flagged, a binary one is not`() {
         val budget = ImportBudget()
         val sheet = "G   D\nDown by the river\n".encodeToByteArray()

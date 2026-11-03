@@ -45,6 +45,8 @@ kotlin {
                 implementation(project(":domain:api"))
                 // The composables render the ChordPro model directly; parsing and transposing go through use cases.
                 implementation(project(":chordpro"))
+                // The score a Guitar Pro file holds is read and set on the page by this module; the screen only paints it.
+                implementation(project(":guitarpro"))
                 // The click is the app's rather than a screen's, and is handed a complete pattern by the view model.
                 implementation(project(":metronome:api"))
                 implementation(project(":tuner:api"))

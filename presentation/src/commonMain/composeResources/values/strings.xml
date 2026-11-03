@@ -248,6 +248,10 @@
     <string name="songs_labels_sorted_alphabetically">Sorted alphabetically</string>
     <string name="songs_filters_reset">Reset all filters</string>
 
+    <!-- The letter in front of a song's title that says what its file is: G for a Guitar Pro score, C for a ChordPro song, read out as these. -->
+    <string name="songs_kind_guitar_pro">Guitar Pro score</string>
+    <string name="songs_kind_chordpro">ChordPro song</string>
+
     <!-- Setlists screen -->
     <string name="setlists">Setlists</string>
     <string name="setlists_no_data">No setlists yet</string>
@@ -383,6 +387,14 @@
     <string name="settings_song_font_description">The typeface of the lyrics and the chords. Monospaced keeps every chord exactly over its word.</string>
     <string name="settings_song_font_default">Default</string>
     <string name="settings_song_font_monospace">Monospaced</string>
+    <string name="settings_chord_dot_labels">Chord diagram dots</string>
+    <string name="settings_chord_dot_labels_description">What the dots of a diagram say: nothing, the finger, the note, or its place in the chord (R root, 3 third, 5 fifth, ♭7 seventh).</string>
+    <string name="settings_chord_dot_labels_none">Nothing</string>
+    <string name="settings_chord_dot_labels_fingers">Fingers</string>
+    <string name="settings_chord_dot_labels_notes">Notes</string>
+    <string name="settings_chord_dot_labels_degrees">Degrees</string>
+    <string name="settings_chord_dot_colors">Color by function</string>
+    <string name="settings_chord_dot_colors_description">The root keeps the accent, the thirds are orange, the fifths green and the sevenths and the sixth purple.</string>
     <string name="settings_music_search">Listen to the song</string>
     <string name="settings_music_search_description">The song's listen button searches for its artist and title on this service, in your browser.</string>
     <string name="settings_external_player">Music player</string>
@@ -773,6 +785,18 @@
     <string name="scale_aliases_augmented">Hexatonic</string>
     <string name="scale_aliases_diminished">Octatonic</string>
 
+    <!-- The sheet that reads a Guitar Pro file: the staff, the tablature and the rhythm under it. -->
+    <string name="score_staff">Staff</string>
+    <string name="score_tablature">Tablature</string>
+    <string name="score_rhythm">Rhythm</string>
+    <string name="score_size">Size</string>
+    <!-- The name of a track the file does not name, e.g. "Track 2". -->
+    <string name="score_track_unnamed">Track %1$d</string>
+    <string name="score_error_not_guitar_pro">This is not a Guitar Pro file.</string>
+    <string name="score_error_unsupported">This version of Guitar Pro cannot be read yet. Only Guitar Pro 3, 4 and 5 files can.</string>
+    <string name="score_error_unexpected_end">The file ends before the score does.</string>
+    <string name="score_unreadable">This score cannot be read.</string>
+    <string name="score_error_corrupt">The file is damaged and cannot be read.</string>
     <!-- Song editor screen -->
     <string name="song_editor_edit">Edit</string>
     <string name="song_editor_preview">Preview</string>

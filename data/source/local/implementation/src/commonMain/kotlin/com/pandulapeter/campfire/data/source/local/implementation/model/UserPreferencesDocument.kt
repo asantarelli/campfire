@@ -90,6 +90,8 @@ internal data class UserPreferencesDocument(
     val pinnedChordsPosition: String = "",
     val autoScrollSpeed: Int = 4,
     val songFont: String = "",
+    val chordDotLabels: String = "",
+    val areChordDotsColoredByFunction: Boolean = false,
 )
 
 @Serializable

@@ -51,6 +51,36 @@ impl SongOrder {
     }
 }
 
+/// What the dots of a chord diagram say.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DotLabels {
+    None,
+    Fingers,
+    Notes,
+    /// The place of the note in the chord: root, third, fifth, seventh.
+    Degrees,
+}
+
+impl DotLabels {
+    fn key(self) -> &'static str {
+        match self {
+            DotLabels::None => "none",
+            DotLabels::Fingers => "fingers",
+            DotLabels::Notes => "notes",
+            DotLabels::Degrees => "degrees",
+        }
+    }
+
+    fn from_key(key: Option<&str>) -> DotLabels {
+        match key {
+            Some("fingers") => DotLabels::Fingers,
+            Some("notes") => DotLabels::Notes,
+            Some("degrees") => DotLabels::Degrees,
+            _ => DotLabels::None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Settings {
     /// How many columns a song is spread over, as many as fit.
@@ -72,6 +102,9 @@ pub struct Settings {
     pub editor_font: String,
     pub editor_text_size: f32,
     pub song_order: SongOrder,
+    pub dot_labels: DotLabels,
+    /// Whether the dots of a diagram are colored by the function of their note in the chord.
+    pub dots_colored_by_function: bool,
 }
 
 impl Default for Settings {
@@ -91,6 +124,8 @@ impl Default for Settings {
             editor_font: crate::theme::BUNDLED_EDITOR_FONT.to_string(),
             editor_text_size: 16.0,
             song_order: SongOrder::Title,
+            dot_labels: DotLabels::None,
+            dots_colored_by_function: false,
         }
     }
 }
@@ -154,6 +189,8 @@ impl Settings {
             editor_font: object.get("editorFont").and_then(Value::as_str).map(str::to_string).unwrap_or(defaults.editor_font),
             editor_text_size: number("editorTextSize", defaults.editor_text_size).clamp(MIN_TEXT_SIZE, MAX_TEXT_SIZE),
             song_order: SongOrder::from_key(object.get("songOrder").and_then(Value::as_str)),
+            dot_labels: DotLabels::from_key(object.get("dotLabels").and_then(Value::as_str)),
+            dots_colored_by_function: boolean("dotsColoredByFunction", defaults.dots_colored_by_function),
         })
     }
 
@@ -174,6 +211,8 @@ impl Settings {
         object.insert("editorFont".into(), Value::from(self.editor_font.clone()));
         object.insert("editorTextSize".into(), Value::from(self.editor_text_size as f64));
         object.insert("songOrder".into(), Value::from(self.song_order.key()));
+        object.insert("dotLabels".into(), Value::from(self.dot_labels.key()));
+        object.insert("dotsColoredByFunction".into(), Value::from(self.dots_colored_by_function));
         object.insert("instrument".into(), Value::from(if self.instrument == Instrument::Ukulele { "ukulele" } else { "guitar" }));
         serde_json::to_string_pretty(&Value::Object(object)).expect("a JSON value always serializes")
     }
@@ -200,6 +239,8 @@ mod tests {
             editor_font: "Consolas".into(),
             editor_text_size: 20.0,
             song_order: SongOrder::ArtistGroups,
+            dot_labels: DotLabels::Notes,
+            dots_colored_by_function: true,
         };
         assert_eq!(Settings::decode(&settings.encode()), Some(settings));
     }

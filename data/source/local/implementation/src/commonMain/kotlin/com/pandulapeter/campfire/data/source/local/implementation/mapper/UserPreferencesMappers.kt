@@ -85,6 +85,8 @@ internal fun UserPreferencesDocument.toModel() = UserPreferences(
     pinnedChordsPosition = UserPreferences.PinnedChordsPosition.entries.firstOrNull { it.id == pinnedChordsPosition } ?: UserPreferences.PinnedChordsPosition.RIGHT,
     autoScrollSpeed = autoScrollSpeed.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED),
     songFont = UserPreferences.SongFont.entries.firstOrNull { it.id == songFont } ?: UserPreferences.SongFont.DEFAULT,
+    chordDotLabels = UserPreferences.ChordDotLabels.entries.firstOrNull { it.id == chordDotLabels } ?: UserPreferences.ChordDotLabels.NONE,
+    areChordDotsColoredByFunction = areChordDotsColoredByFunction,
 )
 
 internal fun UserPreferences.toDocument() = UserPreferencesDocument(
@@ -143,6 +145,8 @@ internal fun UserPreferences.toDocument() = UserPreferencesDocument(
     pinnedChordsPosition = pinnedChordsPosition.id,
     autoScrollSpeed = autoScrollSpeed,
     songFont = songFont.id,
+    chordDotLabels = chordDotLabels.id,
+    areChordDotsColoredByFunction = areChordDotsColoredByFunction,
 )
 
 internal fun PrintSettingsDocument.toModel() = PrintSettings(

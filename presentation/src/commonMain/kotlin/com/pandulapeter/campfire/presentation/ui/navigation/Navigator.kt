@@ -67,6 +67,8 @@ internal class Navigator(
     private val isSongSelecting: () -> Boolean,
     private val endSongSelection: () -> Unit,
     private val onTransitionEnded: () -> Unit,
+    private val isScore: (fileName: String) -> Boolean,
+    private val openScore: (fileName: String) -> Unit,
 ) {
 
     /** Written into [savedStateStore] on every change, see [persistBackStack], and read back from it here. */
@@ -361,9 +363,15 @@ internal class Navigator(
         )
     )
 
-    /** Refused while the songs are switched off, which an import's snackbar or screen can still offer to open one in. */
+    /**
+     * Refused while the songs are switched off, which an import's snackbar or screen can still offer to open one in. A song
+     * that holds a Guitar Pro score has no page to read: its score is shown on a sheet over what is on screen instead.
+     */
     private fun openSongDetails(destination: CampfireDestination.SongDetails) {
-        if (backStack.lastOrNull() !is CampfireDestination.SongDetails && isEnabled(destination)) {
+        val song = destination.songFileNames.getOrNull(destination.initialIndex)
+        if (song != null && isScore(song)) {
+            if (isEnabled(destination)) openScore(song)
+        } else if (backStack.lastOrNull() !is CampfireDestination.SongDetails && isEnabled(destination)) {
             updateBackStack { add(destination) }
         }
     }
@@ -381,6 +389,7 @@ internal class Navigator(
         val songFileNames = listOf(fileName)
         val destination = CampfireDestination.SongDetails(songFileNames = songFileNames, setlistFileName = null, initialIndex = 0)
         if (!isEnabled(destination)) return
+        if (isScore(fileName)) return openScore(fileName)
         val current = backStack.lastOrNull()
         if (current is CampfireDestination.SongDetails && current.setlistFileName == null && current.songFileNames == songFileNames) return
         updateBackStack {

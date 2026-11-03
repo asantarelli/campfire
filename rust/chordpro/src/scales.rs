@@ -17,7 +17,7 @@ pub struct Scale {
     pub intervals: &'static [i32],
 }
 
-pub const SCALES: [Scale; 12] = [
+pub const SCALES: [Scale; 13] = [
     Scale { name: "Mayor", intervals: &[0, 2, 4, 5, 7, 9, 11] },
     Scale { name: "Menor natural", intervals: &[0, 2, 3, 5, 7, 8, 10] },
     Scale { name: "Menor armónica", intervals: &[0, 2, 3, 5, 7, 8, 11] },
@@ -30,6 +30,8 @@ pub const SCALES: [Scale; 12] = [
     Scale { name: "Lidia", intervals: &[0, 2, 4, 6, 7, 9, 11] },
     Scale { name: "Mixolidia", intervals: &[0, 2, 4, 5, 7, 9, 10] },
     Scale { name: "Locria", intervals: &[0, 1, 3, 5, 6, 8, 10] },
+    // Every note, which is the whole neck named.
+    Scale { name: "Cromática", intervals: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
 ];
 
 const LETTERS: [char; 7] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
@@ -120,21 +122,37 @@ pub fn scale_chords(root: &str, scale: &Scale, with_seventh: bool) -> Option<Vec
     Some(chords)
 }
 
-/// Where the notes of the scale are on the neck: for each string (from the lowest) and each fret from 0 to `frets`, whether the note
-/// there is one of the scale, and whether it is the root.
-pub fn on_fretboard(root: &str, scale: &Scale, tuning: &Tuning, frets: u8) -> Option<Vec<Vec<(bool, bool)>>> {
+/// A note of the scale on the neck: which of the scale's notes it is, counted from the root as the first, and whether it is the root.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FretNote {
+    pub degree: usize,
+    pub is_root: bool,
+}
+
+/// Where the notes of the scale are on the neck: for each string (from the lowest) and each fret from 0 to `frets`, the note of the
+/// scale there, or `None` where the note is not one of them.
+pub fn on_fretboard(root: &str, scale: &Scale, tuning: &Tuning, frets: u8) -> Option<Vec<Vec<Option<FretNote>>>> {
     let root_class = root_pitch_class(root)?;
-    let classes: Vec<i32> = scale.intervals.iter().map(|interval| (root_class + interval).rem_euclid(12)).collect();
     Some(
         tuning
             .strings
             .iter()
-            .map(|string| (0..=frets).map(|fret| {
-                let class = (string + fret as i32).rem_euclid(12);
-                (classes.contains(&class), class == root_class)
-            }).collect())
+            .map(|string| {
+                (0..=frets)
+                    .map(|fret| {
+                        let class = (string + fret as i32).rem_euclid(12);
+                        scale.intervals.iter().position(|interval| (root_class + interval).rem_euclid(12) == class).map(|degree| FretNote { degree, is_root: class == root_class })
+                    })
+                    .collect()
+            })
             .collect(),
     )
+}
+
+/// What a note a number of semitones above the root is called as a degree of the scale: `1`, `b3`, `5`, `b7`.
+pub fn degree_label(interval: i32) -> &'static str {
+    const LABELS: [&str; 12] = ["1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7"];
+    LABELS[interval.rem_euclid(12) as usize]
 }
 
 #[cfg(test)]
@@ -187,11 +205,20 @@ mod tests {
         assert_eq!(neck.len(), 6);
         assert_eq!(neck[0].len(), 13);
         // Low E string: E (open) F G A B C at the 8th fret is the root.
-        assert_eq!(neck[0][0], (true, false));
-        assert_eq!(neck[0][1], (true, false));
-        assert_eq!(neck[0][2], (false, false));
-        assert_eq!(neck[0][8], (true, true));
+        assert_eq!(neck[0][0], Some(FretNote { degree: 2, is_root: false }));
+        assert_eq!(neck[0][1], Some(FretNote { degree: 3, is_root: false }));
+        assert_eq!(neck[0][2], None);
+        assert_eq!(neck[0][8], Some(FretNote { degree: 0, is_root: true }));
         // The A string's third fret is the root too.
-        assert_eq!(neck[1][3], (true, true));
+        assert_eq!(neck[1][3], Some(FretNote { degree: 0, is_root: true }));
+    }
+
+    #[test]
+    fn the_chromatic_scale_names_every_fret_of_the_neck() {
+        let neck = on_fretboard("C", &SCALES[12], &Tuning::guitar(), 12).unwrap();
+        assert!(neck.iter().flatten().all(Option::is_some));
+        assert_eq!(note_names("C", &SCALES[12]).unwrap().len(), 12);
+        assert_eq!(degree_label(3), "b3");
+        assert_eq!(degree_label(12), "1");
     }
 }

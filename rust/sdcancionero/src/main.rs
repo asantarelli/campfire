@@ -20,6 +20,7 @@ mod icons;
 mod layout;
 mod listen;
 mod media;
+mod score_view;
 mod settings;
 mod song_list;
 mod theme;

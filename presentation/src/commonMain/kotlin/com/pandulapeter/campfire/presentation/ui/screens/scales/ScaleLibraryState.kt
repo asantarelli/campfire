@@ -57,7 +57,7 @@ internal class ScaleLibraryState(
     }
 
     /** What the scale sheet writes in its dots, wherever it is opened from. */
-    var labels by mutableStateOf(ScaleLabels.DEGREES)
+    var labels by mutableStateOf(ScaleLabels.NOTES)
 
     val scrollPosition = ScrollPosition()
 

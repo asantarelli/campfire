@@ -81,6 +81,11 @@ data class Song(
      * knows what a reset goes back to before the song's text has been read.
      */
     val capo: Int? = null,
+    /**
+     * Whether the file holds a Guitar Pro score rather than a chord sheet: a song like any other to the library, which is read
+     * as a staff and a tablature instead of a page of chords (see `ScoreSongText`).
+     */
+    val isScore: Boolean = false,
 ) {
 
     companion object {

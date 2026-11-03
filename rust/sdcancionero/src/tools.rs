@@ -69,6 +69,8 @@ pub struct Tools {
     query: String,
     scale_root: usize,
     scale_index: usize,
+    /// Whether the dots of the neck say the degree of their note rather than its name.
+    scale_degrees: bool,
 }
 
 /// The metronome beside a song: its tempo and a button, so that it can be played along with the song on the screen.
@@ -187,6 +189,7 @@ impl Tools {
             query: String::new(),
             scale_root: 0,
             scale_index: 0,
+            scale_degrees: false,
         }
     }
 
@@ -502,6 +505,11 @@ impl Tools {
                 }
             }
         });
+        ui.horizontal(|ui| {
+            ui.label("En los círculos");
+            ui.selectable_value(&mut self.scale_degrees, false, "Notas");
+            ui.selectable_value(&mut self.scale_degrees, true, "Grados");
+        });
         ui.separator();
         let root = ROOTS[self.scale_root];
         let scale = &scales::SCALES[self.scale_index];
@@ -514,7 +522,13 @@ impl Tools {
         let tuning = settings.instrument.tuning();
         egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
             if let Some(neck) = scales::on_fretboard(root, scale, &tuning, FRETBOARD_FRETS) {
-                egui::ScrollArea::horizontal().id_salt("neck").show(ui, |ui| fretboard(ui, &neck, colors));
+                // What each of the scale's notes says inside its dot.
+                let labels: Vec<String> = if self.scale_degrees {
+                    scale.intervals.iter().map(|interval| scales::degree_label(*interval).replace('b', "♭")).collect()
+                } else {
+                    scales::note_names(root, scale).unwrap_or_default().iter().map(|note| shown_note(note, settings.notation, settings.accidental_signs)).collect()
+                };
+                egui::ScrollArea::horizontal().id_salt("neck").show(ui, |ui| fretboard(ui, &neck, &labels, colors));
             }
             for (title, with_seventh) in [("Acordes de esta escala", false), ("Acordes de séptima", true)] {
                 let Some(chords) = scales::scale_chords(root, scale, with_seventh) else {
@@ -526,7 +540,7 @@ impl Tools {
                     for chord in &chords {
                         ui.vertical(|ui| {
                             ui.label(RichText::new(&chord.degree).color(colors.muted));
-                            pinned_chord(ui, &chord.name, settings, colors, &[]);
+                            let _ = pinned_chord(ui, &chord.name, settings, colors, &[]);
                         });
                     }
                 });
@@ -560,7 +574,9 @@ impl Tools {
         });
         ui.separator();
         let name = if self.query.trim().is_empty() { format!("{}{}", ROOTS[self.root], SUFFIXES[self.suffix]) } else { self.query.trim().to_string() };
-        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| chord_sheet(ui, &name, settings, colors, 8, 1.15, &[]));
+        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
+            let _ = chord_sheet(ui, &name, settings, colors, 8, 1.15, &[]);
+        });
     }
 }
 
@@ -577,9 +593,9 @@ fn shown_note(note: &str, notation: ChordNotation, accidental_signs: bool) -> St
 const FRETBOARD_FRETS: u8 = 12;
 
 /// A neck seen from the front, the high string on top: a dot where a note of the scale is, the root in orange.
-fn fretboard(ui: &mut Ui, neck: &[Vec<(bool, bool)>], colors: &SongColors) {
+fn fretboard(ui: &mut Ui, neck: &[Vec<Option<scales::FretNote>>], labels: &[String], colors: &SongColors) {
     let strings = neck.len();
-    let (fret_width, string_gap, margin) = (54.0, 30.0, 30.0);
+    let (fret_width, string_gap, margin) = (54.0, 32.0, 30.0);
     let width = margin + (FRETBOARD_FRETS as f32 + 1.0) * fret_width;
     let height = (strings as f32 + 0.5) * string_gap + 24.0;
     let (rect, _) = ui.allocate_exact_size(Vec2::new(width, height), Sense::hover());
@@ -596,13 +612,17 @@ fn fretboard(ui: &mut Ui, neck: &[Vec<(bool, bool)>], colors: &SongColors) {
     for (row, string) in neck.iter().rev().enumerate() {
         let y = top + row as f32 * string_gap;
         painter.line_segment([Pos2::new(rect.left() + margin, y), Pos2::new(rect.left() + margin + FRETBOARD_FRETS as f32 * fret_width, y)], Stroke::new(1.0, colors.muted));
-        for (fret, (is_note, is_root)) in string.iter().enumerate() {
-            if !is_note {
+        for (fret, note) in string.iter().enumerate() {
+            let Some(note) = note else {
                 continue;
-            }
+            };
             let x = if fret == 0 { rect.left() + margin - 14.0 } else { rect.left() + margin + (fret as f32 - 0.5) * fret_width };
-            let color = if *is_root { theme::ORANGE } else { theme::PURPLE };
-            painter.circle_filled(Pos2::new(x, y), 9.0, color);
+            let color = if note.is_root { theme::ORANGE } else { theme::PURPLE };
+            painter.circle_filled(Pos2::new(x, y), 12.0, color);
+            if let Some(label) = labels.get(note.degree) {
+                let size = if label.chars().count() > 2 { 9.5 } else { 12.0 };
+                painter.text(Pos2::new(x, y), Align2::CENTER_CENTER, label, FontId::new(size, theme::bold()), Color32::WHITE);
+            }
         }
     }
 }
@@ -627,17 +647,18 @@ fn cents_meter(ui: &mut Ui, cents: f32, colors: &SongColors) {
 }
 
 /// The notes of the chord called `name` and its shapes on the player's instrument, at most `limit` of them.
-pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, limit: usize, scale: f32, definitions: &[ChordDefinition]) {
+pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, limit: usize, scale: f32, definitions: &[ChordDefinition]) -> Option<f32> {
+    let tuning: Tuning = settings.instrument.tuning();
     if let Some(voicing) = defined_voicing(name, settings, definitions) {
         ui.label(RichText::new(name).size(26.0).strong());
         ui.label(RichText::new("La forma que define la canción.").color(colors.muted));
         ui.add_space(6.0);
-        diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, name, &voicing, colors, scale));
-        return;
+        let look = look_of(settings, &tuning, None);
+        return diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, name, &voicing, colors, scale, &look));
     }
     let Some(chord) = chord::parse(name, ChordNotation::Standard) else {
         ui.label(RichText::new(format!("«{name}» no es un acorde.")).color(colors.muted));
-        return;
+        return None;
     };
     let shown = shown_chord(name, settings);
     ui.label(RichText::new(shown).size(26.0).strong());
@@ -645,19 +666,29 @@ pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongCo
         let notes: Vec<String> = notes.iter().map(|note| if settings.accidental_signs { notation::with_accidental_signs(note) } else { note.clone() }).collect();
         ui.label(RichText::new(format!("Notas: {}", notes.join("  "))).color(colors.muted));
     }
-    let tuning: Tuning = settings.instrument.tuning();
     let found = voicings::voicings(&chord, &tuning, limit);
     if found.is_empty() {
         ui.add_space(6.0);
         ui.label(RichText::new(format!("No hay una forma cómoda de este acorde en {}.", settings.instrument.name().to_lowercase())).color(colors.muted));
-        return;
+        return None;
     }
     ui.add_space(6.0);
+    let look = look_of(settings, &tuning, Some(chord.root));
+    let mut tapped = None;
     ui.horizontal_wrapped(|ui| {
         for voicing in &found {
-            diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown_chord(name, settings), voicing, colors, scale));
+            if let Some(frequency) = diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown_chord(name, settings), voicing, colors, scale, &look)) {
+                tapped = Some(frequency);
+            }
         }
     });
+    tapped
+}
+
+/// What the diagrams of the player's instrument say beyond their shape, from the settings: the notes are read against the strings
+/// of the instrument and the root of the chord.
+fn look_of<'a>(settings: &Settings, tuning: &'a Tuning, root: Option<i32>) -> diagram::Look<'a> {
+    diagram::Look { labels: settings.dot_labels, is_colored: settings.dots_colored_by_function, strings: &tuning.strings, root }
 }
 
 /// The shape the song itself defines for the chord `name` on the player's instrument (as many strings as it has), the last of them.
@@ -668,21 +699,24 @@ pub fn defined_voicing(name: &str, settings: &Settings, definitions: &[ChordDefi
 
 /// A chord of the strip pinned beside a song: its name and its shape, the song's own where it defines one and else the most
 /// comfortable.
-pub fn pinned_chord(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, definitions: &[ChordDefinition]) {
+pub fn pinned_chord(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongColors, definitions: &[ChordDefinition]) -> Option<f32> {
+    let tuning = settings.instrument.tuning();
     let (voicing, shown) = match defined_voicing(name, settings, definitions) {
         // A name no table knows is written as the song writes it.
         Some(voicing) => (voicing, if chord::parse(name, ChordNotation::Standard).is_some() { shown_chord(name, settings) } else { name.to_string() }),
         None => {
             let Some(chord) = chord::parse(name, ChordNotation::Standard) else {
-                return;
+                return None;
             };
-            let Some(voicing) = voicings::voicings(&chord, &settings.instrument.tuning(), 1).into_iter().next() else {
-                return;
+            let Some(voicing) = voicings::voicings(&chord, &tuning, 1).into_iter().next() else {
+                return None;
             };
             (voicing, shown_chord(name, settings))
         }
     };
-    diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown, &voicing, colors, 0.85));
+    let root = chord::parse(name, ChordNotation::Standard).map(|chord| chord.root);
+    let look = look_of(settings, &tuning, root);
+    diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown, &voicing, colors, 0.85, &look))
 }
 
 /// The name of a chord as the player reads it: in their notation, with the signs they chose.

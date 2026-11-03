@@ -35,6 +35,8 @@ pub struct SongEntry {
     pub file_name: String,
     pub metadata: Metadata,
     pub has_chords: bool,
+    /// Whether the file holds a Guitar Pro score rather than a chord sheet, which opens as a staff and a tablature.
+    pub is_score: bool,
 }
 
 impl SongEntry {
@@ -259,7 +261,7 @@ impl Library {
                 continue;
             };
             let song = parser::parse(&text, ChordNotation::Standard);
-            entries.push(SongEntry { file_name, has_chords: song.has_chords(), metadata: song.metadata });
+            entries.push(SongEntry { file_name, has_chords: song.has_chords(), is_score: guitarpro::song::is_score(&song.metadata.custom), metadata: song.metadata });
         }
         Ok(entries)
     }
@@ -289,6 +291,18 @@ impl Library {
         let mut plan = ImportPlan { skipped: unread, ..ImportPlan::default() };
         let mut seen: HashSet<String> = HashSet::new();
         for file in files {
+            // A score becomes the song that holds it, named by its own title and artist as any song is.
+            let file = if names::is_score_file_name(&file.name) {
+                match Self::score_song(&file) {
+                    Some(song) => song,
+                    None => {
+                        plan.skipped.push(file.name);
+                        continue;
+                    }
+                }
+            } else {
+                file
+            };
             let directory = if names::is_song_file_name(&file.name) {
                 self.songs_directory()
             } else if names::is_setlist_file_name(&file.name) {
@@ -310,6 +324,15 @@ impl Library {
             }
         }
         Ok(plan)
+    }
+
+    /// The song that holds the score of `file`, or `None` where it is no score that can be read.
+    fn score_song(file: &ImportedFile) -> Option<ImportedFile> {
+        let base = file.name.rsplit_once('.').map(|(base, _)| base).unwrap_or(&file.name);
+        let text = guitarpro::song::of(&file.bytes, base)?;
+        let metadata = parser::parse(&text, ChordNotation::Standard).metadata;
+        let name = names::song_file_name(metadata.artist.as_deref(), metadata.title.as_deref().unwrap_or(base));
+        Some(ImportedFile { name, bytes: text.into_bytes() })
     }
 
     /// The bytes of the file whose name is `name` under any case, which is what Windows would call the same file.
@@ -410,6 +433,25 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let library = Library::open(directory.path().join("library")).unwrap();
         (directory, library)
+    }
+
+    #[test]
+    fn a_guitar_pro_score_is_imported_as_the_song_that_holds_it() {
+        let (_guard, library) = library();
+        let bytes = std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/../guitarpro/tests/fixtures/song.gp5")).unwrap();
+        let score = ImportedFile { name: "Exercises.GP5".into(), bytes: bytes.clone() };
+        let broken = ImportedFile { name: "broken.gp3".into(), bytes: b"not a score".to_vec() };
+        let plan = library.plan_import(vec![score, broken], Vec::new()).unwrap();
+        assert_eq!(plan.skipped, ["broken.gp3"]);
+        let report = library.apply_import(plan, Collision::Number).unwrap();
+        assert_eq!(report.added, ["yo-practica_002.cho"]);
+        let songs = library.scan_songs().unwrap();
+        assert_eq!(songs.len(), 1);
+        assert!(songs[0].is_score);
+        assert_eq!(songs[0].display_title(), "Práctica 002");
+        let text = library.read_song("yo-practica_002.cho").unwrap().unwrap();
+        let metadata = parser::parse(&text, ChordNotation::Standard).metadata;
+        assert_eq!(guitarpro::song::bytes_of(&metadata.custom), Some(bytes));
     }
 
     #[test]

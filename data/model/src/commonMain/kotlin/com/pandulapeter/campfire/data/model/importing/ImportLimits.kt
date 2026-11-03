@@ -29,6 +29,9 @@ object ImportLimits {
      */
     const val MAX_TEXT_FILE_SIZE = 8L shl 20
 
+    /** One Guitar Pro score: a book of hundreds of exercises is under a megabyte, so this leaves room for any real one. */
+    const val MAX_SCORE_FILE_SIZE = 8L shl 20
+
     /** Documents may carry embedded fonts and images much larger than their extracted text. */
     const val MAX_DOCUMENT_FILE_SIZE = 16L shl 20
 
@@ -93,6 +96,7 @@ class ImportBudget {
      *   file of unknown size is found out. Null for a file that cannot be read, which is then left out.
      */
     inline fun read(name: String, size: Long?, readBytes: (limit: Long) -> ByteArray?): ImportedFile? {
+        if (LibraryFiles.isScoreFileName(name)) return readScore(name, size, readBytes)
         if (!LibraryFiles.isImportableFileName(name)) return readUnknown(name, size, readBytes)
         val ownLimit = ImportLimits.maxSizeOf(name)
         // A text name is read as far as the selection allows rather than to its own limit, since one over that limit may
@@ -104,6 +108,17 @@ class ImportBudget {
         if (bytes.size > limit || (bytes.size > ownLimit && !LibraryFiles.isZipArchive(bytes))) {
             return ImportedFile.unread(name, isTooLarge = true)
         }
+        remaining -= bytes.size
+        return ImportedFile(name = name, bytes = bytes)
+    }
+
+    /** A Guitar Pro score is kept whole whatever its bytes are, since the score screen, not the import, says what is wrong with it. */
+    @PublishedApi
+    internal inline fun readScore(name: String, size: Long?, readBytes: (limit: Long) -> ByteArray?): ImportedFile? {
+        val limit = minOf(ImportLimits.MAX_SCORE_FILE_SIZE, remaining)
+        if (size != null && size > limit) return ImportedFile.unread(name, isTooLarge = true)
+        val bytes = readBytes(limit) ?: return null
+        if (bytes.size > limit) return ImportedFile.unread(name, isTooLarge = true)
         remaining -= bytes.size
         return ImportedFile(name = name, bytes = bytes)
     }

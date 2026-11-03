@@ -31,6 +31,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pandulapeter.campfire.data.model.sync.SyncState
 import com.pandulapeter.campfire.data.model.importing.ImportedFile
+import com.pandulapeter.campfire.presentation.ui.chords.ChordDiagramStyle
+import com.pandulapeter.campfire.presentation.ui.chords.LocalChordDiagramStyle
 import com.pandulapeter.campfire.presentation.ui.platform.SharedTextPayload
 import com.pandulapeter.campfire.presentation.ui.platform.areBeatHapticsFeltInBackground
 import com.pandulapeter.campfire.presentation.ui.platform.rememberBeatHaptics
@@ -129,6 +131,12 @@ fun CampfireApp(
     val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
     val arePreferencesLoaded by viewModel.preferencesController.arePreferencesLoaded.collectAsStateWithLifecycle()
     ApplyLanguagePreference(userPreferences?.language)
+    val chordDiagramStyle = remember(userPreferences?.chordDotLabels, userPreferences?.areChordDotsColoredByFunction) {
+        ChordDiagramStyle(
+            labels = userPreferences?.chordDotLabels ?: UserPreferences.ChordDotLabels.NONE,
+            isColoredByFunction = userPreferences?.areChordDotsColoredByFunction == true,
+        )
+    }
     // Menus are counted into the view model's own overlay state rather than a global, so the key handlers and the web
     // build's history that read it read the one this app is composed with.
     CompositionLocalProvider(
@@ -138,6 +146,7 @@ fun CampfireApp(
         LocalForcedSongColumns provides (userPreferences?.songColumns ?: UserPreferences.AUTOMATIC_SONG_COLUMNS),
         LocalPinnedChordsPosition provides (userPreferences?.pinnedChordsPosition ?: UserPreferences.PinnedChordsPosition.IN_SONG),
         LocalSongFont provides (userPreferences?.songFont ?: UserPreferences.SongFont.DEFAULT),
+        LocalChordDiagramStyle provides chordDiagramStyle,
     ) {
         CampfireTheme(
             uiMode = userPreferences?.uiMode,

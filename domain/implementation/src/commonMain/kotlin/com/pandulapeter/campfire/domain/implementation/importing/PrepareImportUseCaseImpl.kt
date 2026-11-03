@@ -22,6 +22,7 @@ import com.pandulapeter.campfire.data.model.importing.ImportLimits
 import com.pandulapeter.campfire.data.model.importing.ImportPlan
 import com.pandulapeter.campfire.data.model.importing.ImportProgress
 import com.pandulapeter.campfire.data.model.importing.ImportedFile
+import com.pandulapeter.campfire.guitarpro.song.ScoreSongText
 import com.pandulapeter.campfire.data.model.library.LibraryFiles
 import com.pandulapeter.campfire.data.model.Logger
 import com.pandulapeter.campfire.data.model.library.decodeLibraryText
@@ -77,6 +78,14 @@ internal class PrepareImportUseCaseImpl(
                 // Picked along with the songs it sits next to by a "select all" on a volume macOS has written to. It
                 // carries the extension of the file it belongs to, and decoded as a song it would be a screen of binary.
                 LibraryFiles.isHiddenFileName(file.name) -> triage.skippedFileNames += file.name
+                // A Guitar Pro score becomes a song that holds it (see ScoreSongText), which is then every song's business: named,
+                // compared with the library and written as any other. One that cannot be read is not worth keeping.
+                LibraryFiles.isScoreFileName(file.name) -> when {
+                    file.isTooLarge -> triage.oversizedFileNames += file.name
+                    else -> ScoreSongText.of(file.bytes, fallbackTitle = file.baseName)
+                        ?.let { sort(file = ImportedFile(name = file.baseName + LibraryFiles.SONG_EXTENSION, bytes = it.encodeToByteArray()), origin = origin) }
+                        ?: run { triage.skippedFileNames += file.name }
+                }
                 // Kept for reading as text under a name that says nothing (see ImportedFile.isPlainTextByContent), so
                 // held to the text limit, and a song only where it has the structure of one: a README or a licence
                 // next to the songs is not one, and as a text nobody chose it must not become prose that is.
