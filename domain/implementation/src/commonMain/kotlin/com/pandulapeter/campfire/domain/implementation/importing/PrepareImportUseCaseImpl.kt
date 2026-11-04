@@ -272,7 +272,7 @@ internal class PrepareImportUseCaseImpl(
             extension.equals(LibraryFiles.TEXT_EXTENSION.removePrefix("."), ignoreCase = true) ->
                 isTooLarge || ChordSheetStructure.hasSongStructure(bytes.decodeLibraryText())
             else -> extension.lowercase() in SONG_EXTENSIONS || extension.lowercase() in DOCUMENT_EXTENSIONS ||
-                name.endsWith(LibraryFiles.SETLIST_EXTENSION, ignoreCase = true)
+                name.endsWith(LibraryFiles.SETLIST_EXTENSION, ignoreCase = true) || LibraryFiles.isScoreFileName(name)
         }
     }
 

@@ -10,7 +10,7 @@
 //! it is painted and nothing has to be bundled for it. Every shape is in units of the space between two lines of a staff, with the staff's
 //! top line at y = 0 and its bottom one at y = 4.
 
-use crate::draw::{bezier, Draw};
+use crate::draw::{bezier, Anchor, Draw, TextStyle, Tone};
 
 /// The thickness of the thin lines of a staff, a stem and a bar line.
 pub const LINE: f32 = 0.1;
@@ -109,6 +109,53 @@ pub fn treble_clef(x: f32) -> Vec<Draw> {
     ];
     let points: Vec<(f32, f32)> = crate::draw::smooth(&path).into_iter().map(|(px, py)| (x + px, py)).collect();
     vec![Draw::polyline(points, 0.17), Draw::dot(x + 0.55, 5.85, 0.2)]
+}
+
+/// A chord diagram, `top` being where the marks over its strings start and `center_x` the middle of it: the strings from the lowest at its left,
+/// five frets under a nut where it starts at the first and under the number of its first fret where it does not, a dot for a string pressed, a ring
+/// for one played open and a cross for one that is not played. `frets` are from the highest string, as the file keeps them.
+pub fn chord_diagram(center_x: f32, top: f32, first_fret: i32, frets: &[i32]) -> Vec<Draw> {
+    const STRING_GAP: f32 = 0.6;
+    const FRET_GAP: f32 = 0.7;
+    const ROWS: usize = 5;
+    let strings = frets.len();
+    if strings < 2 {
+        return Vec::new();
+    }
+    let width = (strings - 1) as f32 * STRING_GAP;
+    let left = center_x - width / 2.0;
+    let grid_top = top + 0.9;
+    let grid_bottom = grid_top + ROWS as f32 * FRET_GAP;
+    let mut draws = Vec::new();
+    for string in 0..strings {
+        let x = left + string as f32 * STRING_GAP;
+        draws.push(Draw::line(x, grid_top, x, grid_bottom, 0.07));
+    }
+    for row in 0..=ROWS {
+        let y = grid_top + row as f32 * FRET_GAP;
+        draws.push(Draw::line(left, y, left + width, y, if row == 0 && first_fret <= 1 { 0.25 } else { 0.07 }));
+    }
+    if first_fret > 1 {
+        draws.push(Draw::text(left - 0.3, grid_top + FRET_GAP / 2.0, first_fret.to_string(), 0.75, Anchor::Right, TextStyle::Normal, Tone::Muted));
+    }
+    // A diagram can hold its frets from where it starts (1 is the first it shows) or as the neck counts them.
+    let base = first_fret.max(1);
+    let is_relative = first_fret > 1 && frets.iter().filter(|&&fret| fret > 0).all(|&fret| fret < first_fret);
+    for (index, &fret) in frets.iter().enumerate() {
+        let x = left + (strings - 1 - index) as f32 * STRING_GAP;
+        if fret > 0 {
+            let row = if is_relative { fret - 1 } else { fret - base };
+            if (0..ROWS as i32).contains(&row) {
+                draws.push(Draw::dot(x, grid_top + (row as f32 + 0.5) * FRET_GAP, 0.25));
+            }
+        } else if fret == 0 {
+            draws.push(Draw::Ellipse { x, y: top + 0.4, rx: 0.17, ry: 0.17, angle: 0.0, filled: false, width: 0.07, tone: Tone::Ink });
+        } else {
+            draws.push(Draw::line(x - 0.15, top + 0.25, x + 0.15, top + 0.55, 0.08));
+            draws.push(Draw::line(x - 0.15, top + 0.55, x + 0.15, top + 0.25, 0.08));
+        }
+    }
+    draws
 }
 
 /// A repeat's two dots, on the spaces either side of the middle line, at `x`.

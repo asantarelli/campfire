@@ -58,6 +58,8 @@ pub struct System {
 const TAB_GAP: f32 = 1.2;
 /// From the top of a system to the top of its first staff: room for the markers, the chords and the notes above the staff.
 const ABOVE: f32 = 7.2;
+/// What a system takes more above its staff where a chord diagram is drawn there.
+const DIAGRAM_BAND: f32 = 6.0;
 /// From the notation staff to the tablature one: room for the notes and the stems under the staff.
 const BETWEEN: f32 = 4.4;
 /// Under the tablature, for the rhythm.
@@ -299,8 +301,10 @@ impl Painter<'_> {
         let first = plan.measures.start;
         let key = self.keys[first];
         let prefix = prefix_width(options, key);
-        let notation_top = top + ABOVE;
-        let tab_top = if options.notation { notation_top + 4.0 + BETWEEN } else { top + ABOVE - 1.0 };
+        let has_diagram = plan.measures.clone().any(|index| plans[index].beats.iter().any(|beat| beat.beat.chord_shape.is_some()));
+        let above = ABOVE + if has_diagram { DIAGRAM_BAND } else { 0.0 };
+        let notation_top = top + above;
+        let tab_top = if options.notation { notation_top + 4.0 + BETWEEN } else { top + above - 1.0 };
         let tab_bottom = tab_top + (strings as f32 - 1.0) * TAB_GAP;
         let bottom = if options.tab { tab_bottom + if options.rhythm { RHYTHM } else { 1.5 } } else { notation_top + 4.0 + 3.5 };
         let staves = Staves { notation_top, tab_top, tab_bottom, strings, system: number, left: 0.0 };
@@ -802,6 +806,9 @@ impl Painter<'_> {
         for (position, column) in columns.iter().enumerate() {
             if let Some(chord) = &column.beat.chord {
                 draws.push(Draw::text(column.x - 0.9, chord_y, chord.clone(), 1.15, Anchor::Left, TextStyle::Bold, Tone::Accent));
+            }
+            if let Some(shape) = &column.beat.chord_shape {
+                draws.extend(glyphs::chord_diagram(column.x, first - 11.0, shape.first_fret, &shape.frets));
             }
             if let Some(text) = &column.beat.text {
                 draws.push(Draw::text(column.x - 0.9, text_y, text.clone(), 0.95, Anchor::Left, TextStyle::Italic, Tone::Ink));

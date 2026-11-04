@@ -11,6 +11,7 @@ package com.pandulapeter.campfire.guitarpro.reader
 
 import com.pandulapeter.campfire.guitarpro.model.Beat
 import com.pandulapeter.campfire.guitarpro.model.BeatStatus
+import com.pandulapeter.campfire.guitarpro.model.ChordShape
 import com.pandulapeter.campfire.guitarpro.model.Duration
 import com.pandulapeter.campfire.guitarpro.model.Note
 import com.pandulapeter.campfire.guitarpro.model.NoteEffects
@@ -41,7 +42,7 @@ internal class BeatReader(
             val enters = cursor.i32()
             duration = duration.copy(enters = tupletEnters(enters), times = tupletTimes(enters))
         }
-        val chord = if (flags and 0x02 != 0) chord() else null
+        val (chord, chordShape) = if (flags and 0x02 != 0) chord(strings) else null to null
         val text = if (flags and 0x04 != 0) cursor.intByteSizeString() else null
         var wholeBeat = NoteEffects()
         if (flags and 0x08 != 0) {
@@ -55,7 +56,7 @@ internal class BeatReader(
                 cursor.skip(1)
             }
         }
-        return Beat(start = start, duration = duration, status = status, notes = notes, text = text, chord = chord, tempo = tempo)
+        return Beat(start = start, duration = duration, status = status, notes = notes, text = text, chord = chord, chordShape = chordShape, tempo = tempo)
     }
 
     private fun tupletEnters(enters: Int) = if (enters in TUPLETS) enters else 1
@@ -67,25 +68,44 @@ internal class BeatReader(
         else -> 1
     }
 
-    /** The chord diagram of a beat, of which the name is what a score shows. */
-    private fun chord(): String? {
+    /** The chord diagram of a beat: its name, which may be empty, and its shape. */
+    private fun chord(strings: Int): Pair<String?, ChordShape?> {
         val isNew = cursor.boolean()
         val name: String
+        var shape: ChordShape? = null
         if (!isNew) {
             name = cursor.intByteSizeString()
-            if (cursor.i32() != 0) {
-                cursor.skip(6 * 4)
+            val firstFret = cursor.i32()
+            if (firstFret != 0) {
+                shape = chordFrets(firstFret, stored = 6, strings = strings)
             }
         } else if (major == 3) {
             cursor.skip(1 + 3 + 4 * 5 + 1)
             name = cursor.byteSizeString(22)
-            cursor.skip(3 * 4 + 4 + 6 * 4 + 4 + 2 * 4 * 3 + 7 + 1)
+            cursor.skip(3 * 4)
+            val firstFret = cursor.i32()
+            shape = chordFrets(firstFret, stored = 6, strings = strings)
+            cursor.skip(4 + 2 * 4 * 3 + 7 + 1)
         } else {
             cursor.skip(1 + 3 + 1 + 1 + 1 + 4 + 4 + 1)
             name = cursor.byteSizeString(22)
-            cursor.skip(3 + 4 + 7 * 4 + 1 + 5 * 3 + 7 + 1 + 7 + 1)
+            cursor.skip(3)
+            val firstFret = cursor.i32()
+            shape = chordFrets(firstFret, stored = 7, strings = strings)
+            cursor.skip(1 + 5 * 3 + 7 + 1 + 7 + 1)
         }
-        return name.ifEmpty { null }
+        // A diagram with nothing played is not worth drawing.
+        return name.ifEmpty { null } to shape?.takeIf { diagram -> diagram.frets.any { it >= 0 } }
+    }
+
+    /** The frets of a chord diagram, [stored] of them written, of which the track's [strings] are kept. */
+    private fun chordFrets(firstFret: Int, stored: Int, strings: Int): ChordShape {
+        val frets = mutableListOf<Int>()
+        for (index in 0 until stored) {
+            val fret = cursor.i32()
+            if (index < strings.coerceAtMost(MAX_STRINGS)) frets += fret
+        }
+        return ChordShape(firstFret, frets)
     }
 
     /** The effects that belong to the beat as a whole, which each of its notes has too. */

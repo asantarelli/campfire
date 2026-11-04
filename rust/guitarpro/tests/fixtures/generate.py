@@ -11,7 +11,7 @@
 The files are written by PyGuitarPro (`pip install pyguitarpro`), an implementation of the format that is not ours, so that what
 the reader makes of them is compared with what somebody else made of the same bytes: `python generate.py` here rewrites
 `song.gp3`, `song.gp4`, `song.gp5` (5.00) and `song51.gp5` (5.10) and their `.json`. The JSON holds, per track and measure, the
-beats of the first voice as `[start, value, is_dotted, enters, times, status, [[string, fret, type]...]]`.
+beats of the first voice as `[start, value, is_dotted, enters, times, status, [[string, fret, type]...], chord]`.
 """
 
 import json
@@ -35,6 +35,16 @@ def beat(voice, value, notes=(), dotted=False, tuplet=(1, 1), rest=False, text=N
         b.notes.append(note)
     voice.beats.append(b)
     return b
+
+
+def chord(b, name, first_fret, frets):
+    """Puts a chord diagram on the beat: `frets` from the highest string to the lowest, -1 for a string that is not played."""
+    b.effect.chord = gp.Chord(
+        length=6, sharp=False, root=gp.PitchClass(0), type=gp.ChordType.major, extension=gp.ChordExtension.none, bass=gp.PitchClass(0),
+        tonality=gp.ChordAlteration.perfect, add=False, name=name, fifth=gp.ChordAlteration.perfect, ninth=gp.ChordAlteration.perfect,
+        eleventh=gp.ChordAlteration.perfect, firstFret=first_fret, strings=list(frets), barres=[], omissions=[True] * 7,
+        fingerings=[gp.Fingering.open] * 7, show=True, newFormat=True,
+    )
 
 
 def hammer(note):
@@ -126,14 +136,17 @@ def build():
     voice = lambda track, index: track.measures[index].voices[0]
     # 1: quarters with a text and a chord
     v = voice(guitar, 0)
-    beat(v, 4, [(5, 0), (4, 2)], text='Verso')
+    chord(beat(v, 4, [(5, 0), (4, 2)], text='Verso'), 'Am', 1, [0, 1, 2, 2, 0, -1])
     beat(v, 4, [(3, 2)])
     beat(v, 4, [(2, 1, hammer)])
     beat(v, 4, rest=True)
     # 2: eighths, a dotted note and a rest
     v = voice(guitar, 1)
-    for fret in (0, 2, 3, 2):
-        beat(v, 8, [(4, fret)])
+    for index, fret in enumerate((0, 2, 3, 2)):
+        b = beat(v, 8, [(4, fret)])
+        if index == 0:
+            # A diagram with no name, which is how an editor writes one that nobody named: three frets up the neck.
+            chord(b, '', 7, [0, 8, 9, 9, 7, -1])
     beat(v, 4, [(3, 0, slide), (2, 0)], dotted=False)
     beat(v, 8, [(3, 2)], dotted=True)
     beat(v, 16, [(3, 3)])
@@ -187,6 +200,7 @@ def dump(song):
                 beats.append([
                     b.start, b.duration.value, b.duration.isDotted, b.duration.tuplet.enters, b.duration.tuplet.times, b.status.value,
                     [[n.string, n.value, n.type.value] for n in b.notes],
+                    {'name': b.effect.chord.name, 'first_fret': b.effect.chord.firstFret, 'frets': list(b.effect.chord.strings)} if b.effect.chord else None,
                 ])
             measures.append(beats)
         tracks.append({'name': track.name, 'strings': [s.value for s in track.strings], 'capo': track.offset, 'measures': measures})

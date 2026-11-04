@@ -12,6 +12,8 @@ package com.pandulapeter.campfire.presentation.ui.print
 import com.pandulapeter.campfire.chordpro.chords.ChordNotation
 import com.pandulapeter.campfire.chordpro.model.ChordTuning
 import com.pandulapeter.campfire.chordpro.model.ChordProSong
+import com.pandulapeter.campfire.guitarpro.layout.ScoreSystem
+import com.pandulapeter.campfire.guitarpro.model.Score
 import com.pandulapeter.campfire.presentation.ui.chords.ChordDiagramGeometry
 import com.pandulapeter.campfire.presentation.ui.chords.chordDiagramGeometryOf
 import com.pandulapeter.campfire.presentation.ui.chords.emptyChordDiagramGeometryOf
@@ -59,6 +61,8 @@ internal data class PrintSong(
      * the reader's tuning; empty where the chord diagrams are switched off in the app, whatever the export asks for.
      */
     val chords: List<PrintChord> = emptyList(),
+    /** The Guitar Pro score the song holds, which is printed as a staff and a tablature in place of its blocks; null for a chord sheet. */
+    val score: Score? = null,
 )
 
 /**
@@ -135,11 +139,23 @@ internal data class PrintDiagram(
     val height: Float,
 )
 
+/**
+ * One system of a score, drawn with its top left corner at [x], [y] in PDF points, [space] points between two lines of its staff.
+ * Its fret numbers and chord names are not selectable text: read back by an import they would be numbers and chords of a song.
+ */
+internal data class PrintScoreSystem(
+    val system: ScoreSystem,
+    val x: Float,
+    val y: Float,
+    val space: Float,
+)
+
 /** Everything on one page, in PDF points from its top left corner; the rules are drawn under the texts and the diagrams. */
 internal data class PrintPage(
     val texts: List<PrintText>,
     val rules: List<PrintRule> = emptyList(),
     val diagrams: List<PrintDiagram> = emptyList(),
+    val scores: List<PrintScoreSystem> = emptyList(),
 )
 
 /** The pages of one export, all of one size, which is the paper's in PDF points turned for the orientation. */

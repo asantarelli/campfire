@@ -399,8 +399,16 @@ impl App {
             ui.heading("Herramientas");
         });
         let colors = SongColors::of(self.settings.is_dark);
+        let mut answer = None;
         if let Some(tools) = &mut self.tools {
-            tools.show(ui, &self.settings, &colors);
+            answer = tools.show(ui, &self.settings, &colors);
+        }
+        // An answer of the practice is added to the totals, which are kept over every session.
+        if let Some(answer) = answer {
+            let (hits, attempts) = if answer.is_study { (&mut self.settings.study_hits, &mut self.settings.study_attempts) } else { (&mut self.settings.neck_hits, &mut self.settings.neck_attempts) };
+            *attempts += 1;
+            *hits += answer.is_hit as u32;
+            self.save_settings();
         }
         if leave {
             // The click never outlives its screen, and the microphone is closed with it.
@@ -1032,6 +1040,9 @@ impl App {
             ui.end_row();
             ui.label("Diagramas de acordes");
             changed |= ui.checkbox(&mut self.settings.pin_chord_diagrams, "Fijarlos junto a la canción").changed();
+            ui.end_row();
+            ui.label("Tamaño de los diagramas");
+            changed |= ui.add(egui::Slider::new(&mut self.settings.diagram_size, settings::MIN_DIAGRAM_SIZE..=settings::MAX_DIAGRAM_SIZE).step_by(0.1).custom_formatter(|value, _| format!("{:.0}%", value * 100.0))).changed();
             ui.end_row();
             ui.label("Puntos de los diagramas");
             ui.horizontal(|ui| {

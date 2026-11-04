@@ -12,17 +12,33 @@ package com.pandulapeter.campfire.presentation.ui.chords
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.pandulapeter.campfire.chordpro.training.StudyHelp
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 
 /**
  * What a player asked the diagrams to say beyond the shape: [labels] on the dots and over the open strings, and whether
- * the dots are [isColoredByFunction]. Provided once for the whole app, like the song's font, since every diagram of the
+ * the dots are [isColoredByFunction], and how big they are [scale]d. Provided once for the whole app, like the song's font, since every diagram of the
  * Chords section, the pinned ones and the chord's sheet follow it.
  */
 @Immutable
 internal data class ChordDiagramStyle(
     val labels: UserPreferences.ChordDotLabels = UserPreferences.ChordDotLabels.NONE,
     val isColoredByFunction: Boolean = false,
+    /** How much bigger or smaller than the app's own size a diagram of a song is drawn, see [UserPreferences.chordDiagramScale]. */
+    val scale: Float = 1f,
+    /** Set while a diagram is the question of the study mode: it then says no more than the help allows. */
+    val study: ChordStudyView? = null,
+)
+
+/**
+ * What the study mode asks of a diagram: the note of the dot at [string] and [row] (0 being the window's first fret), the one it marks,
+ * with the [help] the dots carry. It takes everything else a diagram says about the chord away: the root's color, the notes, the colors.
+ */
+@Immutable
+internal data class ChordStudyView(
+    val string: Int,
+    val row: Int,
+    val help: StudyHelp,
 )
 
 internal val LocalChordDiagramStyle = compositionLocalOf { ChordDiagramStyle() }

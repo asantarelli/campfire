@@ -16,6 +16,13 @@ import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.music_search_spotify
 import com.pandulapeter.campfire.presentation.resources.music_search_youtube
 import com.pandulapeter.campfire.presentation.resources.music_search_youtube_music
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size_description
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size_largest
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size_large
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size_larger
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size_normal
+import com.pandulapeter.campfire.presentation.resources.settings_chord_diagram_size_smaller
 import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_colors
 import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_colors_description
 import com.pandulapeter.campfire.presentation.resources.settings_chord_dot_labels
@@ -93,6 +100,26 @@ internal fun SongReadingSection(
             selected = userPreferences?.pinnedChordsPosition ?: UserPreferences.PinnedChordsPosition.RIGHT,
             isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
             onSelected = viewModel.preferencesController::setPinnedChordsPosition,
+        )
+    }
+    SettingsSubsection(
+        title = stringResource(Res.string.settings_chord_diagram_size),
+        description = stringResource(Res.string.settings_chord_diagram_size_description),
+        isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
+    ) {
+        SegmentedChoice(
+            options = UserPreferences.CHORD_DIAGRAM_SCALES.zip(
+                listOf(
+                    stringResource(Res.string.settings_chord_diagram_size_smaller),
+                    stringResource(Res.string.settings_chord_diagram_size_normal),
+                    stringResource(Res.string.settings_chord_diagram_size_larger),
+                    stringResource(Res.string.settings_chord_diagram_size_large),
+                    stringResource(Res.string.settings_chord_diagram_size_largest),
+                ),
+            ),
+            selected = userPreferences?.chordDiagramScale ?: UserPreferences.DEFAULT_CHORD_DIAGRAM_SCALE,
+            isEnabled = userPreferences?.areChordsEnabled != false && userPreferences?.areChordDiagramsEnabled != false,
+            onSelected = viewModel.preferencesController::setChordDiagramScale,
         )
     }
     SettingsSubsection(

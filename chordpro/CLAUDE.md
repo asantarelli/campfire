@@ -13,7 +13,7 @@ The [ChordPro](https://www.chordpro.org) format and the conversion of positioned
 at all**, not even Koin: stateless `object`s called directly by `:presentation`, `:domain:*`, `:data:formats`, and
 `:data:source:local:implementation`. Explicit API mode. Everything is pure and tested in `commonTest`; rules pinned by a
 test are not repeated here. Each package's rules are in its own `CLAUDE.md` (`chords`, `voicings`, `scales`, `tabs`, `edit`,
-`convert`).
+`convert`); `training` is the practice's pure side.
 
 ## Rules that span the module
 

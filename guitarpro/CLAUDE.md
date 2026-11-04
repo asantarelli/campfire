@@ -44,6 +44,9 @@ dependencies at all**, explicit API mode, stateless `object`s called by `:presen
   says how much a mark matters.
 - Signs are strokes and ellipses (`Glyphs`), not a font: nothing to bundle and no license. The staff is always a treble
   clef with an 8 under it, since a guitar sounds an octave below what it is written.
+- **A chord is its diagram, which a file may hold without a name** (an editor writes the diagram and leaves the name
+  empty): the reader keeps both (`Beat.chordShape`), and a system that has a diagram takes a band more above its staff
+  (`DIAGRAM_BAND`). Frets are kept as the neck counts them, or from the diagram's first fret; `chordDiagram` tells which.
 - A tie, a slur and a slide join notes of different measures, so one `TabPainter` lives for the whole track.
 - Measures are stretched alike to the width of the system; the last system is stretched by 1.4 at most, so a short last line
   does not spread across the page.

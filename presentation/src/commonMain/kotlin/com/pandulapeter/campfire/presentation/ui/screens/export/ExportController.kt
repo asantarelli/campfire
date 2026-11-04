@@ -25,6 +25,7 @@ import com.pandulapeter.campfire.presentation.ui.instrument.chordTuning
 import com.pandulapeter.campfire.presentation.mapper.toChordNotation
 import com.pandulapeter.campfire.presentation.ui.dialogs.DialogHost
 import com.pandulapeter.campfire.presentation.ui.dialogs.DialogType
+import com.pandulapeter.campfire.presentation.ui.dialogs.score.scoreOfSongText
 import com.pandulapeter.campfire.presentation.ui.fontScale.FontScaleController
 import com.pandulapeter.campfire.presentation.ui.instrument.storedChordShapes
 import com.pandulapeter.campfire.presentation.ui.messages.Message
@@ -185,7 +186,8 @@ internal class ExportController(
                 emptyList()
             }
             PrintSong(entry.songFileName, song?.title ?: entry.songFileName.substringBeforeLast('.'), song?.artist,
-                index = if (setlist == null) null else index + 1, transposition = transposition, song = rendered, text = content?.text, chords = chords)
+                index = if (setlist == null) null else index + 1, transposition = transposition, song = rendered, text = content?.text, chords = chords,
+                score = content?.takeIf { song?.isScore == true }?.let { scoreOfSongText(it.text) })
         }
         // Several songs are titled by the screen, which counts them in the app's language.
         return PrintSource(

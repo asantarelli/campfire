@@ -24,6 +24,7 @@ mod score_view;
 mod settings;
 mod song_list;
 mod theme;
+mod trainer;
 mod tools;
 mod viewer;
 

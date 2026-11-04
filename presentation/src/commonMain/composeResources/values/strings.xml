@@ -252,6 +252,28 @@
     <string name="songs_kind_guitar_pro">Guitar Pro score</string>
     <string name="songs_kind_chordpro">ChordPro song</string>
 
+    <!-- The neck trainer and the study mode: practice sheets that ask which note a dot of the neck or of a chord diagram is. -->
+    <string name="training_neck_title">Neck trainer</string>
+    <string name="training_neck_description">Learn where the notes are: a dot on the neck, and the note it is.</string>
+    <string name="training_neck_question">Which note is this?</string>
+    <string name="training_study_title">Study chords</string>
+    <string name="training_study_description">Learn what each finger plays: the chord with one dot marked, and the note it holds. The help goes as you get a chord right.</string>
+    <string name="training_study_question_finger">Which note does finger %1$d hold?</string>
+    <string name="training_study_question_dot">Which note does the marked dot hold?</string>
+    <string name="training_study_notes">The notes of this chord: %1$s</string>
+    <string name="training_help_fingers">Help: the fingers</string>
+    <string name="training_help_blank">No help</string>
+    <string name="training_study_empty">There are no chord shapes to study for this instrument. Pick one with strings and shapes in the chips of the Chords tab.</string>
+    <string name="training_needs_strings">Pick an instrument with a neck of frets to practice it.</string>
+    <string name="training_correct">Correct!</string>
+    <string name="training_wrong">It was %1$s.</string>
+    <string name="training_next">Next</string>
+    <string name="training_session">This session: %1$d of %2$d</string>
+    <string name="training_streak">In a row: %1$d (best %2$d)</string>
+    <string name="training_total">Every session: %1$d of %2$d</string>
+    <string name="training_open_neck">Practice the neck</string>
+    <string name="training_open_study">Study the chords</string>
+
     <!-- Setlists screen -->
     <string name="setlists">Setlists</string>
     <string name="setlists_no_data">No setlists yet</string>
@@ -389,6 +411,13 @@
     <string name="settings_song_font_monospace">Monospaced</string>
     <string name="settings_chord_dot_labels">Chord diagram dots</string>
     <string name="settings_chord_dot_labels_description">What the dots of a diagram say: nothing, the finger, the note, or its place in the chord (R root, 3 third, 5 fifth, ♭7 seventh).</string>
+    <string name="settings_chord_diagram_size">Chord diagram size</string>
+    <string name="settings_chord_diagram_size_description">How big the diagrams of a song's chords are, in the song and pinned beside it, on top of the text size.</string>
+    <string name="settings_chord_diagram_size_smaller">Smaller</string>
+    <string name="settings_chord_diagram_size_normal">Normal</string>
+    <string name="settings_chord_diagram_size_larger">Larger</string>
+    <string name="settings_chord_diagram_size_large">Large</string>
+    <string name="settings_chord_diagram_size_largest">Largest</string>
     <string name="settings_chord_dot_labels_none">Nothing</string>
     <string name="settings_chord_dot_labels_fingers">Fingers</string>
     <string name="settings_chord_dot_labels_notes">Notes</string>

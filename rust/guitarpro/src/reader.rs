@@ -402,9 +402,9 @@ impl Reader<'_> {
                 _ => (1, 1),
             };
         }
-        let mut beat = Beat { start, duration, status, notes: Vec::new(), text: None, chord: None, tempo: None, stroke: None };
+        let mut beat = Beat { start, duration, status, notes: Vec::new(), text: None, chord: None, chord_shape: None, tempo: None, stroke: None };
         if flags & 0x02 != 0 {
-            beat.chord = self.chord()?;
+            (beat.chord, beat.chord_shape) = self.chord(strings)?;
         }
         if flags & 0x04 != 0 {
             beat.text = Some(self.int_byte_size_string()?);
@@ -426,27 +426,47 @@ impl Reader<'_> {
         Ok(beat)
     }
 
-    /// The chord diagram of a beat, of which the name is what a score shows.
-    fn chord(&mut self) -> Result<Option<String>, Error> {
+    /// The chord diagram of a beat: its name, which may be empty, and its shape.
+    fn chord(&mut self, strings: usize) -> Result<(Option<String>, Option<ChordShape>), Error> {
         let is_new = self.boolean()?;
-        if !is_new {
-            let name = self.int_byte_size_string()?;
-            if self.i32()? != 0 {
-                self.skip(6 * 4)?;
-            }
-            return Ok(Some(name).filter(|name| !name.is_empty()));
-        }
         let name;
-        if self.version.major == 3 {
+        let mut shape = None;
+        if !is_new {
+            name = self.int_byte_size_string()?;
+            let first_fret = self.i32()?;
+            if first_fret != 0 {
+                shape = Some(self.chord_frets(first_fret, 6, strings)?);
+            }
+        } else if self.version.major == 3 {
             self.skip(1 + 3 + 4 * 5 + 1)?;
             name = self.byte_size_string(22)?;
-            self.skip(3 * 4 + 4 + 6 * 4 + 4 + 2 * 4 * 3 + 7 + 1)?;
+            self.skip(3 * 4)?;
+            let first_fret = self.i32()?;
+            shape = Some(self.chord_frets(first_fret, 6, strings)?);
+            self.skip(4 + 2 * 4 * 3 + 7 + 1)?;
         } else {
             self.skip(1 + 3 + 1 + 1 + 1 + 4 + 4 + 1)?;
             name = self.byte_size_string(22)?;
-            self.skip(3 + 4 + 7 * 4 + 1 + 5 * 3 + 7 + 1 + 7 + 1)?;
+            self.skip(3)?;
+            let first_fret = self.i32()?;
+            shape = Some(self.chord_frets(first_fret, 7, strings)?);
+            self.skip(1 + 5 * 3 + 7 + 1 + 7 + 1)?;
         }
-        Ok(Some(name).filter(|name| !name.is_empty()))
+        // A diagram with nothing played is not worth drawing.
+        let shape = shape.filter(|shape| shape.frets.iter().any(|&fret| fret >= 0));
+        Ok((Some(name).filter(|name| !name.is_empty()), shape))
+    }
+
+    /// The frets of a chord diagram, `stored` of them written, of which the track's `strings` are kept.
+    fn chord_frets(&mut self, first_fret: i32, stored: usize, strings: usize) -> Result<ChordShape, Error> {
+        let mut frets = Vec::new();
+        for index in 0..stored {
+            let fret = self.i32()?;
+            if index < strings.min(7) {
+                frets.push(fret);
+            }
+        }
+        Ok(ChordShape { first_fret, frets })
     }
 
     /// The effects that belong to the beat as a whole, and the direction of its strum.

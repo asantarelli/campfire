@@ -48,6 +48,7 @@ import com.pandulapeter.campfire.presentation.mapper.toChordNotation
 import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.scale_family_common
 import com.pandulapeter.campfire.presentation.resources.scales_instrument_other
+import com.pandulapeter.campfire.presentation.resources.training_open_neck
 import com.pandulapeter.campfire.presentation.resources.scales_search
 import com.pandulapeter.campfire.presentation.resources.scales_search_heading
 import com.pandulapeter.campfire.presentation.resources.scales_search_no_scale
@@ -73,6 +74,7 @@ import com.pandulapeter.campfire.presentation.ui.chrome.TOOL_PAGE_PADDING
 import com.pandulapeter.campfire.presentation.ui.components.ScrollToTopOnRequest
 import com.pandulapeter.campfire.presentation.ui.components.bleedHorizontally
 import com.pandulapeter.campfire.presentation.ui.components.bounceScrollableContent
+import com.pandulapeter.campfire.presentation.ui.components.PracticeButton
 import com.pandulapeter.campfire.presentation.ui.components.fadingTopEdge
 import com.pandulapeter.campfire.presentation.ui.components.list.listItemAnimation
 import com.pandulapeter.campfire.presentation.ui.components.only
@@ -184,6 +186,10 @@ internal fun ScalesScreen(
                         onSelected = { state.keyIndex = it },
                     )
                     ScaleLabelsToggle(labels = labels, onLabelsSelected = { state.labels = it })
+                    PracticeButton(
+                        description = stringResource(Res.string.training_open_neck),
+                        onClick = { viewModel.dialogHost.showDialog(DialogType.FretboardTrainer) },
+                    )
                 }
             }
             item(key = HEADER_KEY, span = { GridItemSpan(maxLineSpan) }, contentType = HEADER_KEY) {

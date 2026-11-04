@@ -11,6 +11,7 @@ package com.pandulapeter.campfire.guitarpro.layout
 
 import com.pandulapeter.campfire.guitarpro.draw.Anchor
 import com.pandulapeter.campfire.guitarpro.draw.Draw
+import com.pandulapeter.campfire.guitarpro.draw.Glyphs
 import com.pandulapeter.campfire.guitarpro.draw.TextStyle
 import com.pandulapeter.campfire.guitarpro.draw.Tone
 import com.pandulapeter.campfire.guitarpro.draw.textOf
@@ -77,6 +78,9 @@ internal class MeasurePainter(private val context: LayoutContext) {
         for ((position, column) in columns.withIndex()) {
             column.beat.chord?.let {
                 draws += textOf(column.x - 0.9f, first - 3.9f, it, 1.15f, Anchor.START, TextStyle.BOLD, Tone.ACCENT)
+            }
+            column.beat.chordShape?.let {
+                draws += Glyphs.chordDiagram(column.x, first - 11f, it.firstFret, it.frets)
             }
             column.beat.text?.let {
                 draws += textOf(column.x - 0.9f, first - 2.5f, it, 0.95f, Anchor.START, TextStyle.ITALIC, Tone.INK)

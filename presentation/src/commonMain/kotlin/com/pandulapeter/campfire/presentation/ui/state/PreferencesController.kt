@@ -194,6 +194,18 @@ internal class PreferencesController(
 
     fun setChordDotLabels(value: UserPreferences.ChordDotLabels) = changeUserPreferences { copy(chordDotLabels = value) }
 
+    /** Adds an answer of the neck trainer to the totals kept over every session. */
+    fun recordNeckTraining(isHit: Boolean) = changeUserPreferences {
+        copy(neckTrainerAttempts = neckTrainerAttempts + 1, neckTrainerHits = neckTrainerHits + if (isHit) 1 else 0)
+    }
+
+    /** Adds an answer of the study mode to the totals kept over every session. */
+    fun recordChordStudy(isHit: Boolean) = changeUserPreferences {
+        copy(chordStudyAttempts = chordStudyAttempts + 1, chordStudyHits = chordStudyHits + if (isHit) 1 else 0)
+    }
+
+    fun setChordDiagramScale(value: Float) = changeUserPreferences { copy(chordDiagramScale = value) }
+
     fun setChordDotsColoredByFunction(value: Boolean) = changeUserPreferences { copy(areChordDotsColoredByFunction = value) }
 
     fun setAutoScrollSpeed(value: Int) = changeUserPreferences {

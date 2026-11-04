@@ -91,6 +91,11 @@ internal data class UserPreferencesDocument(
     val autoScrollSpeed: Int = 4,
     val songFont: String = "",
     val chordDotLabels: String = "",
+    val chordDiagramScale: Float = 1f,
+    val neckTrainerHits: Int = 0,
+    val neckTrainerAttempts: Int = 0,
+    val chordStudyHits: Int = 0,
+    val chordStudyAttempts: Int = 0,
     val areChordDotsColoredByFunction: Boolean = false,
 )
 

@@ -86,6 +86,11 @@ internal fun UserPreferencesDocument.toModel() = UserPreferences(
     autoScrollSpeed = autoScrollSpeed.coerceIn(UserPreferences.MIN_AUTO_SCROLL_SPEED, UserPreferences.MAX_AUTO_SCROLL_SPEED),
     songFont = UserPreferences.SongFont.entries.firstOrNull { it.id == songFont } ?: UserPreferences.SongFont.DEFAULT,
     chordDotLabels = UserPreferences.ChordDotLabels.entries.firstOrNull { it.id == chordDotLabels } ?: UserPreferences.ChordDotLabels.NONE,
+    chordDiagramScale = UserPreferences.nearestChordDiagramScale(chordDiagramScale),
+    neckTrainerHits = neckTrainerHits.coerceAtLeast(0),
+    neckTrainerAttempts = neckTrainerAttempts.coerceAtLeast(0),
+    chordStudyHits = chordStudyHits.coerceAtLeast(0),
+    chordStudyAttempts = chordStudyAttempts.coerceAtLeast(0),
     areChordDotsColoredByFunction = areChordDotsColoredByFunction,
 )
 
@@ -146,6 +151,11 @@ internal fun UserPreferences.toDocument() = UserPreferencesDocument(
     autoScrollSpeed = autoScrollSpeed,
     songFont = songFont.id,
     chordDotLabels = chordDotLabels.id,
+    chordDiagramScale = chordDiagramScale,
+    neckTrainerHits = neckTrainerHits,
+    neckTrainerAttempts = neckTrainerAttempts,
+    chordStudyHits = chordStudyHits,
+    chordStudyAttempts = chordStudyAttempts,
     areChordDotsColoredByFunction = areChordDotsColoredByFunction,
 )
 

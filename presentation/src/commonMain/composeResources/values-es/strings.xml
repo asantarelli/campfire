@@ -252,6 +252,28 @@
     <string name="songs_kind_guitar_pro">Partitura de Guitar Pro</string>
     <string name="songs_kind_chordpro">Canción de ChordPro</string>
 
+    <!-- The neck trainer and the study mode: practice sheets that ask which note a dot of the neck or of a chord diagram is. -->
+    <string name="training_neck_title">Entrenador de mástil</string>
+    <string name="training_neck_description">Aprendé dónde están las notas: un punto en el mástil y la nota que es.</string>
+    <string name="training_neck_question">¿Qué nota es esta?</string>
+    <string name="training_study_title">Estudiar acordes</string>
+    <string name="training_study_description">Aprendé qué toca cada dedo: el acorde con un punto marcado y la nota que sostiene. La ayuda se va retirando a medida que acertás un acorde.</string>
+    <string name="training_study_question_finger">¿Qué nota sostiene el dedo %1$d?</string>
+    <string name="training_study_question_dot">¿Qué nota sostiene el punto marcado?</string>
+    <string name="training_study_notes">Las notas de este acorde: %1$s</string>
+    <string name="training_help_fingers">Ayuda: los dedos</string>
+    <string name="training_help_blank">Sin ayuda</string>
+    <string name="training_study_empty">No hay posiciones de acordes para estudiar con este instrumento. Elegí uno con cuerdas y posiciones en los chips de la pestaña Acordes.</string>
+    <string name="training_needs_strings">Elegí un instrumento con un mástil de trastes para practicarlo.</string>
+    <string name="training_correct">¡Correcto!</string>
+    <string name="training_wrong">Era %1$s.</string>
+    <string name="training_next">Siguiente</string>
+    <string name="training_session">Esta sesión: %1$d de %2$d</string>
+    <string name="training_streak">Seguidas: %1$d (mejor %2$d)</string>
+    <string name="training_total">Todas las sesiones: %1$d de %2$d</string>
+    <string name="training_open_neck">Practicar el mástil</string>
+    <string name="training_open_study">Estudiar los acordes</string>
+
     <!-- Setlists screen -->
     <string name="setlists">Repertorios</string>
     <string name="setlists_no_data">Todavía no hay repertorios</string>
@@ -389,6 +411,13 @@
     <string name="settings_song_font_monospace">Monoespaciada</string>
     <string name="settings_chord_dot_labels">Puntos de los diagramas</string>
     <string name="settings_chord_dot_labels_description">Qué dicen los puntos de un diagrama: nada, el dedo, la nota o su lugar en el acorde (R fundamental, 3 tercera, 5 quinta, ♭7 séptima).</string>
+    <string name="settings_chord_diagram_size">Tamaño de los diagramas de acordes</string>
+    <string name="settings_chord_diagram_size_description">Qué tan grandes se dibujan los diagramas de los acordes de una canción, en ella y fijados al lado, además del tamaño del texto.</string>
+    <string name="settings_chord_diagram_size_smaller">Más chicos</string>
+    <string name="settings_chord_diagram_size_normal">Normal</string>
+    <string name="settings_chord_diagram_size_larger">Más grandes</string>
+    <string name="settings_chord_diagram_size_large">Grandes</string>
+    <string name="settings_chord_diagram_size_largest">Enormes</string>
     <string name="settings_chord_dot_labels_none">Nada</string>
     <string name="settings_chord_dot_labels_fingers">Dedos</string>
     <string name="settings_chord_dot_labels_notes">Notas</string>

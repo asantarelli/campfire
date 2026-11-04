@@ -23,6 +23,9 @@ internal const val TAB_GAP = 1.2f
 /** From the top of a system to the top of its first staff: room for the markers, the chords and the notes above the staff. */
 internal const val ABOVE = 7.2f
 
+/** What a system takes more above its staff where a chord diagram is drawn there. */
+internal const val DIAGRAM_BAND = 6f
+
 /** From the notation staff to the tablature one: room for the notes and the stems under the staff. */
 internal const val BETWEEN = 4.4f
 

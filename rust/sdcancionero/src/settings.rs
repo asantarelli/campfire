@@ -51,6 +51,10 @@ impl SongOrder {
     }
 }
 
+/// The smallest and the biggest the diagrams of the chords can be drawn, as multiples of their usual size.
+pub const MIN_DIAGRAM_SIZE: f32 = 0.7;
+pub const MAX_DIAGRAM_SIZE: f32 = 2.0;
+
 /// What the dots of a chord diagram say.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DotLabels {
@@ -105,6 +109,13 @@ pub struct Settings {
     pub dot_labels: DotLabels,
     /// Whether the dots of a diagram are colored by the function of their note in the chord.
     pub dots_colored_by_function: bool,
+    /// How big the diagrams of the chords are drawn, as a multiple of the size the app starts with.
+    pub diagram_size: f32,
+    /// How the answers of the neck trainer and of the study mode have gone over every session: the right ones and all of them.
+    pub neck_hits: u32,
+    pub neck_attempts: u32,
+    pub study_hits: u32,
+    pub study_attempts: u32,
 }
 
 impl Default for Settings {
@@ -126,6 +137,11 @@ impl Default for Settings {
             song_order: SongOrder::Title,
             dot_labels: DotLabels::None,
             dots_colored_by_function: false,
+            diagram_size: 1.0,
+            neck_hits: 0,
+            neck_attempts: 0,
+            study_hits: 0,
+            study_attempts: 0,
         }
     }
 }
@@ -166,6 +182,7 @@ impl Settings {
         };
         let defaults = Settings::default();
         let boolean = |key: &str, default: bool| object.get(key).and_then(Value::as_bool).unwrap_or(default);
+        let count = |key: &str| object.get(key).and_then(Value::as_u64).map(|value| value.min(u32::MAX as u64) as u32).unwrap_or(0);
         let number = |key: &str, default: f32| object.get(key).and_then(Value::as_f64).map(|value| value as f32).unwrap_or(default);
         Some(Settings {
             columns: object.get("columns").and_then(Value::as_u64).map(|columns| (columns as usize).clamp(1, MAX_COLUMNS)).unwrap_or(defaults.columns),
@@ -191,6 +208,11 @@ impl Settings {
             song_order: SongOrder::from_key(object.get("songOrder").and_then(Value::as_str)),
             dot_labels: DotLabels::from_key(object.get("dotLabels").and_then(Value::as_str)),
             dots_colored_by_function: boolean("dotsColoredByFunction", defaults.dots_colored_by_function),
+            diagram_size: number("diagramSize", defaults.diagram_size).clamp(MIN_DIAGRAM_SIZE, MAX_DIAGRAM_SIZE),
+            neck_hits: count("neckHits"),
+            neck_attempts: count("neckAttempts"),
+            study_hits: count("studyHits"),
+            study_attempts: count("studyAttempts"),
         })
     }
 
@@ -213,6 +235,11 @@ impl Settings {
         object.insert("songOrder".into(), Value::from(self.song_order.key()));
         object.insert("dotLabels".into(), Value::from(self.dot_labels.key()));
         object.insert("dotsColoredByFunction".into(), Value::from(self.dots_colored_by_function));
+        object.insert("diagramSize".into(), Value::from(self.diagram_size as f64));
+        object.insert("neckHits".into(), Value::from(self.neck_hits));
+        object.insert("neckAttempts".into(), Value::from(self.neck_attempts));
+        object.insert("studyHits".into(), Value::from(self.study_hits));
+        object.insert("studyAttempts".into(), Value::from(self.study_attempts));
         object.insert("instrument".into(), Value::from(if self.instrument == Instrument::Ukulele { "ukulele" } else { "guitar" }));
         serde_json::to_string_pretty(&Value::Object(object)).expect("a JSON value always serializes")
     }
@@ -241,6 +268,11 @@ mod tests {
             song_order: SongOrder::ArtistGroups,
             dot_labels: DotLabels::Notes,
             dots_colored_by_function: true,
+            diagram_size: 1.5,
+            neck_hits: 12,
+            neck_attempts: 20,
+            study_hits: 3,
+            study_attempts: 4,
         };
         assert_eq!(Settings::decode(&settings.encode()), Some(settings));
     }

@@ -18,6 +18,17 @@ import com.pandulapeter.campfire.chordpro.model.CommentStyle
 import com.pandulapeter.campfire.chordpro.model.GridToken
 import com.pandulapeter.campfire.chordpro.model.SectionType
 import com.pandulapeter.campfire.data.model.preferences.PrintSettings
+import com.pandulapeter.campfire.guitarpro.model.Beat
+import com.pandulapeter.campfire.guitarpro.model.BeatStatus
+import com.pandulapeter.campfire.guitarpro.model.Duration
+import com.pandulapeter.campfire.guitarpro.model.Measure
+import com.pandulapeter.campfire.guitarpro.model.MeasureHeader
+import com.pandulapeter.campfire.guitarpro.model.Note
+import com.pandulapeter.campfire.guitarpro.model.NoteEffects
+import com.pandulapeter.campfire.guitarpro.model.NoteKind
+import com.pandulapeter.campfire.guitarpro.model.QUARTER_TICKS
+import com.pandulapeter.campfire.guitarpro.model.Score
+import com.pandulapeter.campfire.guitarpro.model.Track
 import com.pandulapeter.campfire.presentation.ui.chords.ChordDiagramGeometry
 import com.pandulapeter.campfire.presentation.ui.songLayout.DefaultSectionLabels
 import kotlinx.coroutines.test.runTest
@@ -50,6 +61,30 @@ internal class PrintLayoutTest {
     private suspend fun lyricPitch(fontSize: Int = PrintSettings().fontSize): Float {
         val texts = layout(source(song(lyrics(2))), PrintSettings(fontSize = fontSize)).pages.single().texts
         return texts.single { it.text == "Line 2" }.y - texts.single { it.text == "Line 1" }.y
+    }
+
+    private fun scoreOf(measures: Int): Score {
+        val beat = { start: Int -> Beat(start = start, duration = Duration(value = 4), status = BeatStatus.NORMAL, notes = listOf(Note(string = 1, fret = 3, kind = NoteKind.NORMAL, effects = NoteEffects()))) }
+        val headers = (0 until measures).map { MeasureHeader(numerator = 4, denominator = 4, start = QUARTER_TICKS + it * 4 * QUARTER_TICKS) }
+        val track = Track(name = "Guitar", strings = listOf(64, 59, 55, 50, 45, 40), capo = 0, isPercussion = false, measures = headers.map { header -> Measure(listOf((0 until 4).map { beat(header.start + it * QUARTER_TICKS) })) })
+        return Score(tempo = 100, headers = headers, tracks = listOf(track))
+    }
+
+    @Test fun `a score is printed as systems across the whole page, a page of them to the sheet, whatever the columns`() = runTest {
+        val song = PrintSong("score.cho", "A score", "Artist", song = null, score = scoreOf(measures = 80))
+        PrintSettings(columns = 1).let { settings ->
+            val single = layout(source(song), settings)
+            assertTrue(single.pages.size > 1)
+            val margin = settings.marginMm * 72f / 25.4f
+            val systems = single.pages.flatMap { it.scores }
+            assertTrue(systems.isNotEmpty())
+            systems.forEach { assertEquals(margin, it.x) }
+            single.pages.forEach { page -> assertTrue(page.scores.all { it.y < single.height - margin + 0.01f }) }
+            // The pages that hold only systems are pages all the same, numbered like the rest.
+            assertTrue(single.pages.drop(1).all { it.scores.isNotEmpty() })
+        }
+        val columned = layout(source(song), PrintSettings(columns = 3))
+        assertTrue(columned.pages.flatMap { it.scores }.all { it.x == columned.pages.first().scores.first().x })
     }
 
     @Test fun `long songs keep every line and chord within printable columns`() = runTest {

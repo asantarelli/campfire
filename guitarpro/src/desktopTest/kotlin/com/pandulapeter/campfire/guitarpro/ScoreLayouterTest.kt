@@ -58,6 +58,13 @@ class ScoreLayouterTest {
     }
 
     @Test
+    fun `a chord diagram is drawn over its beat, with its first fret where it starts up the neck`() {
+        val all = texts(LayoutOptions())
+        assertTrue("Am" in all)
+        assertTrue("7" in all)
+    }
+
+    @Test
     fun `the chord and the marker of a measure are written over it`() {
         val all = texts(LayoutOptions())
         assertTrue("Intro" in all)

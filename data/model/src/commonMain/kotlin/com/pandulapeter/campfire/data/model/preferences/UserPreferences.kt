@@ -238,6 +238,14 @@ data class UserPreferences(
     val chordDotLabels: ChordDotLabels = ChordDotLabels.NONE,
     /** Whether the dots of a chord diagram are colored by the function of their note in the chord. */
     val areChordDotsColoredByFunction: Boolean = false,
+    /** How big the diagrams of a song's chords are drawn, on top of the song's text size: one of [CHORD_DIAGRAM_SCALES]. */
+    val chordDiagramScale: Float = DEFAULT_CHORD_DIAGRAM_SCALE,
+    /** How the neck trainer's answers have gone over all the times it was used: the right ones and all of them. */
+    val neckTrainerHits: Int = 0,
+    val neckTrainerAttempts: Int = 0,
+    /** The same for the chord study mode. */
+    val chordStudyHits: Int = 0,
+    val chordStudyAttempts: Int = 0,
 ) {
 
     /**
@@ -272,6 +280,13 @@ data class UserPreferences(
         /** The number of columns that says the width of the window decides, which is what a song has always done. */
         const val AUTOMATIC_SONG_COLUMNS = 0
         const val MAX_SONG_COLUMNS = 4
+
+        /** The sizes a chord diagram can be drawn at, smallest first, as multiples of the one the app starts with. */
+        val CHORD_DIAGRAM_SCALES = listOf(0.8f, 1f, 1.25f, 1.5f, 1.8f)
+        const val DEFAULT_CHORD_DIAGRAM_SCALE = 1f
+
+        /** The size of [CHORD_DIAGRAM_SCALES] nearest to [scale], which is what a stored value that is none of them means. */
+        fun nearestChordDiagramScale(scale: Float) = CHORD_DIAGRAM_SCALES.minBy { kotlin.math.abs(it - scale) }
         const val MIN_AUTO_SCROLL_SPEED = 1
         const val MAX_AUTO_SCROLL_SPEED = 20
         const val DEFAULT_AUTO_SCROLL_SPEED = 4

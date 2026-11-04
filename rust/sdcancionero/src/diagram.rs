@@ -22,6 +22,8 @@ pub struct Look<'a> {
     pub is_colored: bool,
     pub strings: &'a [i32],
     pub root: Option<i32>,
+    /// The string of the dot a study question is about, which is marked and carries a question mark where the others carry nothing.
+    pub study: Option<usize>,
 }
 
 impl Look<'_> {
@@ -167,7 +169,13 @@ pub fn draw(ui: &Ui, rect: Rect, name: &str, voicing: &Voicing, colors: &SongCol
                 // The dot is as big as the room lets it where it carries a note.
                 let says_note = matches!(look.labels, DotLabels::Notes | DotLabels::Degrees);
                 let radius = if says_note { (fret_gap * 0.44).min(string_gap * 0.5) } else { (fret_gap * 0.34).min(string_gap * 0.42) };
-                painter.circle_filled(Pos2::new(x, y), radius, look.function_color(string, *fret).unwrap_or(colors.text));
+                let is_asked = look.study == Some(string);
+                painter.circle_filled(Pos2::new(x, y), radius, if is_asked { colors.chord } else { look.function_color(string, *fret).unwrap_or(colors.text) });
+                if is_asked {
+                    painter.circle_stroke(Pos2::new(x, y), radius * 1.5, Stroke::new(1.6, colors.chord));
+                    painter.text(Pos2::new(x, y), Align2::CENTER_CENTER, "?", FontId::new(radius * 1.35, theme::bold()), finger_color);
+                    continue;
+                }
                 // Without a label asked for, the fingers a song's own definition names are shown, as they always were.
                 let label = if look.labels == DotLabels::None { finger.filter(|&finger| finger > 0).map(|finger| finger.to_string()) } else { look.label(string, *fret, finger) };
                 if let Some(label) = label {

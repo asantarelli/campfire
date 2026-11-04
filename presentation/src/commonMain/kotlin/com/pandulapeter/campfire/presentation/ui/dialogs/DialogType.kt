@@ -33,6 +33,12 @@ sealed interface DialogType {
         val songSetlistFileName: String? = null,
         val songs: List<Song> = emptyList(),
     ) : DialogType
+    /** The neck trainer: which note is at a place on the neck, over and over, with what is missed coming back sooner. */
+    data object FretboardTrainer : DialogType
+
+    /** The study mode, over the chords the Chords tab lists for its key: which note a dot of a diagram holds, with less help as it is known. */
+    data object ChordStudy : DialogType
+
     /** The staff and the tablature of the Guitar Pro score a [song] holds, whose file is [bytes]: read, never written back. */
     data class GuitarProScore(val song: Song, val bytes: ByteArray) : DialogType
     data object NewSetlist : DialogType

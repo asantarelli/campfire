@@ -36,6 +36,11 @@ pub fn is_song_file_name(name: &str) -> bool {
     !is_hidden_file_name(name) && SONG_EXTENSIONS.iter().any(|extension| lower.ends_with(extension))
 }
 
+/// Whether `name` is a plain text file, which an import reads as a chord sheet where it is one.
+pub fn is_text_file_name(name: &str) -> bool {
+    !is_hidden_file_name(name) && name.to_lowercase().ends_with(".txt")
+}
+
 /// Whether `name` is a Guitar Pro score, which an import turns into a song that holds it (see `guitarpro::song`).
 pub fn is_score_file_name(name: &str) -> bool {
     let lower = name.to_lowercase();

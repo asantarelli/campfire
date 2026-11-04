@@ -12,6 +12,7 @@ package com.pandulapeter.campfire.guitarpro
 import com.pandulapeter.campfire.guitarpro.GuitarProFixtures.NAMES
 import com.pandulapeter.campfire.guitarpro.GuitarProFixtures.bytesOf
 import com.pandulapeter.campfire.guitarpro.model.Beat
+import com.pandulapeter.campfire.guitarpro.model.ChordShape
 import com.pandulapeter.campfire.guitarpro.model.Score
 import com.pandulapeter.campfire.guitarpro.reader.GuitarProException
 import com.pandulapeter.campfire.guitarpro.reader.GuitarProException.Reason
@@ -63,6 +64,20 @@ class GuitarProReaderTest {
             assertTrue(guitar.measures[3].voices[0][1].notes[0].effects.harmonic, "$name harmonic")
             assertEquals("Intro", score.headers[0].marker, name)
             assertEquals(2, guitar.capo, name)
+        }
+    }
+
+    @Test
+    fun `a chord diagram is read with its frets, named or not, in every version`() {
+        for (name in NAMES) {
+            val guitar = scoreOf(name).tracks.first()
+            val named = guitar.measures[0].voices[0][0]
+            assertEquals("Am", named.chord, name)
+            assertEquals(ChordShape(firstFret = 1, frets = listOf(0, 1, 2, 2, 0, -1)), named.chordShape, name)
+            val unnamed = guitar.measures[1].voices[0][0]
+            assertEquals(null, unnamed.chord, name)
+            assertEquals(ChordShape(firstFret = 7, frets = listOf(0, 8, 9, 9, 7, -1)), unnamed.chordShape, name)
+            assertEquals(null, guitar.measures[0].voices[0][1].chordShape, name)
         }
     }
 

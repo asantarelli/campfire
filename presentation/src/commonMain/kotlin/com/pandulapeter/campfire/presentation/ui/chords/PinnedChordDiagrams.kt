@@ -45,7 +45,8 @@ internal fun PinnedChordDiagrams(
     onChordClicked: ((String) -> Unit)?,
 ) {
     val cells = remember(chords, tuning, storedShapes) { chords.map { it to selectShape(it, tuning, storedShapes) } }
-    val cellWidth = chordCellMinWidth(tuning.instrument, PINNED_CHORDS_SCALE)
+    val scale = PINNED_CHORDS_SCALE * LocalChordDiagramStyle.current.scale
+    val cellWidth = chordCellMinWidth(tuning.instrument, scale)
     Surface(modifier = modifier, color = MaterialTheme.colorScheme.background) {
         when (position) {
             UserPreferences.PinnedChordsPosition.TOP -> LazyRow(
@@ -59,7 +60,7 @@ internal fun PinnedChordDiagrams(
                         tuning = tuning,
                         selection = selection,
                         onClick = { onChordClicked?.invoke(chord.name) },
-                        scale = PINNED_CHORDS_SCALE,
+                        scale = scale,
                     )
                 }
             }
@@ -76,7 +77,7 @@ internal fun PinnedChordDiagrams(
                         tuning = tuning,
                         selection = selection,
                         onClick = { onChordClicked?.invoke(chord.name) },
-                        scale = PINNED_CHORDS_SCALE,
+                        scale = scale,
                     )
                 }
             }
@@ -87,10 +88,10 @@ internal fun PinnedChordDiagrams(
 /** How many cells stand side by side in the panel on the right: two diagrams of a neck fit it, one of a keyboard does. */
 internal fun pinnedChordsColumns(instrument: ChordInstrument) = if (instrument.isFretted) 2 else 1
 
-/** The width of the panel on the right for [instrument]: its columns of cells and the gaps between and around them. */
-internal fun pinnedChordsPanelWidth(instrument: ChordInstrument): Dp {
+/** The width of the panel on the right for [instrument] at the player's [diagramScale]: its columns of cells and the gaps between and around them. */
+internal fun pinnedChordsPanelWidth(instrument: ChordInstrument, diagramScale: Float = 1f): Dp {
     val columns = pinnedChordsColumns(instrument)
-    return chordCellMinWidth(instrument, PINNED_CHORDS_SCALE) * columns + PINNED_CHORDS_GAP * (columns + 1)
+    return chordCellMinWidth(instrument, PINNED_CHORDS_SCALE * diagramScale) * columns + PINNED_CHORDS_GAP * (columns + 1)
 }
 
 /**

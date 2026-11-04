@@ -12,7 +12,11 @@ package com.pandulapeter.campfire.presentation.ui.print
 import com.pandulapeter.campfire.chordpro.model.ChordProBlock
 import com.pandulapeter.campfire.chordpro.model.ChordProSong
 import com.pandulapeter.campfire.data.model.preferences.PrintSettings
+import com.pandulapeter.campfire.guitarpro.layout.LayoutOptions
+import com.pandulapeter.campfire.guitarpro.layout.ScoreLayouter
+import com.pandulapeter.campfire.guitarpro.model.Score
 import com.pandulapeter.campfire.presentation.ui.chords.ChordDiagramGeometry
+import com.pandulapeter.campfire.presentation.ui.dialogs.score.firstReadableTrack
 import com.pandulapeter.campfire.presentation.ui.songLayout.balancedRowStarts
 import com.pandulapeter.campfire.presentation.ui.songLayout.joinCutSections
 import com.pandulapeter.campfire.presentation.ui.songLayout.withNumberedSections
@@ -112,7 +116,7 @@ private class PrintLayouter(
     }
 
     private fun newPage() {
-        if (pages.isNotEmpty() && pages.last().texts.isNotEmpty()) page()
+        if (pages.isNotEmpty() && pages.last().isFilled) page()
     }
 
     private fun space(amount: Float) {
@@ -166,6 +170,7 @@ private class PrintLayouter(
         val heading = printRows.wrapped(title, printRows.titleStyle).toMutableList()
         if (options.showMetadata) entry.artist?.takeIf { it.isNotBlank() }?.let { heading += printRows.wrapped(it) }
         entry.song?.let { playingDetails(entry, it).takeIf(String::isNotBlank)?.let { heading += printRows.wrapped(it, printRows.detailStyle) } }
+        entry.score?.let { return scoreSong(heading, it) }
         // The heading travels with the first segment that prints anything (a missing song's notice standing in for it),
         // or with the chord diagrams where the song has them: that segment whole where heading and segment fit a column
         // together, otherwise its first two rows, after which it flows on from under its heading. A break before the
@@ -228,6 +233,26 @@ private class PrintLayouter(
                     }
                 }
             }
+        }
+        space(options.fontSize.toFloat())
+    }
+
+    /**
+     * A score under its [heading]: its systems, one under the other across the whole of the page whatever the columns the options
+     * ask for, since a staff is read along a line and a column would cut it into pieces too short to read. A system is a unit
+     * never split; the one that does not fit starts a page of its own, so a score never flows into a second column.
+     */
+    private fun scoreSong(heading: List<Row>, score: Score) {
+        if (column > 0) page()
+        place(heading)
+        space(headingGap)
+        val space = options.fontSize * SCORE_SPACE
+        val layout = ScoreLayouter.layout(score, score.firstReadableTrack(), LayoutOptions(width = (width - 2 * margin) / space))
+        layout.systems.forEachIndexed { index, system ->
+            val systemHeight = ((layout.systems.getOrNull(index + 1)?.top ?: layout.height) - system.top) * space
+            if (y + systemHeight > bottom && y > margin) page()
+            pages.last().scores += PrintScoreSystem(system, x = margin, y = y, space = space)
+            y += systemHeight
         }
         space(options.fontSize.toFloat())
     }
@@ -311,7 +336,7 @@ private class PrintLayouter(
      * tall), so it never reaches into the margin the user chose, where printers may not print.
      */
     private fun finish(): PrintDocument {
-        val nonempty = pages.filter { it.texts.isNotEmpty() }
+        val nonempty = pages.filter { it.isFilled }
         val style = PrintStyle(size = 9, gray = 90)
         return PrintDocument(
             width = width,
@@ -323,7 +348,7 @@ private class PrintLayouter(
                 } else {
                     page.texts
                 }
-                PrintPage(texts, page.rules, page.diagrams)
+                PrintPage(texts, page.rules, page.diagrams, page.scores)
             },
         )
     }
@@ -350,9 +375,13 @@ private fun List<DiagramNamePart>.lineHeight() = maxOf { it.style.size } * 1.45f
 
 /** A page while it is being filled. */
 private class PageContent {
+    val scores = mutableListOf<PrintScoreSystem>()
     val texts = mutableListOf<PrintText>()
     val rules = mutableListOf<PrintRule>()
     val diagrams = mutableListOf<PrintDiagram>()
+
+    /** Whether anything is on it: a page of a score may hold nothing but systems. */
+    val isFilled get() = texts.isNotEmpty() || scores.isNotEmpty()
 }
 
 private fun List<Row>.height() = sumOf { it.height.toDouble() }.toFloat()
@@ -367,3 +396,6 @@ private const val FRETTED_DIAGRAM_HEIGHT = 4.4f
 private const val KEYBOARD_DIAGRAM_WIDTH = 4.75f
 private const val KEYBOARD_DIAGRAM_HEIGHT = 2.5f
 private const val DIAGRAM_GAP = 0.75f
+
+/** Points between two lines of a score's staff, in multiples of the text size: at 12 pt a little under the size the sheet draws it at, so that a page holds three or four lines of it. */
+private const val SCORE_SPACE = 0.6f

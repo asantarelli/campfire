@@ -39,6 +39,11 @@ the option). The setlist date uses the date picker's formatter in the app's lang
   changes. **Values are three spaces apart**, which lets the importer read them back one by one. `showMetadata` is the
   artist and a setlist's date and description.
 
+### Scores
+
+A Guitar Pro score is a `PrintSong.score`: `scoreSong` lays out its systems (`guitarpro`'s `ScoreLayouter`) at a staff space of
+`SCORE_SPACE` times the text size, across the page, and the renderer paints them (`PrintScoreSystem`, see `ui/dialogs/score`).
+
 ### Renderer
 
 `PrintRenderer` draws the preview and the file and measures for the layout, with the same fonts: the file is the

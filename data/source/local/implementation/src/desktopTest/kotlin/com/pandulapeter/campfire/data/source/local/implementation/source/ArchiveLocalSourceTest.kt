@@ -38,6 +38,26 @@ class ArchiveLocalSourceTest {
     }
 
     @Test
+    fun `a guitar pro score and a text file travel in an archive with the songs, in any case of their names`() = runBlocking {
+        // Not a score that reads: the archive only hands the bytes over, whatever they are, and the import decides.
+        val score = byteArrayOf(0x18, 'F'.code.toByte(), 1, 2, 3)
+        val archive = ZipWriter.write(
+            listOf(
+                ZipEntry("songs/a.cho", "{title: A}".encodeToByteArray()),
+                ZipEntry("scores/Exercises.GP5", score),
+                ZipEntry("scores/old.gp3", score),
+                ZipEntry("notes/chords.txt", "G   D\nDown by the river\n".encodeToByteArray()),
+            ),
+        )
+
+        val files = archiveLocalSource.unpack(archive = archive, maxSize = ImportLimits.MAX_IMPORT_SIZE)
+
+        assertEquals(listOf("a.cho", "Exercises.GP5", "old.gp3", "chords.txt"), files.map { it.name })
+        assertContentEquals(score, files[1].bytes)
+        assertFalse(files[1].isPlainTextByContent)
+    }
+
+    @Test
     fun `strips backslash paths the way Windows PowerShell writes them`() = runBlocking {
         val archive = ZipWriter.write(
             listOf(

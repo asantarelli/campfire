@@ -9,6 +9,7 @@
  */
 package com.pandulapeter.campfire.presentation.ui.chords
 
+import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.chordpro.model.ChordTuning
 import com.pandulapeter.campfire.chordpro.model.ChordVoicing
 import kotlin.test.Test
@@ -52,5 +53,13 @@ class ChordDiagramStyleTest {
         val geometry = chordDiagramGeometryOf(ChordVoicing.Fretted(listOf(null, 3, 2, 0, 1, 0)), ChordTuning.GUITAR, root = 0) as ChordDiagramGeometry.Fretted
         assertEquals(listOf(null, 0, 4, 7, 0, 4), geometry.pitchClasses)
         assertEquals(0, geometry.root)
+    }
+
+    @Test
+    fun `a stored diagram size that is none of the sizes is the nearest one`() {
+        assertEquals(1f, UserPreferences.nearestChordDiagramScale(1f))
+        assertEquals(1.25f, UserPreferences.nearestChordDiagramScale(1.3f))
+        assertEquals(0.8f, UserPreferences.nearestChordDiagramScale(0f))
+        assertEquals(1.8f, UserPreferences.nearestChordDiagramScale(9f))
     }
 }

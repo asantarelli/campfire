@@ -21,6 +21,10 @@
 - A score has no text to type into, so its menu entry is About the song instead of Edit song file: the title and the artist
   are what the player changes, written into the file's lines like any song's. Scores are edited in a score editor and
   imported again.
+- **A score song prints as a staff and a tablature** (`PrintSong.score`, `PrintLayouter.scoreSong`): its systems run across
+  the whole page whatever the columns and are never split, a system that does not fit starts a page of its own, and a page
+  of nothing but systems is a page like the others. They are painted by the sheet's own `drawScoreSystem` in black, in
+  points (`ScorePaintMetrics`), and are no selectable text: the fret numbers would be read back as a song.
 - The score is read when the sheet composes (`readScore`, which never throws: a failure is a reason, worded from strings).
   No `SavedDialog`: a process Android restores does not reopen it.
 - The page is one canvas to a line (`ScorePage`), so a long score draws only what is in sight; the layout is set again

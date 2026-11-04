@@ -292,8 +292,9 @@ impl Library {
         let mut seen: HashSet<String> = HashSet::new();
         for file in files {
             // A score becomes the song that holds it, named by its own title and artist as any song is.
-            let file = if names::is_score_file_name(&file.name) {
-                match Self::score_song(&file) {
+            let file = if names::is_score_file_name(&file.name) || names::is_text_file_name(&file.name) {
+                let converted = if names::is_score_file_name(&file.name) { Self::score_song(&file) } else { Self::text_song(&file) };
+                match converted {
                     Some(song) => song,
                     None => {
                         plan.skipped.push(file.name);
@@ -333,6 +334,28 @@ impl Library {
         let metadata = parser::parse(&text, ChordNotation::Standard).metadata;
         let name = names::song_file_name(metadata.artist.as_deref(), metadata.title.as_deref().unwrap_or(base));
         Some(ImportedFile { name, bytes: text.into_bytes() })
+    }
+
+    /// The song a plain text file holds: ChordPro as it is, a chord sheet converted, and `None` for a text that is neither (a README, a
+    /// licence), which nobody meant to import. A text that names no title is titled by its file.
+    fn text_song(file: &ImportedFile) -> Option<ImportedFile> {
+        let base = file.name.rsplit_once('.').map(|(base, _)| base).unwrap_or(&file.name);
+        let text = decode_library_text(&file.bytes);
+        let song = if chordpro::convert::looks_like_chordpro(&text) {
+            text
+        } else if chordpro::convert::is_chord_sheet(&text) {
+            chordpro::convert::convert_song(&text)?
+        } else {
+            return None;
+        };
+        let metadata = parser::parse(&song, ChordNotation::Standard).metadata;
+        let title = metadata.title.as_deref().map(str::trim).filter(|title| !title.is_empty());
+        let (song, title) = match title {
+            Some(title) => (song.clone(), title.to_string()),
+            None => (format!("{{title: {base}}}
+{song}"), base.to_string()),
+        };
+        Some(ImportedFile { name: names::song_file_name(metadata.artist.as_deref(), &title), bytes: song.into_bytes() })
     }
 
     /// The bytes of the file whose name is `name` under any case, which is what Windows would call the same file.
@@ -452,6 +475,46 @@ mod tests {
         let text = library.read_song("yo-practica_002.cho").unwrap().unwrap();
         let metadata = parser::parse(&text, ChordNotation::Standard).metadata;
         assert_eq!(guitarpro::song::bytes_of(&metadata.custom), Some(bytes));
+    }
+
+    #[test]
+    fn a_zip_with_a_score_and_a_text_brings_both_in_as_songs() {
+        let (_guard, library) = library();
+        let score = std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/../guitarpro/tests/fixtures/song.gp5")).unwrap();
+        let archive = archive::pack(&[
+            ("songs/a.cho".to_string(), b"{title: A}
+[G]hola
+".to_vec()),
+            ("scores/Exercises.GP5".to_string(), score),
+            ("notes/chords.txt".to_string(), b"{title: Texto}
+[Am]hola
+".to_vec()),
+        ])
+        .unwrap();
+        let report = library.import_archive(&archive, Collision::Number).unwrap();
+        assert_eq!(report.added.len(), 3, "{report:?}");
+        let songs = library.scan_songs().unwrap();
+        assert_eq!(songs.iter().filter(|song| song.is_score).count(), 1);
+    }
+
+    #[test]
+    fn a_text_is_imported_as_a_chord_sheet_where_it_is_one_and_left_out_where_it_is_not() {
+        let (_guard, library) = library();
+        let sheet = ImportedFile { name: "Sola.txt".into(), bytes: "Sola
+
+   Am        F
+Estoy aqui sentado
+   C         G
+mirando el mar
+".as_bytes().to_vec() };
+        let readme = ImportedFile { name: "README.txt".into(), bytes: b"This folder holds my songs.
+Please do not delete them.
+".to_vec() };
+        let plan = library.plan_import(vec![sheet, readme], Vec::new()).unwrap();
+        assert_eq!(plan.skipped, ["README.txt"]);
+        assert_eq!(plan.new.len(), 1);
+        let text = String::from_utf8(plan.new[0].bytes.clone()).unwrap();
+        assert!(text.contains("{title: Sola}") && text.contains("[Am]"), "{text}");
     }
 
     #[test]

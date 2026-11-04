@@ -127,6 +127,12 @@ The view model facade, the composition root, and the product rules every screen 
 - Card details after the artist are chosen per list (`songCardDetails`, `setlistCardDetails`); tempo follows the metronome
   switch (`CardDetails.isTempoShown`) without writing anything.
 
+## Chord diagram size
+
+`UserPreferences.chordDiagramScale` (one of `CHORD_DIAGRAM_SCALES`, Settings → Preferences → Song view) multiplies the size of the
+diagrams of a song's Chords section and of the pinned ones, on top of the song's text size; the strip across the top and the panel
+on the right make room for it. It reaches them through `ChordDiagramStyle.scale`. The Chords tab and the printed page keep their own sizes.
+
 ## Haptics
 
 - Only what the eye cannot easily follow, through `LocalHapticFeedback` (platform feedback and its setting; nothing on

@@ -117,6 +117,50 @@ internal object Glyphs {
         return listOf(Draw.Polyline(points, 0.17f), dot(x + 0.55f, 5.85f, 0.2f))
     }
 
+    /**
+     * A chord diagram, [top] being where the marks over its strings start and [centerX] the middle of it: the strings from the lowest at its
+     * left, five frets under a nut where it starts at the first and under the number of its first fret where it does not, a dot for a string
+     * pressed, a ring for one played open and a cross for one that is not played. [frets] are from the highest string, as the file keeps them.
+     */
+    fun chordDiagram(centerX: Float, top: Float, firstFret: Int, frets: List<Int>): List<Draw> {
+        val strings = frets.size
+        if (strings < 2) return emptyList()
+        val width = (strings - 1) * CHORD_STRING_GAP
+        val left = centerX - width / 2f
+        val gridTop = top + 0.9f
+        val gridBottom = gridTop + CHORD_ROWS * CHORD_FRET_GAP
+        val draws = mutableListOf<Draw>()
+        for (string in 0 until strings) {
+            val x = left + string * CHORD_STRING_GAP
+            draws += Draw.Line(x, gridTop, x, gridBottom, 0.07f)
+        }
+        for (row in 0..CHORD_ROWS) {
+            val y = gridTop + row * CHORD_FRET_GAP
+            draws += Draw.Line(left, y, left + width, y, if (row == 0 && firstFret <= 1) 0.25f else 0.07f)
+        }
+        if (firstFret > 1) {
+            draws += textOf(left - 0.3f, gridTop + CHORD_FRET_GAP / 2f, firstFret.toString(), 0.75f, Anchor.END, TextStyle.NORMAL, Tone.MUTED)
+        }
+        // A diagram can hold its frets from where it starts (1 is the first it shows) or as the neck counts them.
+        val base = firstFret.coerceAtLeast(1)
+        val isRelative = firstFret > 1 && frets.filter { it > 0 }.all { it < firstFret }
+        for ((index, fret) in frets.withIndex()) {
+            val x = left + (strings - 1 - index) * CHORD_STRING_GAP
+            when {
+                fret > 0 -> {
+                    val row = if (isRelative) fret - 1 else fret - base
+                    if (row in 0 until CHORD_ROWS) draws += dot(x, gridTop + (row + 0.5f) * CHORD_FRET_GAP, 0.25f)
+                }
+                fret == 0 -> draws += Draw.Ellipse(x, top + 0.4f, 0.17f, 0.17f, 0f, isFilled = false, width = 0.07f)
+                else -> {
+                    draws += Draw.Line(x - 0.15f, top + 0.25f, x + 0.15f, top + 0.55f, 0.08f)
+                    draws += Draw.Line(x - 0.15f, top + 0.55f, x + 0.15f, top + 0.25f, 0.08f)
+                }
+            }
+        }
+        return draws
+    }
+
     /** A repeat's two dots, on the spaces either side of the middle line, at [x]. */
     fun repeatDots(x: Float): List<Draw> = listOf(dot(x, 1.5f, 0.2f), dot(x, 2.5f, 0.2f))
 
@@ -139,6 +183,10 @@ internal object Glyphs {
         32 -> 3
         else -> 4
     }
+
+    private const val CHORD_STRING_GAP = 0.6f
+    private const val CHORD_FRET_GAP = 0.7f
+    private const val CHORD_ROWS = 5
 
     // The staff positions in half spaces below the top line, in the order the signs are added.
     private val SHARPS = listOf(0f, 1.5f, -0.5f, 1f, 2.5f, 0.5f, 2f)

@@ -9,6 +9,7 @@
  */
 package com.pandulapeter.campfire.presentation.ui.chords
 
+import com.pandulapeter.campfire.chordpro.training.StudyHelp
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -91,8 +92,11 @@ internal fun DrawScope.drawChordDiagram(
     style: ChordDiagramStyle = ChordDiagramStyle(),
 ) = when (geometry) {
     is ChordDiagramGeometry.Fretted -> {
-        val labels = style.labels.takeIf { it != UserPreferences.ChordDotLabels.NONE } ?: if (showsFingers) UserPreferences.ChordDotLabels.FINGERS else UserPreferences.ChordDotLabels.NONE
-        drawFretted(geometry, area, lineColor, mutedColor, rootColor, backgroundColor, textMeasurer, fontFamily, labels, style.isColoredByFunction, minimumStroke)
+        val labels = when {
+            style.study != null -> if (style.study.help == StudyHelp.BLANK) UserPreferences.ChordDotLabels.NONE else UserPreferences.ChordDotLabels.FINGERS
+            else -> style.labels.takeIf { it != UserPreferences.ChordDotLabels.NONE } ?: if (showsFingers) UserPreferences.ChordDotLabels.FINGERS else UserPreferences.ChordDotLabels.NONE
+        }
+        drawFretted(geometry, area, lineColor, mutedColor, rootColor, backgroundColor, textMeasurer, fontFamily, labels, style.isColoredByFunction && style.study == null, minimumStroke, style.study)
     }
     is ChordDiagramGeometry.Keyboard -> drawKeyboard(geometry, area, lineColor, rootColor, backgroundColor, minimumStroke)
 }
@@ -109,6 +113,7 @@ private fun DrawScope.drawFretted(
     labels: UserPreferences.ChordDotLabels,
     isColoredByFunction: Boolean,
     minimumStroke: Float,
+    study: ChordStudyView? = null,
 ) {
     // The left band is kept whether or not a base fret is named in it, so that every diagram of a row lines up.
     val left = size.width * SIDE_BAND
@@ -140,7 +145,8 @@ private fun DrawScope.drawFretted(
                 drawLine(mutedColor, Offset(x(string) - markerSize, markerY + markerSize), Offset(x(string) + markerSize, markerY - markerSize), strokeWidth = thin)
             }
             ChordDiagramGeometry.Fretted.Marker.OPEN, ChordDiagramGeometry.Fretted.Marker.OPEN_ROOT -> {
-                val isRoot = marker == ChordDiagramGeometry.Fretted.Marker.OPEN_ROOT
+                // A study question does not say which string is the root.
+                val isRoot = marker == ChordDiagramGeometry.Fretted.Marker.OPEN_ROOT && study == null
                 val ringColor = if (isRoot) rootColor else lineColor
                 val text = if (labels == UserPreferences.ChordDotLabels.NOTES || labels == UserPreferences.ChordDotLabels.DEGREES) openLabelOf(geometry, string, labels) else null
                 if (text == null) {
@@ -178,13 +184,23 @@ private fun DrawScope.drawFretted(
     }
     geometry.dots.forEach { dot ->
         val center = Offset(x(dot.string), y(dot.row))
-        val color = if (dot.isRoot) rootColor else if (isColoredByFunction) functionColorOf(geometry, dot.string, lineColor) else lineColor
+        val color = if (study != null) lineColor else if (dot.isRoot) rootColor else if (isColoredByFunction) functionColorOf(geometry, dot.string, lineColor) else lineColor
         drawCircle(color, radius = radius, center = center)
         labelOf(geometry, dot.string, dot.finger, labels)?.let {
             if (labels == UserPreferences.ChordDotLabels.FINGERS) drawFinger(textMeasurer, fontFamily, dot.finger!!, center, radius, backgroundColor) else drawLabel(textMeasurer, fontFamily, it, center, radius, backgroundColor, isBold = true)
         }
     }
+    // The dot the study mode asks about, ringed in the accent and carrying a question mark where the others carry their fingers.
+    study?.let {
+        val center = Offset(x(it.string), y(it.row))
+        drawCircle(rootColor, radius = radius, center = center)
+        drawCircle(rootColor, radius = radius * STUDY_RING, center = center, style = Stroke(thin * ROOT_RING_WIDTH))
+        drawLabel(textMeasurer, fontFamily, "?", center, radius, backgroundColor, isBold = true)
+    }
 }
+
+/** How far the ring round the dot a study question is about reaches, in dot radii. */
+private const val STUDY_RING = 1.5f
 
 /** What the dot of [string] says in [labels]: its finger, its note or its place in the chord, or nothing. */
 private fun labelOf(geometry: ChordDiagramGeometry.Fretted, string: Int, finger: Int?, labels: UserPreferences.ChordDotLabels): String? {

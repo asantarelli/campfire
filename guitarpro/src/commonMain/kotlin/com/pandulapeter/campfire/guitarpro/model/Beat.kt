@@ -21,9 +21,17 @@ public data class Beat(
     val text: String? = null,
     /** The name of the chord written over it. */
     val chord: String? = null,
+    /** The diagram of the chord written over it, which a file may hold without a name. */
+    val chordShape: ChordShape? = null,
     /** The tempo it changes to, beats a minute. */
     val tempo: Int? = null,
 )
+
+/**
+ * A chord diagram: the fret it starts at and the fret of each string from the highest, -1 for a string that is not played and 0 for one that is
+ * played open.
+ */
+public data class ChordShape(val firstFret: Int, val frets: List<Int>)
 
 public enum class BeatStatus {
     EMPTY,

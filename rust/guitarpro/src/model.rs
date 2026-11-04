@@ -86,9 +86,19 @@ pub struct Beat {
     pub text: Option<String>,
     /// The name of the chord written over it.
     pub chord: Option<String>,
+    /// The diagram of the chord written over it, which a file may hold without a name.
+    pub chord_shape: Option<ChordShape>,
     /// The tempo it changes to, beats a minute.
     pub tempo: Option<i32>,
     pub stroke: Option<Stroke>,
+}
+
+/// A chord diagram: the fret it starts at and the fret of each string from the highest, -1 for a string that is not played and 0 for one that
+/// is played open.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChordShape {
+    pub first_fret: i32,
+    pub frets: Vec<i32>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

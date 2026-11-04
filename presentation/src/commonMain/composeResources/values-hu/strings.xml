@@ -252,6 +252,28 @@
     <string name="songs_kind_guitar_pro">Guitar Pro-kotta</string>
     <string name="songs_kind_chordpro">ChordPro-dal</string>
 
+    <!-- The neck trainer and the study mode: practice sheets that ask which note a dot of the neck or of a chord diagram is. -->
+    <string name="training_neck_title">Nyaktréner</string>
+    <string name="training_neck_description">Tanuld meg, hol vannak a hangok: egy pont a nyakon, és a hang, amelyik az.</string>
+    <string name="training_neck_question">Melyik hang ez?</string>
+    <string name="training_study_title">Akkordok tanulása</string>
+    <string name="training_study_description">Tanuld meg, mit játszik minden ujj: az akkord egy megjelölt ponttal és a hang, amelyet tart. A segítség fokozatosan elmarad, ahogy eltalálod az akkordot.</string>
+    <string name="training_study_question_finger">Melyik hangot tartja a(z) %1$d. ujj?</string>
+    <string name="training_study_question_dot">Melyik hangot tartja a megjelölt pont?</string>
+    <string name="training_study_notes">Az akkord hangjai: %1$s</string>
+    <string name="training_help_fingers">Segítség: az ujjak</string>
+    <string name="training_help_blank">Segítség nélkül</string>
+    <string name="training_study_empty">Ehhez a hangszerhez nincs akkordállás a tanuláshoz. Az Akkordok lap csipjeiben válassz egy húros, állásokkal rendelkező hangszert.</string>
+    <string name="training_needs_strings">Válassz bundos nyakú hangszert a gyakorláshoz.</string>
+    <string name="training_correct">Helyes!</string>
+    <string name="training_wrong">A válasz: %1$s.</string>
+    <string name="training_next">Következő</string>
+    <string name="training_session">Ez a munkamenet: %1$d / %2$d</string>
+    <string name="training_streak">Egymás után: %1$d (legjobb: %2$d)</string>
+    <string name="training_total">Összes munkamenet: %1$d / %2$d</string>
+    <string name="training_open_neck">A nyak gyakorlása</string>
+    <string name="training_open_study">Az akkordok tanulása</string>
+
     <!-- Setlists screen -->
     <string name="setlists">Listák</string>
     <string name="setlists_no_data">Még nincsenek listák</string>
@@ -389,6 +411,13 @@
     <string name="settings_song_font_monospace">Fix szélességű</string>
     <string name="settings_chord_dot_labels">Akkordábrák pontjai</string>
     <string name="settings_chord_dot_labels_description">Mit írnak a pontok: semmit, az ujjat, a hangot vagy a helyét az akkordban (R alaphang, 3 terc, 5 kvint, ♭7 szeptim).</string>
+    <string name="settings_chord_diagram_size">Akkorddiagramok mérete</string>
+    <string name="settings_chord_diagram_size_description">Mekkorák a dal akkordjainak diagramjai a dalban és mellette kitűzve, a szövegméreten felül.</string>
+    <string name="settings_chord_diagram_size_smaller">Kisebb</string>
+    <string name="settings_chord_diagram_size_normal">Normál</string>
+    <string name="settings_chord_diagram_size_larger">Nagyobb</string>
+    <string name="settings_chord_diagram_size_large">Nagy</string>
+    <string name="settings_chord_diagram_size_largest">Legnagyobb</string>
     <string name="settings_chord_dot_labels_none">Semmit</string>
     <string name="settings_chord_dot_labels_fingers">Ujjak</string>
     <string name="settings_chord_dot_labels_notes">Hangok</string>

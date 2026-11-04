@@ -166,6 +166,8 @@ One line each; the detail is in the file named (`ui/` = `presentation/src/common
   included; 12-TET only. Scale suggestions (a switch under Scales, as Chord diagrams is under Chords) add a song's Scales
   section, one home and at most three moments to change scale for (a key, a centre, a chord), and a chord sheet's scales:
   `ui/screens/scales`, `ui/songView`, `chordpro/scales`.
+- The neck trainer (Scales tab) and the study mode (Chords tab) ask which note a dot of the neck or of a chord diagram holds, and
+  ask more of what is missed: `ui/dialogs/training`, `chordpro/training`.
 - The tuner asks for the microphone only on a tap, listens only while on screen, keeps nothing: `ui/tuner`.
 - The demo library (two songs, one setlist) is planted once on a fresh install through the import: `ui/firstRun`.
 - Under three songs, the songs list ends in a hint on pasting from a website and importing another app's songs:

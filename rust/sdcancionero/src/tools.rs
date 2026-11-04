@@ -34,12 +34,13 @@ pub enum ToolTab {
     Tuner,
     Chords,
     Scales,
+    Trainer,
 }
 
 const TIME_SIGNATURES: [(u32, u32); 8] = [(2, 4), (3, 4), (4, 4), (5, 4), (6, 8), (7, 8), (9, 8), (12, 8)];
 /// The suffixes the chord picker offers, as they are written after a root.
 const SUFFIXES: [&str; 16] = ["", "m", "7", "maj7", "m7", "sus2", "sus4", "dim", "aug", "6", "m6", "9", "add9", "m7b5", "7sus4", "5"];
-const ROOTS: [&str; 12] = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"];
+pub(crate) const ROOTS: [&str; 12] = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"];
 /// How long the tuner keeps showing a note after the sound that made it has stopped.
 const HOLD_NOTE: Duration = Duration::from_millis(700);
 const DETECTION_INTERVAL: Duration = Duration::from_millis(50);
@@ -71,6 +72,7 @@ pub struct Tools {
     scale_index: usize,
     /// Whether the dots of the neck say the degree of their note rather than its name.
     scale_degrees: bool,
+    trainer: crate::trainer::Trainer,
 }
 
 /// The metronome beside a song: its tempo and a button, so that it can be played along with the song on the screen.
@@ -190,6 +192,7 @@ impl Tools {
             scale_root: 0,
             scale_index: 0,
             scale_degrees: false,
+            trainer: crate::trainer::Trainer::default(),
         }
     }
 
@@ -238,9 +241,10 @@ impl Tools {
         self.tab = tab;
     }
 
-    pub fn show(&mut self, ui: &mut Ui, settings: &Settings, colors: &SongColors) {
+    /// Draws the tool, and answers what the practice tab was answered, for the settings to count.
+    pub fn show(&mut self, ui: &mut Ui, settings: &Settings, colors: &SongColors) -> Option<crate::trainer::Answer> {
         ui.horizontal(|ui| {
-            for (tab, label) in [(ToolTab::Metronome, "Metrónomo"), (ToolTab::Tuner, "Afinador"), (ToolTab::Chords, "Acordes"), (ToolTab::Scales, "Escalas")] {
+            for (tab, label) in [(ToolTab::Metronome, "Metrónomo"), (ToolTab::Tuner, "Afinador"), (ToolTab::Chords, "Acordes"), (ToolTab::Scales, "Escalas"), (ToolTab::Trainer, "Entrenador")] {
                 if ui.selectable_label(self.tab == tab, RichText::new(label).size(16.0)).clicked() {
                     self.set_tab(tab);
                 }
@@ -252,7 +256,9 @@ impl Tools {
             ToolTab::Tuner => self.tuner(ui, settings, colors),
             ToolTab::Chords => self.chords(ui, settings, colors),
             ToolTab::Scales => self.scales(ui, settings, colors),
+            ToolTab::Trainer => return self.trainer.show(ui, settings, colors),
         }
+        None
     }
 
     fn metronome(&mut self, ui: &mut Ui, colors: &SongColors) {
@@ -580,7 +586,7 @@ impl Tools {
     }
 }
 
-fn shown_note(note: &str, notation: ChordNotation, accidental_signs: bool) -> String {
+pub(crate) fn shown_note(note: &str, notation: ChordNotation, accidental_signs: bool) -> String {
     let shown = notation::shown_name(note, notation);
     if accidental_signs {
         notation::with_accidental_signs(&shown)
@@ -593,7 +599,7 @@ fn shown_note(note: &str, notation: ChordNotation, accidental_signs: bool) -> St
 const FRETBOARD_FRETS: u8 = 12;
 
 /// A neck seen from the front, the high string on top: a dot where a note of the scale is, the root in orange.
-fn fretboard(ui: &mut Ui, neck: &[Vec<Option<scales::FretNote>>], labels: &[String], colors: &SongColors) {
+pub(crate) fn fretboard(ui: &mut Ui, neck: &[Vec<Option<scales::FretNote>>], labels: &[String], colors: &SongColors) {
     let strings = neck.len();
     let (fret_width, string_gap, margin) = (54.0, 32.0, 30.0);
     let width = margin + (FRETBOARD_FRETS as f32 + 1.0) * fret_width;
@@ -654,7 +660,7 @@ pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongCo
         ui.label(RichText::new("La forma que define la canción.").color(colors.muted));
         ui.add_space(6.0);
         let look = look_of(settings, &tuning, None);
-        return diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, name, &voicing, colors, scale, &look));
+        return diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, name, &voicing, colors, scale * settings.diagram_size, &look));
     }
     let Some(chord) = chord::parse(name, ChordNotation::Standard) else {
         ui.label(RichText::new(format!("«{name}» no es un acorde.")).color(colors.muted));
@@ -677,7 +683,7 @@ pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongCo
     let mut tapped = None;
     ui.horizontal_wrapped(|ui| {
         for voicing in &found {
-            if let Some(frequency) = diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown_chord(name, settings), voicing, colors, scale, &look)) {
+            if let Some(frequency) = diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown_chord(name, settings), voicing, colors, scale * settings.diagram_size, &look)) {
                 tapped = Some(frequency);
             }
         }
@@ -688,7 +694,7 @@ pub fn chord_sheet(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongCo
 /// What the diagrams of the player's instrument say beyond their shape, from the settings: the notes are read against the strings
 /// of the instrument and the root of the chord.
 fn look_of<'a>(settings: &Settings, tuning: &'a Tuning, root: Option<i32>) -> diagram::Look<'a> {
-    diagram::Look { labels: settings.dot_labels, is_colored: settings.dots_colored_by_function, strings: &tuning.strings, root }
+    diagram::Look { labels: settings.dot_labels, is_colored: settings.dots_colored_by_function, strings: &tuning.strings, root, study: None }
 }
 
 /// The shape the song itself defines for the chord `name` on the player's instrument (as many strings as it has), the last of them.
@@ -716,7 +722,7 @@ pub fn pinned_chord(ui: &mut Ui, name: &str, settings: &Settings, colors: &SongC
     };
     let root = chord::parse(name, ChordNotation::Standard).map(|chord| chord.root);
     let look = look_of(settings, &tuning, root);
-    diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown, &voicing, colors, 0.85, &look))
+    diagram::card(ui, settings.is_dark, |ui| diagram::show(ui, &shown, &voicing, colors, 0.85 * settings.diagram_size, &look))
 }
 
 /// The name of a chord as the player reads it: in their notation, with the signs they chose.

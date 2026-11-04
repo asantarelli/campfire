@@ -9,6 +9,7 @@
  */
 package com.pandulapeter.campfire.presentation.ui.songView
 
+import com.pandulapeter.campfire.presentation.ui.chords.LocalChordDiagramStyle
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
 import com.pandulapeter.campfire.presentation.ui.songView.model.ScaleSuggestions
 import com.pandulapeter.campfire.presentation.ui.songView.firstSection.SongMetadataSection
@@ -317,8 +318,10 @@ internal fun SongLyrics(
         )
     }
     val chordsSection = sections.firstNotNullOfOrNull { it as? RenderSection.Chords }
-    val chordLayouts = remember(chordsSection?.cells, chordStyle, textMeasurer, density, fontScale) {
-        chordsSection?.let { ChordCellLayouts(it.cells, chordStyle, textMeasurer, density, fontScale) }
+    // The diagrams grow with the text and with the size the player asked them, which are one factor to the layouts.
+    val diagramScale = fontScale * LocalChordDiagramStyle.current.scale
+    val chordLayouts = remember(chordsSection?.cells, chordStyle, textMeasurer, density, diagramScale) {
+        chordsSection?.let { ChordCellLayouts(it.cells, chordStyle, textMeasurer, density, diagramScale) }
     }
     // Only where a fold can be toggled, which the editor's preview cannot.
     val centeringHold = if (onFoldToggled == null && chordDiagrams?.onFoldToggled == null) {

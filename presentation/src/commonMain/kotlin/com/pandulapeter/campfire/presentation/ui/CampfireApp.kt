@@ -131,10 +131,11 @@ fun CampfireApp(
     val userPreferences by viewModel.userPreferences.collectAsStateWithLifecycle()
     val arePreferencesLoaded by viewModel.preferencesController.arePreferencesLoaded.collectAsStateWithLifecycle()
     ApplyLanguagePreference(userPreferences?.language)
-    val chordDiagramStyle = remember(userPreferences?.chordDotLabels, userPreferences?.areChordDotsColoredByFunction) {
+    val chordDiagramStyle = remember(userPreferences?.chordDotLabels, userPreferences?.areChordDotsColoredByFunction, userPreferences?.chordDiagramScale) {
         ChordDiagramStyle(
             labels = userPreferences?.chordDotLabels ?: UserPreferences.ChordDotLabels.NONE,
             isColoredByFunction = userPreferences?.areChordDotsColoredByFunction == true,
+            scale = userPreferences?.chordDiagramScale ?: UserPreferences.DEFAULT_CHORD_DIAGRAM_SCALE,
         )
     }
     // Menus are counted into the view model's own overlay state rather than a global, so the key handlers and the web

@@ -32,8 +32,9 @@ internal class SystemPainter(private val context: LayoutContext) {
         val first = plan.measures.first
         val key = context.keys[first]
         val prefix = prefixWidth(options, key)
-        val notationTop = top + ABOVE
-        val tabTop = if (options.showNotation) notationTop + 4f + BETWEEN else top + ABOVE - 1f
+        val above = if (plan.measures.any { index -> context.plans[index].beats.any { it.beat.chordShape != null } }) ABOVE + DIAGRAM_BAND else ABOVE
+        val notationTop = top + above
+        val tabTop = if (options.showNotation) notationTop + 4f + BETWEEN else top + above - 1f
         val tabBottom = tabTop + (strings - 1f) * TAB_GAP
         val bottom = when {
             options.showTab -> tabBottom + if (options.showRhythm) RHYTHM else 1.5f

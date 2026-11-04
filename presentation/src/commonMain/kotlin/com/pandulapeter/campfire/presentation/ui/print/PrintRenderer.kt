@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import com.pandulapeter.campfire.presentation.ui.chords.drawChordDiagram
+import com.pandulapeter.campfire.presentation.ui.dialogs.score.ScorePaintMetrics
+import com.pandulapeter.campfire.presentation.ui.dialogs.score.ScorePalette
+import com.pandulapeter.campfire.presentation.ui.dialogs.score.drawScoreSystem
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.yield
 import kotlin.coroutines.coroutineContext
@@ -82,6 +85,18 @@ internal class PrintRenderer(
                 )
             }
             page.texts.zip(layouts.of(page)) { item, layout -> drawText(layout, topLeft = Offset(item.x, item.y)) }
+            page.scores.forEach { item ->
+                translate(item.x, item.y) {
+                    drawScoreSystem(
+                        system = item.system,
+                        space = item.space,
+                        palette = SCORE_PALETTE,
+                        textMeasurer = measurer,
+                        textStyle = TextStyle(fontFamily = textFontFamily, fontFeatureSettings = "liga=0"),
+                        metrics = ScorePaintMetrics(minimumStroke = 1f / scale, minimumText = 2f, textDensity = Density(1f, 1f)),
+                    )
+                }
+            }
             page.diagrams.forEach { diagram ->
                 translate(diagram.x, diagram.y) {
                     drawChordDiagram(
@@ -175,6 +190,9 @@ internal class PrintRenderer(
 // keyboard's other pressed keys are mixed from it and white, and lighter than the black of every other dot.
 private val DIAGRAM_ROOT_COLOR = Color(110, 110, 110)
 private val DIAGRAM_MUTED_COLOR = Color(90, 90, 90)
+
+/** A score on the page: black, its measure numbers and tempo gray, on the white the page is drawn on. */
+private val SCORE_PALETTE = ScorePalette(ink = Color.Black, muted = Color(110, 110, 110), accent = Color(40, 40, 40), background = Color.White)
 
 /** The rows of a page read out of the bitmap at a time, which is as often as an export checks whether it was cancelled. */
 private const val PDF_BAND_ROWS = 64

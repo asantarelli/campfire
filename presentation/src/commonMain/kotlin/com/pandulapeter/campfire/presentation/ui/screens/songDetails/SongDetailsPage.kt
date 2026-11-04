@@ -52,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import com.pandulapeter.campfire.data.model.preferences.UserPreferences
+import com.pandulapeter.campfire.presentation.ui.chords.LocalChordDiagramStyle
 import com.pandulapeter.campfire.presentation.ui.chords.PinnedChordDiagrams
 import com.pandulapeter.campfire.presentation.ui.songView.LocalPinnedChordsPosition
 import androidx.compose.ui.Modifier
@@ -235,7 +236,7 @@ internal fun SongDetailsPage(
         }
         // The chords the reader pinned stand beside the song rather than in it, and what they take of its height or its
         // width is padding the page already counts out of everything it measures of itself.
-        val pinnedChords = pinnedChordsOf(position = LocalPinnedChordsPosition.current, chordDiagrams = chordDiagrams, model = model)
+        val pinnedChords = pinnedChordsOf(position = LocalPinnedChordsPosition.current, chordDiagrams = chordDiagrams, model = model, diagramScale = LocalChordDiagramStyle.current.scale)
         val topPadding = PAGE_TOP_PADDING + pinnedChords.heightInset
         val stepButtonStrip = STEP_BUTTON_SIZE + STEP_BUTTON_GAP
         val pinnedEndPadding = if (pinnedChords.widthInset > 0.dp) pinnedChords.widthInset + stepButtonStrip + PAGE_HORIZONTAL_PADDING else 0.dp

@@ -9,11 +9,13 @@
  */
 package com.pandulapeter.campfire.presentation.ui.dialogs.score
 
+import com.pandulapeter.campfire.chordpro.ChordProParser
 import com.pandulapeter.campfire.data.model.importing.ImportedFile
 import com.pandulapeter.campfire.data.model.library.LibraryFiles
 import com.pandulapeter.campfire.guitarpro.model.Score
 import com.pandulapeter.campfire.guitarpro.reader.GuitarProException
 import com.pandulapeter.campfire.guitarpro.reader.GuitarProReader
+import com.pandulapeter.campfire.guitarpro.song.ScoreSongText
 
 /** Whether the file is named as a Guitar Pro score, which is shown as it is rather than imported into the library. */
 internal val ImportedFile.isGuitarProScore: Boolean
@@ -37,6 +39,12 @@ internal fun readScore(bytes: ByteArray): ScoreReading = try {
     ScoreReading.Failed(exception.reason)
 } catch (_: RuntimeException) {
     ScoreReading.Failed(GuitarProException.Reason.CORRUPT)
+}
+
+/** The score a song's text holds, or null for a song that holds none or whose file cannot be read. */
+internal fun scoreOfSongText(text: String): Score? {
+    val bytes = ScoreSongText.bytesOf(ChordProParser.parseMetadata(text).custom) ?: return null
+    return (readScore(bytes) as? ScoreReading.Read)?.score
 }
 
 /** The track a score opens on: the first that is not a drum kit, which has no strings to read. */

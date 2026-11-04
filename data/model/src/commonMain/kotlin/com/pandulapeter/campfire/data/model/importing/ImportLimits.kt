@@ -68,6 +68,7 @@ object ImportLimits {
     fun maxSizeOf(name: String) = when {
         LibraryFiles.isArchiveFileName(name) -> MAX_IMPORT_SIZE
         LibraryFiles.isDocumentFileName(name) -> MAX_DOCUMENT_FILE_SIZE
+        LibraryFiles.isScoreFileName(name) -> MAX_SCORE_FILE_SIZE
         LibraryFiles.IMPORTABLE_EXTENSIONS.any { name.endsWith(it, ignoreCase = true) } -> MAX_TEXT_FILE_SIZE
         else -> 0L
     }

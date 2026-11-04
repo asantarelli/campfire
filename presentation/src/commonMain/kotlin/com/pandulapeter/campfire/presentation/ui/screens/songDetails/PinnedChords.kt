@@ -31,9 +31,11 @@ internal class PinnedChords(
     val tuning: ChordTuning,
     val storedShapes: Map<String, String>,
     val onChordClicked: ((String) -> Unit)?,
+    /** The size the player asked the diagrams, which the strip and the panel have to make room for. */
+    val diagramScale: Float = 1f,
 ) {
-    val topInset: Dp = if (position == UserPreferences.PinnedChordsPosition.TOP) PINNED_CHORDS_STRIP_HEIGHT else 0.dp
-    val endInset: Dp = if (position == UserPreferences.PinnedChordsPosition.RIGHT) pinnedChordsPanelWidth(tuning.instrument) else 0.dp
+    val topInset: Dp = if (position == UserPreferences.PinnedChordsPosition.TOP) PINNED_CHORDS_STRIP_HEIGHT * diagramScale else 0.dp
+    val endInset: Dp = if (position == UserPreferences.PinnedChordsPosition.RIGHT) pinnedChordsPanelWidth(tuning.instrument, diagramScale) else 0.dp
 }
 
 /**
@@ -45,6 +47,7 @@ internal fun pinnedChordsOf(
     position: UserPreferences.PinnedChordsPosition,
     chordDiagrams: ChordDiagrams?,
     model: SongLyricsModel,
+    diagramScale: Float = 1f,
 ): PinnedChords? {
     val tuning = chordDiagrams?.tuning ?: return null
     if (position == UserPreferences.PinnedChordsPosition.IN_SONG || chordDiagrams.showsDefinitionsOnly) return null
@@ -55,6 +58,7 @@ internal fun pinnedChordsOf(
         tuning = tuning,
         storedShapes = chordDiagrams.storedShapes,
         onChordClicked = chordDiagrams.onChordClicked,
+        diagramScale = diagramScale,
     )
 }
 

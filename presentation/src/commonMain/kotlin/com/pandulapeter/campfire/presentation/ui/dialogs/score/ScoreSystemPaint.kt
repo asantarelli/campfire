@@ -24,6 +24,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.sp
 import com.pandulapeter.campfire.guitarpro.draw.Anchor
 import com.pandulapeter.campfire.guitarpro.draw.Draw
 import com.pandulapeter.campfire.guitarpro.draw.Point
@@ -57,6 +59,7 @@ internal fun DrawScope.drawScoreSystem(
     palette: ScorePalette,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
+    metrics: ScorePaintMetrics = ScorePaintMetrics.Screen,
 ) {
     translate(left = 0f, top = -system.top * space) {
         for (draw in system.draws) {
@@ -66,23 +69,23 @@ internal fun DrawScope.drawScoreSystem(
                     color = color,
                     start = Offset(draw.x1 * space, draw.y1 * space),
                     end = Offset(draw.x2 * space, draw.y2 * space),
-                    strokeWidth = max(draw.width * space, MIN_STROKE),
+                    strokeWidth = max(draw.width * space, metrics.minimumStroke),
                 )
 
                 is Draw.Polyline -> drawPath(
                     path = pathOf(draw.points, space, isClosed = false),
                     color = color,
-                    style = Stroke(width = max(draw.width * space, MIN_STROKE), cap = StrokeCap.Round, join = StrokeJoin.Round),
+                    style = Stroke(width = max(draw.width * space, metrics.minimumStroke), cap = StrokeCap.Round, join = StrokeJoin.Round),
                 )
 
                 is Draw.Polygon -> drawPath(path = pathOf(draw.points, space, isClosed = true), color = color, style = Fill)
                 is Draw.Ellipse -> drawPath(
                     path = pathOf(ellipsePoints(draw), space, isClosed = true),
                     color = color,
-                    style = if (draw.isFilled) Fill else Stroke(width = max(draw.width * space, MIN_STROKE)),
+                    style = if (draw.isFilled) Fill else Stroke(width = max(draw.width * space, metrics.minimumStroke)),
                 )
 
-                is Draw.Text -> drawScoreText(draw, space, color, palette, textMeasurer, textStyle)
+                is Draw.Text -> drawScoreText(draw, space, color, palette, textMeasurer, textStyle, metrics)
             }
         }
     }
@@ -114,12 +117,17 @@ private fun DrawScope.drawScoreText(
     palette: ScorePalette,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
+    metrics: ScorePaintMetrics,
 ) {
+    val size = max(draw.size * space, metrics.minimumText)
     val layout = textMeasurer.measure(
         text = draw.text,
+        density = metrics.textDensity ?: this,
+        layoutDirection = LayoutDirection.Ltr,
         style = textStyle.copy(
             color = color,
-            fontSize = max(draw.size * space, MIN_TEXT).toSp(),
+            // Where the text is measured at a density of its own (a page, whose unit is the point) the size is that unit, not a pixel count.
+            fontSize = if (metrics.textDensity == null) size.toSp() else size.sp,
             fontWeight = if (draw.style == ScoreTextStyle.BOLD) FontWeight.Bold else FontWeight.Normal,
             fontStyle = if (draw.style == ScoreTextStyle.ITALIC) FontStyle.Italic else FontStyle.Normal,
         ),

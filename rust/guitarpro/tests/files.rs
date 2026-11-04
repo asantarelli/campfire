@@ -67,6 +67,16 @@ fn check(name: &str) {
                     BeatStatus::Rest => 2,
                 };
                 assert_eq!(status, values[5].as_i64().unwrap(), "{label} status");
+                match (&beat.chord_shape, &values[7]) {
+                    (Some(shape), Value::Object(chord)) => {
+                        assert_eq!(shape.first_fret as i64, chord["first_fret"].as_i64().unwrap(), "{label} chord first fret");
+                        let frets: Vec<i64> = chord["frets"].as_array().unwrap().iter().map(|fret| fret.as_i64().unwrap()).collect();
+                        assert_eq!(shape.frets.iter().map(|&fret| fret as i64).collect::<Vec<_>>(), frets, "{label} chord frets");
+                        assert_eq!(beat.chord.as_deref().unwrap_or(""), chord["name"].as_str().unwrap(), "{label} chord name");
+                    }
+                    (None, Value::Null) => {}
+                    (shape, expected) => panic!("{label}: chord {shape:?} against {expected}"),
+                }
                 let notes = values[6].as_array().unwrap();
                 assert_eq!(beat.notes.len(), notes.len(), "{label} notes");
                 for (note, expected) in beat.notes.iter().zip(notes) {
@@ -137,4 +147,18 @@ fn a_file_whose_last_measure_lacks_the_closing_byte_is_read() {
     bytes.pop();
     let truncated = guitarpro::read(&bytes).unwrap();
     assert_eq!(truncated.headers.len(), complete.headers.len());
+}
+
+#[test]
+fn a_chord_diagram_with_no_name_is_drawn_over_its_beat() {
+    use guitarpro::draw::Draw;
+    use guitarpro::layout::{layout, Options};
+    for name in ["song.gp3", "song.gp4", "song.gp5", "song51.gp5"] {
+        let score = score_of(name);
+        let page = layout(&score, 0, &Options { width: 60.0, ..Options::default() });
+        let texts: Vec<&str> = page.systems.iter().flat_map(|system| &system.draws).filter_map(|draw| if let Draw::Text { text, .. } = draw { Some(text.as_str()) } else { None }).collect();
+        // The first fret of the diagram that starts up the neck, and the name of the one that has one.
+        assert!(texts.contains(&"7"), "{name}");
+        assert!(texts.contains(&"Am"), "{name}");
+    }
 }

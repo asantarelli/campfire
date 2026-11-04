@@ -14,6 +14,7 @@ import com.pandulapeter.campfire.presentation.ui.chrome.TOOL_GROUP_GAP
 import com.pandulapeter.campfire.presentation.ui.chrome.TOOL_PAGE_PADDING
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import com.pandulapeter.campfire.presentation.resources.Res
 import com.pandulapeter.campfire.presentation.resources.chords_common
 import com.pandulapeter.campfire.presentation.resources.chords_instrument_other
 import com.pandulapeter.campfire.presentation.resources.chords_instrument_without_diagrams
+import com.pandulapeter.campfire.presentation.resources.training_open_study
 import com.pandulapeter.campfire.presentation.resources.chords_search
 import com.pandulapeter.campfire.presentation.resources.chords_search_heading
 import com.pandulapeter.campfire.presentation.resources.chords_search_no_chord
@@ -62,6 +64,7 @@ import com.pandulapeter.campfire.presentation.ui.chords.selectShape
 import com.pandulapeter.campfire.presentation.ui.chords.shownChordName
 import com.pandulapeter.campfire.presentation.mapper.toChordNotation
 import com.pandulapeter.campfire.presentation.ui.components.ScrollToTopOnRequest
+import com.pandulapeter.campfire.presentation.ui.components.PracticeButton
 import com.pandulapeter.campfire.presentation.ui.components.fadingTopEdge
 import com.pandulapeter.campfire.presentation.ui.components.list.listItemAnimation
 import com.pandulapeter.campfire.presentation.ui.components.only
@@ -187,12 +190,18 @@ internal fun ChordsScreen(
                 focusRequests = state.searchFocusRequests,
                 onQueryChanged = { state.query = it },
             ) {
-                LibraryKeyStepper(
-                    keys = keys,
-                    selectedIndex = keyIndex,
-                    notation = notation,
-                    onSelected = { state.keyIndex = it },
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    LibraryKeyStepper(
+                        keys = keys,
+                        selectedIndex = keyIndex,
+                        notation = notation,
+                        onSelected = { state.keyIndex = it },
+                    )
+                    PracticeButton(
+                        description = stringResource(Res.string.training_open_study),
+                        onClick = { viewModel.dialogHost.showDialog(DialogType.ChordStudy) },
+                    )
+                }
             }
             val held = shown
             // An instrument without shapes says so at once, whatever the last tuning's results still hold.
